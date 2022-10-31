@@ -20,6 +20,10 @@ module.exports = {
       zlib: require.resolve("browserify-zlib"),
       buffer: require.resolve("buffer/"),
       assert: require.resolve("assert/"),
+      path: require.resolve("path-browserify"),
+      crypto: require.resolve("crypto-browserify"),
+      timers: require.resolve("timers-browserify"),
+      fs: false,
     },
   },
   // 기본이 될 파일명

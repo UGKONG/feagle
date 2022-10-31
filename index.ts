@@ -1,12 +1,13 @@
 import express from "express";
 import cors from "cors";
 import env from "dotenv";
-import { crnView } from "./controllers/view";
-import appStartFunction from "./controllers/appStartFunction";
+import view from "./controllers/view";
+import serverStart from "./functions/serverStart";
 import viewRoutes from "./routes/view.json";
-import versionRoute from "./routes/version";
+import testRoute from "./routes/test";
 
 const app = express();
+const port = process.env.SERVER_PORT || 8080;
 const multipartMiddleware = require("connect-multiparty")();
 
 // Setting
@@ -17,10 +18,10 @@ app.use(express.json());
 // Router
 const absolutePath: string = __dirname + "/build";
 app.use(express.static(absolutePath));
-viewRoutes.forEach((path: string) => app.get(path, crnView));
+viewRoutes.forEach((path: string) => app.get(path, view));
 
 // Api
-app.use("/api/version", multipartMiddleware, versionRoute);
+app.use("/api/test", multipartMiddleware, testRoute);
 
 // Start
-app.listen(process.env.SERVER_PORT, appStartFunction);
+app.listen(port, serverStart);

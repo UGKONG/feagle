@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
 import fs from "fs";
 
-export const crnView = (req: Request, res: Response) => {
+const view = (req: Request, res: Response) => {
   const filePath: string = __dirname + "/../view/index.html";
 
   const errorMessage: string = filePath || "알 수 없는 페이지입니다.";
@@ -11,3 +11,5 @@ export const crnView = (req: Request, res: Response) => {
     res.status(200).send(html);
   });
 };
+
+export default view;

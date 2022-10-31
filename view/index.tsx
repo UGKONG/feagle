@@ -1,7 +1,8 @@
-import React from "react";
+import _React from "react";
 import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
-import useStore from "../hooks/useStore";
+import { BrowserRouter as Router } from "react-router-dom";
+import store from "../functions/store";
 import App from "./App";
 import "./index.scss";
 
@@ -9,8 +10,10 @@ const rootNode = document.querySelector("#root");
 
 if (rootNode) {
   createRoot(rootNode).render(
-    <Provider store={useStore}>
-      <App />
+    <Provider store={store}>
+      <Router>
+        <App />
+      </Router>
     </Provider>
   );
 } else {
