@@ -5,6 +5,7 @@ import view from "./controllers/view";
 import serverStart from "./functions/serverStart";
 import viewRoutes from "./routes/view.json";
 import testRoute from "./routes/test";
+import masterRouter from "./routes/master";
 
 const app = express();
 const port = process.env.SERVER_PORT || 8080;
@@ -22,6 +23,7 @@ viewRoutes.forEach((path: string) => app.get(path, view));
 
 // Api
 app.use("/api/test", multipartMiddleware, testRoute);
+app.use("/api/master", multipartMiddleware, masterRouter);
 
 // Start
 app.listen(port, serverStart);

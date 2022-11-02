@@ -1,4 +1,5 @@
 import { createStore } from "redux";
+import { Master, MasterAuth, OrNull } from "../types";
 
 // Store Dispatch Interface
 interface Dispatch {
@@ -8,12 +9,14 @@ interface Dispatch {
 
 // Store State Interface
 export interface Store {
-  number: number;
+  master: OrNull<Master>;
+  masterAuth: OrNull<MasterAuth>;
 }
 
 // Store Current State
 const currentState: Store = {
-  number: 1,
+  master: null,
+  masterAuth: null,
 };
 
 // Store Reducer
