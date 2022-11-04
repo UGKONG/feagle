@@ -8,13 +8,27 @@ export type sn = s | number;
 export type P<T = v> = Promise<T>;
 export type OrNull<T> = T | null;
 
+// 성별 (1 - 남자 / 2 - 여자)
+export type Gender = 1 | 2;
+// 권한 유형 (1 - 전체관리자 / 2 - 장비 유지보수 담당자 / 3 - 현황 조회 담당자 / 4 - 영업 담당자)
+export type Auth = 1 | 2 | 3 | 4;
+// 여부 (0 - No / 1 - Yes)
+export type IsYes = 0 | 1;
+// 모바일 운영체제
+export type Os = "android" | "ios";
+// 장비 데이터 구분 필드 (1 - 가스잔량 / 2 - 가스압력 / 3 - 가스유량 / 4 - 누적사용시간 / 5 - 플라즈마 전류)
+export type UseDeviceDataType = 1 | 2 | 3 | 4 | 5;
+// 액터 구분 (1 - 장비 / 2 - 마스터 / 3 - 매니저 / 4 - 회원)
+export type ActorType = 1 | 2 | 3 | 4;
+// 로그 구분 (1 - API / 2 - )
+export type LogType = 1;
+
 // 공통코드 테이블
 export interface CommonCode {
   COMM_SQ: n;
   COMM_GRP: n;
   COMM_CODE: n;
   COMM_NM: s;
-  COMM_DESC: s;
 }
 
 // 샵 테이블
@@ -23,6 +37,7 @@ export interface Shop {
   SHOP_NM: s;
   SHOP_NUM: s;
   SHOP_ADD: s;
+  IS_DEL: IsYes;
   SHOP_MOD_DT: s;
   SHOP_CRT_DT: s;
 }
@@ -56,11 +71,15 @@ export interface Device {
 // 마스터 테이블 (피글 관계자들)
 export interface Master {
   MST_SQ: n;
-  SHOP_SQ: n;
   MST_NM: s;
   MST_NUM: s;
-  AUTH_SQ: n;
-  IS_DEL: n;
+  MST_GRP: s;
+  MST_PO: s;
+  MST_GD: Gender;
+  MST_ID: s;
+  MST_PW: s;
+  AUTH_SQ: Auth;
+  IS_DEL: IsYes;
   MST_MOD_DT: s;
   MST_CRT_DT: s;
 }
@@ -71,8 +90,8 @@ export interface MasterAuth {
   SHOP_SQ: n;
   MST_NM: s;
   MST_NUM: s;
-  AUTH_SQ: n;
-  IS_DEL: n;
+  AUTH_SQ: Auth;
+  IS_DEL: IsYes;
   MST_MOD_DT: s;
   MST_CRT_DT: s;
 }
@@ -83,22 +102,26 @@ export interface Manager {
   SHOP_SQ: n;
   MNG_NM: s;
   MNG_NUM: s;
-  OS: s;
+  MNG_ID: s;
+  MNG_PW: s;
+  OS: Os;
   UUID: s;
-  IS_DEL: n;
+  IS_DEL: IsYes;
   MNG_MOD_DT: s;
   MNG_CRT_DT: s;
 }
 
 // 회원 테이블 (피부샵의 회원들)
-export interface Manager {
+export interface Member {
   MEM_SQ: n;
   SHOP_SQ: n;
   MEM_NM: s;
   MEM_NUM: s;
-  OS: s;
+  MEM_ID: s;
+  MEM_PW: s;
+  OS: Os;
   UUID: s;
-  IS_DEL: n;
+  IS_DEL: IsYes;
   MEM_MOD_DT: s;
   MEM_CRT_DT: s;
 }
@@ -117,7 +140,7 @@ export interface UseDevice {
 export interface UseDeviceData {
   UDD_SQ: n;
   DEVICE_SQ: n;
-  UDD_TP: n;
+  UDD_TP: UseDeviceDataType;
   UDD_VAL: n;
   UDD_CRT_DT: s;
 }
@@ -126,7 +149,7 @@ export interface UseDeviceData {
 export interface GasReq {
   GR_SQ: n;
   SHOP_SQ: n;
-  GR_STT: n;
+  GR_STT: IsYes;
   GR_DT: s;
   GR_MOD_DT: s;
   GR_CRT_DT: s;
@@ -162,8 +185,8 @@ export interface File {
 // 다운로드 로그 테이블
 export interface GetLog {
   GET_SQ: n;
-  GET_TP: n;
   FILE_SQ: n;
+  ACT_TP: ActorType;
   ACT_SQ: n;
   GET_CRT_DT: s;
 }
@@ -180,7 +203,7 @@ export interface VersionLog {
 // 로그 테이블
 export interface Log {
   LOG_SQ: n;
-  LOG_TP: n;
+  LOG_TP: LogType;
   LOG_TXT: s;
   LOG_CRT_DT: s;
 }
