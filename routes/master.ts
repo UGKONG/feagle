@@ -1,8 +1,11 @@
 import { Router } from "express";
-import { getMaster, getMasterAuth } from "../controllers/master";
+import { getMasterList, getMaster, postMaster } from "../controllers/master";
 
 const masterRouter = Router();
 
-masterRouter.get("/", getMaster).get("/auth", getMasterAuth);
+masterRouter
+  .get("/", getMasterList)
+  .get("/:masterSq", getMaster)
+  .post("/", postMaster);
 
 export default masterRouter;
