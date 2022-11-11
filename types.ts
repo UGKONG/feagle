@@ -126,10 +126,21 @@ export interface Member {
   MEM_CRT_DT: s;
 }
 
+// 장비 ON/OFF 테이블 (장비 ON/OFF 내역 / <ON, OFF>)
+export interface AliveDevice {
+  AL_SQ: n;
+  DEVICE_SQ: n;
+  AL_ON: a;
+  AL_OFF: s;
+  AL_MOD_DT: s;
+  AL_CRT_DT: s;
+}
+
 // 장비 사용 테이블 (장비 사용 내역 / <시작, 종료>)
 export interface UseDevice {
   UD_SQ: n;
   DEVICE_SQ: n;
+  UD_MODE: a;
   UD_START: s;
   UD_END: s;
   UD_MOD_DT: s;
