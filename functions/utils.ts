@@ -190,10 +190,10 @@ export const useDatabase = (
   sqlParams?: Array<string | number>
 ): Promise<ConnectionReturn> => {
   const config: ConnectionConfig = {
-    host: process.env.DB_HOST ?? "",
-    user: process.env.DB_USER ?? "",
-    password: process.env.DB_PASSWORD ?? "",
-    database: process.env.DB_DATABASE ?? "",
+    host: process.env.DB_HOST as string,
+    user: process.env.DB_USER as string,
+    password: process.env.DB_PASSWORD as string,
+    database: process.env.DB_DATABASE as string,
     dateStrings: true,
     multipleStatements: true,
   };

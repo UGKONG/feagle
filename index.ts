@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import { programName } from "./string";
 import serverStart from "./functions/serverStart";
 import view from "./functions/view";
 import apiLogger from "./middlewares/apiLogger";
@@ -25,7 +26,7 @@ const multiparty = require("connect-multiparty")();
 const session = require("express-session");
 const MySQLStore = require("express-mysql-session")(session);
 const sessionConfig = session({
-  secret: "feagle",
+  secret: programName,
   resave: false,
   saveUninitialized: true,
   rolling: true,
@@ -36,11 +37,11 @@ const sessionConfig = session({
     maxAge: 60 * 60 * 1000 * 2, // 2시간 세션 유지
   },
   store: new MySQLStore({
-    host: "db.pcmania1.gabia.io",
-    port: 3306,
-    user: "pcmania1",
-    password: "liansoft1!",
-    database: "dbpcmania1",
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_DATABASE,
   }),
 });
 

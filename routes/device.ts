@@ -11,9 +11,9 @@ const deviceRouter = Router();
 
 deviceRouter
   .get("/", getDeviceList)
-  .get("/:deviceSq", getDeviceDetail)
+  .get("/:DEVICE_SQ", getDeviceDetail)
   .post("/", postDevice)
-  .put("/:deviceSq", putDevice)
-  .delete("/:deviceSq", deleteDevice);
+  .put("/:DEVICE_SQ", putDevice)
+  .delete("/:DEVICE_SQ", deleteDevice);
 
 export default deviceRouter;

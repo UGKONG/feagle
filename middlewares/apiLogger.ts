@@ -5,7 +5,7 @@ const apiLogger = (req: Request, res: Response, next: NextFunction) => {
   const parameters = { ...params, ...query, ...body };
   const result = `
 ${method} ${path}
-${JSON.stringify(parameters)}
+PARAMS ${JSON.stringify(parameters)}
 `;
   console.log(result);
   next();
