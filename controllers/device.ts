@@ -4,7 +4,7 @@ import { errorMessage } from "../string";
 import type { Device } from "../types";
 
 // 조회 공통 쿼리
-const deviceListQuery = `
+const deviceCommonQuery = `
   SELECT
   a.DEVICE_SQ, a.MDL_SQ, b.MDL_NM, b.MDL_EN_NM, b.MDL_DESC,
   a.SHOP_SQ, c.SHOP_NM, a.DEVICE_SN, a.DEVICE_NM, a.DEVICE_SW_VN, a.DEVICE_FW_VN,
@@ -17,7 +17,7 @@ const deviceListQuery = `
 
 // 장비 리스트 조회
 export const getDeviceList = async (req: Request, res: Response) => {
-  const { error, result } = await useDatabase(deviceListQuery);
+  const { error, result } = await useDatabase(deviceCommonQuery);
 
   if (error) return res.send(fail(errorMessage.db));
   res.send(success(result));
@@ -30,7 +30,7 @@ export const getDeviceDetail = async (req: Request, res: Response) => {
 
   const { error, result } = await useDatabase(
     `
-    ${deviceListQuery} AND a.DEVICE_SQ = ?
+    ${deviceCommonQuery} AND a.DEVICE_SQ = ?
   `,
     [DEVICE_SQ]
   );
@@ -42,16 +42,15 @@ export const getDeviceDetail = async (req: Request, res: Response) => {
 
 // 장비 추가
 export const postDevice = async (req: Request, res: Response) => {
-  const {
-    MDL_SQ,
-    SHOP_SQ,
-    DEVICE_SN,
-    DEVICE_NM,
-    DEVICE_SW_VN,
-    DEVICE_FW_VN,
-    DEVICE_BUY_DT,
-    DEVICE_INSTL_DT,
-  }: Device = req?.body;
+  const MDL_SQ = req?.query?.MDL_SQ ?? req?.body?.MDL_SQ;
+  const SHOP_SQ = req?.query?.SHOP_SQ ?? req?.body?.SHOP_SQ;
+  const DEVICE_SN = req?.query?.DEVICE_SN ?? req?.body?.DEVICE_SN;
+  const DEVICE_NM = req?.query?.DEVICE_NM ?? req?.body?.DEVICE_NM;
+  const DEVICE_SW_VN = req?.query?.DEVICE_SW_VN ?? req?.body?.DEVICE_SW_VN;
+  const DEVICE_FW_VN = req?.query?.DEVICE_FW_VN ?? req?.body?.DEVICE_FW_VN;
+  const DEVICE_BUY_DT = req?.query?.DEVICE_BUY_DT ?? req?.body?.DEVICE_BUY_DT;
+  const DEVICE_INSTL_DT =
+    req?.query?.DEVICE_INSTL_DT ?? req?.body?.DEVICE_INSTL_DT;
 
   // Validate
   const valid1 =
@@ -94,16 +93,15 @@ export const postDevice = async (req: Request, res: Response) => {
 // 장비 정보 수정
 export const putDevice = async (req: Request, res: Response) => {
   const DEVICE_SQ = req?.params?.DEVICE_SQ;
-  const {
-    MDL_SQ,
-    SHOP_SQ,
-    DEVICE_SN,
-    DEVICE_NM,
-    DEVICE_SW_VN,
-    DEVICE_FW_VN,
-    DEVICE_BUY_DT,
-    DEVICE_INSTL_DT,
-  }: Device = req?.body;
+  const MDL_SQ = req?.query?.MDL_SQ ?? req?.body?.MDL_SQ;
+  const SHOP_SQ = req?.query?.SHOP_SQ ?? req?.body?.SHOP_SQ;
+  const DEVICE_SN = req?.query?.DEVICE_SN ?? req?.body?.DEVICE_SN;
+  const DEVICE_NM = req?.query?.DEVICE_NM ?? req?.body?.DEVICE_NM;
+  const DEVICE_SW_VN = req?.query?.DEVICE_SW_VN ?? req?.body?.DEVICE_SW_VN;
+  const DEVICE_FW_VN = req?.query?.DEVICE_FW_VN ?? req?.body?.DEVICE_FW_VN;
+  const DEVICE_BUY_DT = req?.query?.DEVICE_BUY_DT ?? req?.body?.DEVICE_BUY_DT;
+  const DEVICE_INSTL_DT =
+    req?.query?.DEVICE_INSTL_DT ?? req?.body?.DEVICE_INSTL_DT;
 
   // Validate
   const valid1 =

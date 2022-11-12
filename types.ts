@@ -13,6 +13,11 @@ export type Gender = 1 | 2;
 
 // 권한 유형 (1 - 전체관리자 / 2 - 장비 유지보수 담당자 / 3 - 현황 조회 담당자 / 4 - 영업 담당자)
 export type Auth = 1 | 2 | 3 | 4;
+export type AuthText =
+  | "전체 관리자"
+  | "장비 유지보수 담당자"
+  | "현황 조회 담당자"
+  | "영업 담당자";
 
 // 여부 (0 - No / 1 - Yes)
 export type IsYes = 0 | 1;
@@ -92,6 +97,7 @@ export interface Master {
   MST_ID: s;
   MST_PW: s;
   AUTH_SQ: Auth;
+  AUTH_TEXT?: s;
   IS_DEL: IsYes;
   MST_MOD_DT?: s;
   MST_CRT_DT?: s;

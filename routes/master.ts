@@ -1,11 +1,23 @@
 import { Router } from "express";
-import { getMasterList, getMaster, postMaster } from "../controllers/master";
+import {
+  getMasterList,
+  getMasterDetail,
+  postMaster,
+  putMaster,
+  deleteMaster,
+  getMasterIdDuplicateCheck,
+  postLogin,
+} from "../controllers/master";
 
 const masterRouter = Router();
 
 masterRouter
   .get("/", getMasterList)
-  .get("/:masterSq", getMaster)
-  .post("/", postMaster);
+  .get("/duplicate", getMasterIdDuplicateCheck)
+  .get("/:MST_SQ", getMasterDetail)
+  .post("/", postMaster)
+  .post("/login", postLogin)
+  .put("/:MST_SQ", putMaster)
+  .delete("/:MST_SQ", deleteMaster);
 
 export default masterRouter;
