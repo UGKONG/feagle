@@ -29,7 +29,9 @@ export const getNewVersion = async (req: Request, res: Response) => {
 
 // 현재 버전 정보 저장 (장비 -> 서버)
 export const postVersion = async (req: Request, res: Response) => {
-  const { DEVICE_SN, DEVICE_SW_VN, DEVICE_FW_VN } = req?.body;
+  const DEVICE_SN = req?.query?.DEVICE_SN ?? req?.body?.DEVICE_SN;
+  const DEVICE_SW_VN = req?.query?.DEVICE_SW_VN ?? req?.body?.DEVICE_SW_VN;
+  const DEVICE_FW_VN = req?.query?.DEVICE_FW_VN ?? req?.body?.DEVICE_FW_VN;
   const valid = DEVICE_SN && DEVICE_SW_VN && DEVICE_FW_VN;
   if (!valid) return res.send(fail(errorMessage.parameter));
 
@@ -73,7 +75,9 @@ export const postVersion = async (req: Request, res: Response) => {
 
 // 해당 버전 파일 다운로드
 export const postVersionDownload = async (req: Request, res: Response) => {
-  const { DEVICE_SN, TP, VN } = req?.query ?? req?.body;
+  const DEVICE_SN = req?.query?.DEVICE_SN ?? req?.body?.DEVICE_SN;
+  const TP = req?.query?.TP ?? req?.body?.TP;
+  const VN = req?.query?.VN ?? req?.body?.VN;
   const valid = DEVICE_SN && TP && VN;
   const POST_TP = TP === "sw" ? 4 : TP === "fw" ? 5 : 0;
   if (!valid || !POST_TP) return res.send(fail(errorMessage.parameter));
@@ -115,7 +119,8 @@ export const postVersionDownload = async (req: Request, res: Response) => {
 
 // 장비 On 정보 저장
 export const postOn = async (req: Request, res: Response) => {
-  const { DEVICE_SN, DT } = req?.body;
+  const DEVICE_SN = req?.query?.DEVICE_SN ?? req?.body?.DEVICE_SN;
+  const DT = req?.query?.DT ?? req?.body?.DT;
   const valid = DEVICE_SN && DT;
   if (!valid || DT?.length !== 19) {
     return res.send(fail(errorMessage.parameter));
@@ -136,7 +141,8 @@ export const postOn = async (req: Request, res: Response) => {
 
 // 장비 Off 정보 저장
 export const postOff = async (req: Request, res: Response) => {
-  const { DEVICE_SN, DT } = req?.body;
+  const DEVICE_SN = req?.query?.DEVICE_SN ?? req?.body?.DEVICE_SN;
+  const DT = req?.query?.DT ?? req?.body?.DT;
   const valid = DEVICE_SN && DT;
   if (!valid || DT?.length !== 19) {
     return res.send(fail(errorMessage.parameter));
@@ -148,7 +154,7 @@ export const postOff = async (req: Request, res: Response) => {
       SELECT AL_SQ FROM tb_alive_device
       WHERE DEVICE_SQ = (
         SELECT DEVICE_SQ FROM tb_device WHERE DEVICE_SN = ? LIMIT 1
-      ) AND (AL_ON IS NOT NULL) AND (AL_OFF IS NULL)
+      )
       ORDER BY AL_SQ DESC LIMIT 1
     );
 
@@ -163,7 +169,8 @@ export const postOff = async (req: Request, res: Response) => {
 
 // 장비 Alive 정보 저장
 export const postAlive = async (req: Request, res: Response) => {
-  const { DEVICE_SN, DT } = req?.body;
+  const DEVICE_SN = req?.query?.DEVICE_SN ?? req?.body?.DEVICE_SN;
+  const DT = req?.query?.DT ?? req?.body?.DT;
   const valid = DEVICE_SN && DT;
   if (!valid || DT?.length !== 19) {
     return res.send(fail(errorMessage.parameter));
@@ -171,9 +178,17 @@ export const postAlive = async (req: Request, res: Response) => {
 
   const { error } = await useDatabase(
     `
-  
+    SET @AL_SQ = (
+      SELECT AL_SQ FROM tb_alive_device
+      WHERE DEVICE_SQ = (
+        SELECT DEVICE_SQ FROM tb_device WHERE DEVICE_SN = ? LIMIT 1
+      )
+      ORDER BY AL_SQ DESC LIMIT 1
+    );
+
+    UPDATE tb_alive_device SET AL_OFF = ? WHERE AL_SQ = @AL_SQ;
   `,
-    []
+    [DEVICE_SN, DT]
   );
 
   if (error) return res.send(fail(errorMessage.db));
@@ -182,18 +197,24 @@ export const postAlive = async (req: Request, res: Response) => {
 
 // 사용 시작 일시 저장
 export const postStart = async (req: Request, res: Response) => {
-  const { DEVICE_SN, UD_MODE, UD_TIME, UD_START } = req?.body;
+  const DEVICE_SN = req?.query?.DEVICE_SN ?? req?.body?.DEVICE_SN;
+  const UD_MODE = req?.query?.UD_MODE ?? req?.body?.UD_MODE;
+  const UD_TIME = req?.query?.UD_TIME ?? req?.body?.UD_TIME;
+  const UD_START = req?.query?.UD_START ?? req?.body?.UD_START;
   const valid1 = DEVICE_SN && UD_TIME;
   const valid2 = 0 < UD_MODE && UD_MODE <= 10 && UD_START?.length === 19;
   if (!valid1 || !valid2) {
     return res.send(fail(errorMessage.parameter));
   }
 
-  const { error } = await useDatabase(
+  const { error, result } = await useDatabase(
     `
-  
+    INSERT INTO tb_use_device
+    (DEVICE_SQ, UD_MODE, UD_TIME, UD_START)
+    SELECT DEVICE_SQ, ?, ?, ?
+    FROM tb_device WHERE DEVICE_SN = ?;
   `,
-    []
+    [UD_MODE, UD_TIME, UD_START, DEVICE_SN]
   );
 
   if (error) return res.send(fail(errorMessage.db));
@@ -202,7 +223,8 @@ export const postStart = async (req: Request, res: Response) => {
 
 // 사용 종료 일시 저장
 export const postEnd = async (req: Request, res: Response) => {
-  const { DEVICE_SN, UD_END } = req?.body;
+  const DEVICE_SN = req?.query?.DEVICE_SN ?? req?.body?.DEVICE_SN;
+  const UD_END = req?.query?.UD_END ?? req?.body?.UD_END;
   const valid = DEVICE_SN && UD_END && UD_END?.length === 19;
   if (!valid) {
     return res.send(fail(errorMessage.parameter));
@@ -210,9 +232,17 @@ export const postEnd = async (req: Request, res: Response) => {
 
   const { error } = await useDatabase(
     `
-  
+    SET @UD_SQ = (
+      SELECT UD_SQ FROM tb_use_device
+      WHERE DEVICE_SQ = (
+        SELECT DEVICE_SQ FROM tb_device WHERE DEVICE_SN = ? LIMIT 1
+      )
+      ORDER BY UD_SQ DESC LIMIT 1
+    );
+
+    UPDATE tb_use_device SET UD_END = ? WHERE UD_SQ = @UD_SQ;
   `,
-    []
+    [DEVICE_SN, UD_END]
   );
 
   if (error) return res.send(fail(errorMessage.db));
@@ -221,7 +251,8 @@ export const postEnd = async (req: Request, res: Response) => {
 
 // 데이터 저장
 export const postUse = async (req: Request, res: Response) => {
-  const { DEVICE_SN, UDD_TP } = req?.body;
+  const DEVICE_SN = req?.query?.DEVICE_SN ?? req?.body?.DEVICE_SN;
+  const UDD_TP = req?.query?.UDD_TP ?? req?.body?.UDD_TP;
   const UDD_VAL = Number(req?.body?.UDD_VAL) ?? 0;
   const valid = DEVICE_SN && 0 < UDD_TP && Number(UDD_TP) <= 5;
   if (!valid || isNaN(UDD_VAL)) {
@@ -230,9 +261,12 @@ export const postUse = async (req: Request, res: Response) => {
 
   const { error } = await useDatabase(
     `
-  
+    INSERT INTO tb_use_device_data
+    (DEVICE_SQ, UDD_TP, UDD_VAL)
+    SELECT DEVICE_SQ, ?, ?
+    FROM tb_device WHERE DEVICE_SN = ? LIMIT 1
   `,
-    []
+    [UDD_TP, UDD_VAL, DEVICE_SN]
   );
 
   if (error) return res.send(fail(errorMessage.db));
