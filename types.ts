@@ -35,10 +35,10 @@ export type ActorType = 1 | 2 | 3 | 4;
 export type LogType = 1;
 
 // 장비 모드 (1 ~ 10)
-export type DeviceMode = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10
+export type DeviceMode = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
 
 // 자료 구분 (1 - 매뉴얼 / 2 - 가이드 / 3 - 유틸리티 / 4 - 소프트웨어 / 5 - 펌웨어)
-export type PostType = 1 | 2 | 3 | 4 | 5
+export type PostType = 1 | 2 | 3 | 4 | 5;
 
 // 공통코드 테이블
 export interface CommonCode {
@@ -151,6 +151,7 @@ export interface Member {
 export interface AliveDevice {
   AL_SQ?: n;
   DEVICE_SQ: n;
+  AL_ALIVE?: s;
   AL_ON: s;
   AL_OFF: s;
   AL_MOD_DT?: s;
@@ -237,6 +238,7 @@ export interface VersionLog {
 export interface Log {
   LOG_SQ?: n;
   LOG_TP: LogType;
+  LOG_IP: s;
   LOG_TXT: s;
   LOG_CRT_DT?: s;
 }

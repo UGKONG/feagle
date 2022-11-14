@@ -186,9 +186,9 @@ export const postAlive = async (req: Request, res: Response) => {
       ORDER BY AL_SQ DESC LIMIT 1
     );
 
-    UPDATE tb_alive_device SET AL_OFF = ? WHERE AL_SQ = @AL_SQ;
+    UPDATE tb_alive_device SET AL_ALIVE = ?, AL_OFF = ? WHERE AL_SQ = @AL_SQ;
   `,
-    [DEVICE_SN, DT]
+    [DEVICE_SN, DT, DT]
   );
 
   if (error) return res.send(fail(errorMessage.db));

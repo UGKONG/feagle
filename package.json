@@ -31,6 +31,7 @@
     "react-redux": "^8.0.4",
     "react-router-dom": "^6.4.2",
     "redux": "^4.2.0",
+    "request-ip": "^3.3.0",
     "socket.io": "^4.5.3",
     "styled-components": "^5.3.6"
   },
@@ -47,6 +48,7 @@
     "@types/react-icons": "^3.0.0",
     "@types/react-redux": "^7.1.24",
     "@types/redux": "^3.6.0",
+    "@types/request-ip": "^0.0.37",
     "@types/styled-components": "^5.1.26",
     "assert": "^2.0.0",
     "babel-loader": "^8.2.5",
