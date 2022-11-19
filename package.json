@@ -13,6 +13,11 @@
     "dev": "yarn build && concurrently \"yarn dev:view\" \"yarn watch:view\" \"yarn dev:server\""
   },
   "dependencies": {
+    "@emotion/react": "^11.10.5",
+    "@emotion/styled": "^11.10.5",
+    "@fontsource/roboto": "^4.5.8",
+    "@mui/icons-material": "^5.10.14",
+    "@mui/material": "^5.10.14",
     "@toss/hangul": "^1.0.3",
     "@toss/utils": "^1.0.4",
     "@toss/validators": "^1.0.4",

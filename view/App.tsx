@@ -1,15 +1,30 @@
 import _React from "react";
-import logo from "./assets/images/logo.svg";
+import Routes from "./common/Routes";
+import bgImg from "./assets/images/bg.png";
+import styled from "styled-components";
 
 export default function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          <code>React Start</code>
-        </p>
-      </header>
-    </div>
+    <Background>
+      <Container>
+        <Routes />
+      </Container>
+    </Background>
   );
 }
+
+const Background = styled.div`
+  flex: 1;
+  height: 100vh;
+  background: url("${bgImg}") no-repeat center;
+  background-size: cover;
+  padding: 20px;
+  display: flex;
+`;
+const Container = styled.div`
+  background-color: #ffffffcc;
+  border-radius: 10px;
+  padding: 20px;
+  border: 1px solid #dddddd;
+  flex: 1;
+`;
