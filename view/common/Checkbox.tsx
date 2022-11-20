@@ -27,15 +27,11 @@ const CheckboxTag = styled.input.attrs(() => ({ type: "checkbox" }))`
   &:checked + label {
     border: 1px solid #6d3fcf;
     & + label {
+      font-weight: 700;
       color: #6d3fcf;
     }
     &::before {
-      content: "";
-      display: block;
-      width: 100%;
-      height: 100%;
-      border-radius: 2px;
-      background-color: #6d3fcf;
+      opacity: 1;
     }
   }
 `;
@@ -48,14 +44,20 @@ const CheckboxView = styled.label`
   margin-right: 5px;
   padding: 2px;
 
-  &:hover {
-    border: 1px solid #6d3fcf77;
-  }
-  &:active {
-    border: 1px solid #6d3fcf;
+  &::before {
+    content: "";
+    display: block;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 2px;
+    background-color: #6d3fcf;
+    transition: 0.2s;
   }
 `;
 const CheckboxLabel = styled.label`
   font-size: 12px;
   color: #999;
+  user-select: none;
+  transition: 0.2s;
 `;

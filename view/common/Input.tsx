@@ -1,8 +1,8 @@
-import _React from "react";
+import React from "react";
 import styled from "styled-components";
 
 export default function Input(props: any) {
-  return <InputTag {...props} />;
+  return <InputTag ref={props?.childRef} {...props} />;
 }
 
 const InputTag = styled.input`
@@ -14,6 +14,8 @@ const InputTag = styled.input`
   padding: 0 10px;
   font-size: 12px;
   outline: 0;
+  transition: 0.1s;
+
   &:hover {
     border: 1px solid #6d3fcf77;
   }

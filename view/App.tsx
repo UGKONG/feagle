@@ -22,9 +22,10 @@ const Background = styled.div`
   display: flex;
 `;
 const Container = styled.div`
-  background-color: #ffffffcc;
+  background-color: #ffffffdd;
   border-radius: 10px;
   padding: 20px;
   border: 1px solid #dddddd;
   flex: 1;
+  display: flex;
 `;
