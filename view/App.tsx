@@ -1,4 +1,4 @@
-import _React from "react";
+import _React, { useEffect } from "react";
 import Routes from "./common/Routes";
 import bgImg from "./assets/images/bg.png";
 import styled from "styled-components";

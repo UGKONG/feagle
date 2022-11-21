@@ -15,9 +15,9 @@ const rootNode = document.querySelector("#root");
 if (rootNode) {
   createRoot(rootNode).render(
     <Provider store={store}>
-      <HashRouter>
+      <HistoryRouter>
         <App />
-      </HashRouter>
+      </HistoryRouter>
     </Provider>
   );
 } else {

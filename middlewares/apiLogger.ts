@@ -2,8 +2,14 @@ import { Request, Response, NextFunction } from "express";
 import { useDatabase } from "../functions/utils";
 import { getClientIp } from "request-ip";
 
+const passList = [".js", ".ico", ".png", ".jpg", ".svg"];
+
 const apiLogger = (req: Request, res: Response, next: NextFunction) => {
   const { method, path, params, body, query } = req;
+
+  const find = passList?.find((x) => path?.indexOf(x) > -1);
+  if (find) return next();
+
   const parameters = { ...params, ...query, ...body };
   const ip = getClientIp(req) ?? "";
   const result = `${method} ${path}

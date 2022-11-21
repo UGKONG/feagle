@@ -44,17 +44,19 @@ const sessionConfig = session({
     database: process.env.DB_DATABASE,
   }),
 });
+const basePath = __dirname + "/build";
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 app.use(apiLogger);
-// app.use(sessionCheck);
+app.use(sessionCheck);
 app.use(sessionConfig);
-app.use(express.static(__dirname + "/build"));
+viewRoutes.forEach((path: string) => {
+  app.use(path, express.static(basePath));
+});
 
 // View Router
-viewRoutes.forEach((path: string) => app.get(path, view));
 
 // Api Router
 app.use("/api/test", multiparty, testRoute);
