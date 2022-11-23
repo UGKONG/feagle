@@ -52,11 +52,11 @@ app.use(express.json());
 app.use(apiLogger);
 app.use(sessionCheck);
 app.use(sessionConfig);
+
+// View Router
 viewRoutes.forEach((path: string) => {
   app.use(path, express.static(basePath));
 });
-
-// View Router
 
 // Api Router
 app.use("/api/test", multiparty, testRoute);

@@ -2,7 +2,7 @@ import React, { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import logoImg from "../../assets/images/logo.png";
-import _Container from "../../common/Container";
+import FullContainer from "../../common/FullContainer";
 import _Input from "../../common/Input";
 import Checkbox from "../../common/Checkbox";
 import Button from "../../common/Button";
@@ -58,7 +58,7 @@ export default function Signup() {
   return <Container>SIGN UP</Container>;
 }
 
-const Container = styled(_Container)`
+const Container = styled(FullContainer)`
   display: flex;
   flex-direction: column;
   align-items: center;

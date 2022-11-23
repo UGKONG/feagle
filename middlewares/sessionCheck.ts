@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from "express";
-import { fail } from "../functions/utils";
 
 // 예외 Path 리스트
 const passList: string[] = [
+  "/myadmin",
   "/signin",
   "/signup",
   "/signout",

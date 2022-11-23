@@ -9,17 +9,9 @@ export default function Index() {
 
   return (
     <Container>
-      메인페이지
-      <br />
-      <Button onClick={() => navigate("/signin")}>go to signin page</Button>
+      <Button onClick={() => navigate("/signin")}>SIGN IN</Button>
     </Container>
   );
 }
 
-const Container = styled(_Container)`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex: 1;
-  flex-direction: column;
-`;
+const Container = styled(_Container)``;

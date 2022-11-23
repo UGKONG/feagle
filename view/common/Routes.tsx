@@ -13,6 +13,12 @@ export default function Router() {
         <Route path="/" element={<Index />} />
         <Route path="/signin" element={<Signin />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/shop" element={<Index />} />
+        <Route path="/useDevice" element={<Index />} />
+        <Route path="/deviceState" element={<Index />} />
+        <Route path="/ware" element={<Index />} />
+        <Route path="/board" element={<Index />} />
+        <Route path="/user" element={<Index />} />
       </Routes>
     </Suspense>
   );
