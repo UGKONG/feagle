@@ -1,11 +1,14 @@
+// 프로그램명
 export const programName = "feagle";
 
+// API 에러 메시지
 export const errorMessage = {
   server: "server error",
   db: "database error",
   parameter: "parameter error",
 };
 
+// 메뉴 리스트
 export type MenuList = { id: number; path: string; name: string };
 export const menuList: Array<MenuList> = [
   { id: 1, path: "/", name: "대시보드" },

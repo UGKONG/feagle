@@ -1,4 +1,4 @@
-import _React from "react";
+import React from "react";
 import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
 import { BrowserRouter as HistoryRouter, HashRouter } from "react-router-dom";
@@ -14,11 +14,13 @@ const rootNode = document.querySelector("#root");
 
 if (rootNode) {
   createRoot(rootNode).render(
-    <Provider store={store}>
-      <HashRouter>
-        <App />
-      </HashRouter>
-    </Provider>
+    <React.StrictMode>
+      <Provider store={store}>
+        <HashRouter>
+          <App />
+        </HashRouter>
+      </Provider>
+    </React.StrictMode>
   );
 } else {
   console.error("RootNode is null!!");

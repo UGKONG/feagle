@@ -2,7 +2,6 @@ import express from "express";
 import cors from "cors";
 import { programName } from "./string";
 import serverStart from "./functions/serverStart";
-import view from "./functions/view";
 import apiLogger from "./middlewares/apiLogger";
 import sessionCheck from "./middlewares/sessionCheck";
 import viewRoutes from "./routes/view.json";
@@ -16,7 +15,6 @@ import versionRouter from "./routes/version";
 import fileRouter from "./routes/file";
 import gasRouter from "./routes/gas";
 import logRouter from "./routes/log";
-import signRouter from "./routes/sign";
 
 // Setting
 require("dotenv").config();
@@ -50,7 +48,7 @@ const basePath = __dirname + "/build";
 app.use(cors());
 app.use(express.json());
 app.use(apiLogger);
-app.use(sessionCheck);
+// app.use(sessionCheck);
 app.use(sessionConfig);
 
 // View Router
@@ -60,7 +58,6 @@ viewRoutes.forEach((path: string) => {
 
 // Api Router
 app.use("/api/test", multiparty, testRoute);
-app.use("/api/sign", multiparty, signRouter);
 app.use("/api/request", multiparty, requestRouter);
 app.use("/api/common", multiparty, commonRouter);
 app.use("/api/device", multiparty, deviceRouter);

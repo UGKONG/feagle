@@ -7,11 +7,7 @@ import _Container from "../../common/Container";
 export default function Index() {
   const navigate = useNavigate();
 
-  return (
-    <Container>
-      <Button onClick={() => navigate("/signin")}>SIGN IN</Button>
-    </Container>
-  );
+  return <Container></Container>;
 }
 
 const Container = styled(_Container)``;

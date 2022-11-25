@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { Logout } from "@mui/icons-material";
 import { MenuList, menuList } from "../../string";
+import { useAxios } from "../../functions/utils";
 
 interface Props {
   activePage: MenuList | null;
@@ -12,7 +13,8 @@ export default function Menu({ activePage }: Props) {
 
   const menuClick = (path: string) => navigate(path);
 
-  const signin = () => {
+  const logout = () => {
+    useAxios.get("/common/logout");
     navigate("/signin");
   };
 
@@ -33,7 +35,7 @@ export default function Menu({ activePage }: Props) {
           </MenuItem>
         ))}
       </MenuListContainer>
-      <SignoutBtn onClick={signin} />
+      <SignoutBtn onClick={logout} />
     </Container>
   );
 }
@@ -48,7 +50,9 @@ const Container = styled.aside`
   margin-top: 10px;
   margin-right: 20px;
 `;
-const MenuListContainer = styled.ul``;
+const MenuListContainer = styled.ul`
+  width: 100%;
+`;
 const MenuItem = styled.li`
   transition: 0.3s;
   padding: 10px 0;

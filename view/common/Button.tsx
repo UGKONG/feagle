@@ -13,16 +13,16 @@ const ButtonTag = styled.button`
   outline: 0;
   border: none;
   color: #fff;
-  background-color: #6d3fcf;
+  background-color: #8b61dc;
   box-shadow: 0 0 5px #8a69d1 inset;
   cursor: pointer;
   letter-spacing: 1px;
   transition: 0.2s;
 
   &:hover {
-    background-color: #6634d3;
+    background-color: #784dd0;
   }
   &:active {
-    background-color: #5b25ce;
+    background-color: #5b30b2;
   }
 `;

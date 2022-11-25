@@ -6,9 +6,9 @@
   "scripts": {
     "log": "pm2 monit",
     "start": "pm2 start ./index.ts --interpreter ./.nvm/versions/node/v16.18.1/bin/ts-node --watch --name index",
-    "build": "webpack --mode=production",
-    "watch:view": "webpack --mode=development --watch",
-    "dev:view": "webpack-dev-server --mode=development --hot",
+    "build": "webpack --mode production",
+    "watch:view": "webpack --mode development --watch",
+    "dev:view": "webpack-dev-server --mode development --hot",
     "dev:server": "ts-node-dev index.ts --watch",
     "dev": "yarn build && concurrently \"yarn dev:view\" \"yarn watch:view\" \"yarn dev:server\""
   },
@@ -23,6 +23,7 @@
     "@toss/validators": "^1.0.4",
     "@types/multer": "^1.4.7",
     "axios": "^1.1.3",
+    "body-parser": "^1.20.1",
     "connect-multiparty": "^2.2.0",
     "cors": "^2.8.5",
     "express": "^4.18.2",
@@ -33,6 +34,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^4.6.0",
+    "react-notion": "^0.10.0",
     "react-redux": "^8.0.4",
     "react-router-dom": "^6.4.2",
     "redux": "^4.2.0",

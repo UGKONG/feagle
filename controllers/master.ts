@@ -121,11 +121,11 @@ export const deleteMaster = async (req: Request, res: Response) => {
 };
 
 // 마스터 로그인
-export const postLogin = async (req: Request, res: Response) => {
+export const postLogin = async (req: any, res: Response) => {
   const MST_ID = req?.query?.MST_ID ?? req?.body?.MST_ID;
   const MST_PW = req?.query?.MST_PW ?? req?.body?.MST_PW;
   if (!MST_ID || !MST_PW) return res.send(fail(errorMessage.parameter));
-
+  console.log({ MST_ID, MST_PW });
   const { error, result } = await useDatabase(
     `
     ${masterCommonQuery}
@@ -134,7 +134,14 @@ export const postLogin = async (req: Request, res: Response) => {
     [MST_ID, MST_PW]
   );
 
+  const user = result[0];
+
+  // 로그인 실패
+  if (error || !user) req.session.user = null;
   if (error) return res.send(fail(errorMessage.db));
-  if (!result[0]) return res.send(success(null));
-  res.send(success(result[0]));
+  if (!user) return res.send(success(null));
+
+  // 로그인 성공
+  req.session.user = user;
+  res.send(success(user));
 };

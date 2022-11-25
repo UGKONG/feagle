@@ -1,14 +1,15 @@
-import _React, { useMemo } from "react";
+import _React, { memo, useMemo } from "react";
 import styled from "styled-components";
 import { MenuList } from "../../string";
 import { FaBell, FaUserCircle } from "react-icons/fa";
 
 interface Props {
-  activePage: MenuList | null;
+  activePage: MenuList | string | null;
+  iconHide?: boolean;
 }
-export default function Header({ activePage }: Props) {
-  const pageName = useMemo<string>(() => {
-    if (!activePage) return "";
+function Header({ activePage, iconHide }: Props) {
+  const name = useMemo(() => {
+    if (typeof activePage === "string") return activePage;
     return activePage?.name;
   }, [activePage]);
 
@@ -16,15 +17,19 @@ export default function Header({ activePage }: Props) {
     <Container>
       <Side>
         <Logo />
-        <Title>{pageName}</Title>
+        <Title>{name ?? "-"}</Title>
       </Side>
-      <Side>
-        <NoticeIcon />
-        <UserIcon />
-      </Side>
+      {!iconHide && (
+        <Side>
+          <NoticeIcon />
+          <UserIcon />
+        </Side>
+      )}
     </Container>
   );
 }
+
+export default memo(Header);
 
 const Container = styled.header`
   width: 100%;
@@ -55,15 +60,15 @@ const iconStyle = `
   border-radius: 50%;
   color: #aaa;
   cursor: pointer;
-  margin-left: 10px;
+  margin-left: 20px;
 
   &:hover {
     color: #888;
   }
 `;
 const NoticeIcon = styled(FaBell)`
-  width: 30px;
-  height: 30px;
+  width: 26px;
+  height: 26px;
   ${iconStyle}
 `;
 const UserIcon = styled(FaUserCircle)`
