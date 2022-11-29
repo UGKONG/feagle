@@ -199,11 +199,19 @@ export const useDatabase = (
   };
   const db = createConnection(config);
 
+  let sqlString = sql;
+
+  if (sqlParams) {
+    sqlParams?.forEach((param) => {
+      sqlString = sqlString.replace("?", String(param));
+    });
+  }
+
   return new Promise((success) => {
     db.query(sql, sqlParams, (error: Error | null, result: any) => {
       db.end();
       if (error) console.log(error);
-      success({ error, result, sql });
+      success({ error, result, sql: sqlString });
     });
   });
 };
@@ -518,9 +526,14 @@ export const usePhoneMask = (phoneNumber: string): string => {
  * // '02-1599-4905'
  */
 export const usePhoneNumber = (phoneNumber: string): string => {
-  let result: string = formatPhoneNumber(phoneNumber);
-
-  return result;
+  return phoneNumber
+    .replace(/-/g, "")
+    .replace(/[^0-9]/g, "")
+    .replace(
+      /(^02|^0505|^1[0-9]{3}|^0[0-9]{2})([0-9]+)?([0-9]{4})$/,
+      "$1-$2-$3"
+    )
+    .replace("--", "-");
 };
 
 /**

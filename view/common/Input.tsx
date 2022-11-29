@@ -2,7 +2,9 @@ import React from "react";
 import styled from "styled-components";
 
 export default function Input(props: any) {
-  return <InputTag ref={props?.childRef} {...props} />;
+  return (
+    <InputTag autoComplete="new-password" ref={props?.childRef} {...props} />
+  );
 }
 
 const InputTag = styled.input`

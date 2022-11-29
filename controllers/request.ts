@@ -50,6 +50,7 @@ export const postVersion = async (req: Request, res: Response) => {
   if (error1) return res.send(fail(errorMessage.db));
 
   const nowData = result1[0];
+
   if (
     DEVICE_SW_VN === nowData?.DEVICE_SW_VN &&
     DEVICE_FW_VN === nowData?.DEVICE_FW_VN
@@ -57,16 +58,29 @@ export const postVersion = async (req: Request, res: Response) => {
     return res.send(success(null));
   }
 
-  const { error: error2, result: result2 } = await useDatabase(
+  const { error: error2, sql } = await useDatabase(
     `
+    SET @DEVICE_SQ = (
+      SELECT DEVICE_SQ
+      FROM tb_device WHERE DEVICE_SQ = (
+        SELECT DEVICE_SQ FROM tb_device
+        WHERE DEVICE_SN = ? LIMIT 1
+      )
+    );
+
     INSERT INTO tb_version_log (
       DEVICE_SQ, DEVICE_SW_VN, DEVICE_FW_VN
     ) VALUES (
-      ?, ?, ?
+      @DEVICE_SQ, ?, ?
     );
+
+    UPDATE tb_device SET
+    DEVICE_SW_VN = ?, DEVICE_FW_VN = ?
+    WHERE DEVICE_SQ = @DEVICE_SQ;
   `,
-    [nowData?.DEVICE_SQ, DEVICE_SW_VN, DEVICE_FW_VN]
+    [DEVICE_SN, DEVICE_SW_VN, DEVICE_FW_VN, DEVICE_SW_VN, DEVICE_FW_VN]
   );
+  console.log(sql);
 
   if (error2) return res.send(fail(errorMessage.db));
 

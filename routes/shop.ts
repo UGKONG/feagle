@@ -12,10 +12,10 @@ const shopRouter = Router();
 
 shopRouter
   .get("/", getShopList)
-  .get("/:shopSq", getShop)
+  .get("/:SHOP_SQ", getShop)
   .post("/", postShop)
-  .post("/:shopId", postShopActivate)
-  .put("/:shopId", putShop)
-  .delete("/:shopId", deleteShop);
+  .post("/:SHOP_SQ", postShopActivate)
+  .put("/:SHOP_SQ", putShop)
+  .delete("/:SHOP_SQ", deleteShop);
 
 export default shopRouter;

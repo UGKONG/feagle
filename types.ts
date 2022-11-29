@@ -1,3 +1,5 @@
+import React from "react";
+
 export type not = null | undefined;
 export type a = any;
 export type s = string;
@@ -7,6 +9,7 @@ export type v = void;
 export type sn = s | number;
 export type P<T = v> = Promise<T>;
 export type OrNull<T> = T | null;
+export type InputChangeEvent = React.ChangeEvent<HTMLInputElement>;
 
 // 성별 (1 - 남자 / 2 - 여자)
 export type Gender = 1 | 2;
@@ -39,6 +42,14 @@ export type DeviceMode = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
 
 // 자료 구분 (1 - 매뉴얼 / 2 - 가이드 / 3 - 유틸리티 / 4 - 소프트웨어 / 5 - 펌웨어)
 export type PostType = 1 | 2 | 3 | 4 | 5;
+
+// 알림 타입 구분
+export type AlertType = "error" | "warning" | "info" | "success";
+
+export interface AlertData {
+  type: AlertType;
+  text: s;
+}
 
 // 공통코드 테이블
 export interface CommonCode {

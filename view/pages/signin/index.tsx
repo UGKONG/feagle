@@ -42,7 +42,11 @@ export default function Signin() {
     const form = { MST_ID: value?.id, MST_PW: value?.pw };
     const { data } = await useAxios.post("/master/login", form);
 
-    if (!data?.result || !data?.current) return console.log("로그인 실패");
+    if (!data?.result || !data?.current) {
+      let text = data?.message || "아이디 또는 비밀번호가 일치하지 않습니다.";
+      dispatch({ type: "alert", payload: { type: "warning", text } });
+      return;
+    }
 
     dispatch({ type: "master", payload: data?.current });
     navigate("/");

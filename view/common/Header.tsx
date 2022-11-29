@@ -2,21 +2,30 @@ import _React, { memo, useMemo } from "react";
 import styled from "styled-components";
 import { MenuList } from "../../string";
 import { FaBell, FaUserCircle } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
   activePage: MenuList | string | null;
   iconHide?: boolean;
+  logoClick?: string;
 }
-function Header({ activePage, iconHide }: Props) {
+function Header({ activePage, iconHide, logoClick }: Props) {
+  const navigate = useNavigate();
+
   const name = useMemo(() => {
     if (typeof activePage === "string") return activePage;
     return activePage?.name;
   }, [activePage]);
 
+  const onClick = () => {
+    if (!logoClick) return;
+    navigate(logoClick);
+  };
+
   return (
     <Container>
       <Side>
-        <Logo />
+        <Logo onClick={onClick} />
         <Title>{name ?? "-"}</Title>
       </Side>
       {!iconHide && (
@@ -52,6 +61,7 @@ const Logo = styled.h1.attrs(() => ({}))`
   background-size: 85% auto;
   background-position: left center;
   background-image: url(${require("../assets/images/logo.png").default});
+  cursor: pointer;
 `;
 const Title = styled.h2`
   font-size: 20px;

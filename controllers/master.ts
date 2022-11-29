@@ -44,40 +44,37 @@ export const postMaster = async (req: Request, res: Response) => {
   const MST_GD = req?.query?.MST_GD ?? req?.body?.MST_GD;
   const MST_ID = req?.query?.MST_ID ?? req?.body?.MST_ID;
   const MST_PW = req?.query?.MST_PW ?? req?.body?.MST_PW;
-  const AUTH_SQ = req?.query?.AUTH_SQ ?? req?.body?.AUTH_SQ;
 
-  const { error } = await useDatabase(
-    `
-    INSERT INTO tb_master (
-      MST_NM, MST_NUM, MST_GRP, MST_PO, 
-      MST_GD, MST_ID, MST_PW, AUTH_SQ
-    ) VALUES (
-      ?, ?, ?, ?, ?, ?, ?, ?
-    )
-  `,
-    [MST_NM, MST_NUM, MST_GRP, MST_PO, MST_GD, MST_ID, MST_PW, AUTH_SQ]
-  );
-  if (error) return res.send(fail(errorMessage.db));
-  res.send(success(null));
-};
+  const validate = !MST_NM || !MST_NUM || !MST_GD || !MST_ID || !MST_PW;
+  if (validate) {
+    return res.send(fail(errorMessage.parameter));
+  }
 
-// 아이디 중복확인
-export const getMasterIdDuplicateCheck = async (
-  req: Request,
-  res: Response
-) => {
-  const MST_ID = req?.query?.MST_ID ?? req?.body?.MST_ID;
-  if (!MST_ID) return res.send(fail(errorMessage.parameter));
-  const { error, result } = await useDatabase(
+  const { error: error1, result } = await useDatabase(
     `
     SELECT COUNT(*) AS COUNT FROM tb_master
     WHERE MST_ID = ?
   `,
     [MST_ID]
   );
+  if (error1) return res.send(fail(errorMessage.db));
+  if (result[0]?.COUNT > 0) {
+    return res.send(fail("아이디가 중복됩니다."));
+  }
 
-  if (error) return res.send(fail(errorMessage.db));
-  res.send(success({ duplicate: result[0]?.COUNT > 0 }));
+  const { error: error2 } = await useDatabase(
+    `
+    INSERT INTO tb_master (
+      MST_NM, MST_NUM, MST_GRP, MST_PO, 
+      MST_GD, MST_ID, MST_PW
+    ) VALUES (
+      ?, ?, ?, ?, ?, ?, ?
+    )
+  `,
+    [MST_NM, MST_NUM, MST_GRP, MST_PO, MST_GD, MST_ID, MST_PW]
+  );
+  if (error2) return res.send(fail(errorMessage.db));
+  res.send(success(null));
 };
 
 // 마스터 정보 수정
@@ -125,11 +122,13 @@ export const postLogin = async (req: any, res: Response) => {
   const MST_ID = req?.query?.MST_ID ?? req?.body?.MST_ID;
   const MST_PW = req?.query?.MST_PW ?? req?.body?.MST_PW;
   if (!MST_ID || !MST_PW) return res.send(fail(errorMessage.parameter));
-  console.log({ MST_ID, MST_PW });
+
   const { error, result } = await useDatabase(
     `
     ${masterCommonQuery}
-    AND MST_ID = ? AND MST_PW = ?;
+    AND MST_ID = ? AND MST_PW = ?
+    ORDER BY MST_SQ DESC LIMIT 1;
+    ;
   `,
     [MST_ID, MST_PW]
   );
@@ -139,7 +138,14 @@ export const postLogin = async (req: any, res: Response) => {
   // 로그인 실패
   if (error || !user) req.session.user = null;
   if (error) return res.send(fail(errorMessage.db));
-  if (!user) return res.send(success(null));
+  if (!user) return res.send(fail("아이디 또는 비밀번호가 일치하지 않습니다."));
+
+  // 신청자
+  if (!user?.AUTH_SQ) {
+    return res.send(
+      fail("아직 신청수락이 되지 않은 계정입니다. 관리자에게 문의해주세요.")
+    );
+  }
 
   // 로그인 성공
   req.session.user = user;

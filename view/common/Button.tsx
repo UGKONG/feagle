@@ -25,4 +25,11 @@ const ButtonTag = styled.button`
   &:active {
     background-color: #5b30b2;
   }
+  &:disabled {
+    background-color: #888;
+    color: #ccc;
+    border: 1px solid #888;
+    box-shadow: none;
+    cursor: default;
+  }
 `;

@@ -6,6 +6,7 @@ import { useDispatch } from "react-redux";
 import { useAxios } from "../functions/utils";
 import { Master } from "../types";
 import { useNavigate } from "react-router-dom";
+import Alert from "./common/Alert";
 
 export default function App() {
   const navigate = useNavigate();
@@ -28,11 +29,14 @@ export default function App() {
   // useEffect(sessionCheck, []);
 
   return (
-    <Background>
-      <Container>
-        <Routes />
-      </Container>
-    </Background>
+    <>
+      <Background>
+        <Container>
+          <Routes />
+        </Container>
+      </Background>
+      <Alert />
+    </>
   );
 }
 

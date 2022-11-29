@@ -54,7 +54,7 @@ const MenuListContainer = styled.ul`
   width: 100%;
 `;
 const MenuItem = styled.li`
-  transition: 0.3s;
+  transition: 0.1s;
   padding: 10px 0;
   margin-bottom: 10px;
   font-size: 15px;
