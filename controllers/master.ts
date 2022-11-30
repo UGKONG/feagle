@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { fail, success, useDatabase } from "../functions/utils";
+import { fail, success, useDatabase, useIsNumber } from "../functions/utils";
 import { errorMessage } from "../string";
 
 // 마스터 정보 공통 Query
@@ -9,13 +9,16 @@ const masterCommonQuery = `
   a.MST_GD, a.MST_ID, a.AUTH_SQ, b.COMM_NM AS AUTH_TEST
   FROM tb_master a
   LEFT JOIN tb_common b ON b.COMM_CODE = a.AUTH_SQ
-  AND COMM_GRP = 4 AND COMM_CODE > 0
-  WHERE IS_DEL = 0
+  AND b.COMM_GRP = 4 AND b.COMM_CODE > 0
+  WHERE a.IS_DEL = 0
 `;
 
 // 마스터 리스트 조회
 export const getMasterList = async (req: Request, res: Response) => {
-  const { error, result } = await useDatabase(masterCommonQuery);
+  const { error, result } = await useDatabase(`
+    ${masterCommonQuery}
+    ORDER BY a.MST_SQ DESC;
+  `);
   if (error) return res.send(fail(errorMessage.db));
   res.send(success(result));
 };
@@ -23,9 +26,11 @@ export const getMasterList = async (req: Request, res: Response) => {
 // 마스터 정보 조회
 export const getMasterDetail = async (req: Request, res: Response) => {
   const MST_SQ = req?.params?.MST_SQ;
+  if (!useIsNumber(MST_SQ)) return res.send(fail(errorMessage.parameter));
+
   const { error, result } = await useDatabase(
     `
-    ${masterCommonQuery} AND MST_SQ = ?;
+    ${masterCommonQuery} AND a.MST_SQ = ?;
   `,
     [MST_SQ]
   );
@@ -80,6 +85,8 @@ export const postMaster = async (req: Request, res: Response) => {
 // 마스터 정보 수정
 export const putMaster = async (req: Request, res: Response) => {
   const MST_SQ = req?.params?.MST_SQ ?? req?.query?.MST_NM ?? req?.body?.MST_NM;
+  if (!useIsNumber(MST_SQ)) return res.send(fail(errorMessage.parameter));
+
   const MST_NM = req?.query?.MST_NM ?? req?.body?.MST_NM;
   const MST_NUM = req?.query?.MST_NUM ?? req?.body?.MST_NUM;
   const MST_GRP = req?.query?.MST_GRP ?? req?.body?.MST_GRP;
@@ -106,6 +113,8 @@ export const putMaster = async (req: Request, res: Response) => {
 // 마스터 정보 삭제 (회원탈퇴)
 export const deleteMaster = async (req: Request, res: Response) => {
   const MST_SQ = req?.params?.MST_SQ;
+  if (!useIsNumber(MST_SQ)) return res.send(fail(errorMessage.parameter));
+
   const { error } = await useDatabase(
     `
     UPDATE tb_master SET IS_DEL = 1 WHERE MST_SQ = ?;
@@ -126,8 +135,8 @@ export const postLogin = async (req: any, res: Response) => {
   const { error, result } = await useDatabase(
     `
     ${masterCommonQuery}
-    AND MST_ID = ? AND MST_PW = ?
-    ORDER BY MST_SQ DESC LIMIT 1;
+    AND a.MST_ID = ? AND a.MST_PW = ?
+    ORDER BY a.MST_SQ DESC LIMIT 1;
     ;
   `,
     [MST_ID, MST_PW]

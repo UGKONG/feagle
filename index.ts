@@ -11,10 +11,11 @@ import requestRouter from "./routes/request";
 import deviceRouter from "./routes/device";
 import commonRouter from "./routes/common";
 import shopRouter from "./routes/shop";
-import versionRouter from "./routes/version";
+import boardRouter from "./routes/board";
 import fileRouter from "./routes/file";
 import gasRouter from "./routes/gas";
 import logRouter from "./routes/log";
+import managerRouter from "./routes/manager";
 
 // Setting
 require("dotenv").config();
@@ -62,8 +63,9 @@ app.use("/api/request", multiparty, requestRouter);
 app.use("/api/common", multiparty, commonRouter);
 app.use("/api/device", multiparty, deviceRouter);
 app.use("/api/master", multiparty, masterRouter);
+app.use("/api/manager", multiparty, managerRouter);
 app.use("/api/shop", multiparty, shopRouter);
-app.use("/api/version", multiparty, versionRouter);
+app.use("/api/board", multiparty, boardRouter);
 app.use("/api/file", multiparty, fileRouter);
 app.use("/api/gas", multiparty, gasRouter);
 app.use("/api/log", multiparty, logRouter);

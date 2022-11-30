@@ -115,7 +115,7 @@ export const success = (data: any = null): SuccessResponseData => {
 };
 
 export const useAxios = axios.create({
-  baseURL: process.env.API_URL || "http://localhost:8080/api",
+  baseURL: process.env.API_URL || "/api",
   timeout: 5000,
 });
 
@@ -747,4 +747,30 @@ export const useWon = (number: number): string => {
   let result: string = formatToKRW(number);
 
   return result;
+};
+
+/**
+ * @example
+ * useIsNumber('123');
+ * // true
+ * useIsNumber('abc');
+ * // false
+ * useIsNumber([1, '2', 3]);
+ * // true
+ * useIsNumber(['a', 2, 3]);
+ * // false
+ */
+type UseIsNumberProps = number | string | number[] | string[];
+export const useIsNumber = (input: UseIsNumberProps): boolean => {
+  const isArray = Array.isArray(input);
+
+  if (!isArray) {
+    if (isNaN(Number(input))) return false;
+  } else {
+    for (let i = 0; i < input?.length; i++) {
+      if (isNaN(Number(input[i]))) return false;
+    }
+  }
+
+  return true;
 };

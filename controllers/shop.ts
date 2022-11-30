@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { fail, success, useDatabase } from "../functions/utils";
+import { fail, success, useDatabase, useIsNumber } from "../functions/utils";
 import { errorMessage } from "../string";
 
 // 피부샵 리스트 조회
@@ -23,7 +23,7 @@ export const getShopList = async (req: Request, res: Response) => {
 export const getShop = async (req: Request, res: Response) => {
   const SHOP_SQ = req?.params?.SHOP_SQ;
 
-  if (isNaN(Number(SHOP_SQ))) return res.send(fail(errorMessage.parameter));
+  if (!useIsNumber(SHOP_SQ)) return res.send(fail(errorMessage.parameter));
 
   const { error, result } = await useDatabase(
     `
@@ -88,6 +88,19 @@ export const postShop = async (req: Request, res: Response) => {
 
   if (validate1 || validate2) return res.send(fail(errorMessage.parameter));
 
+  const { error: error1, result } = await useDatabase(
+    `
+    SELECT COUNT(*) AS COUNT FROM tb_manager
+    WHERE MNG_ID = ?;
+  `,
+    [MNG_ID]
+  );
+
+  if (error1) return res.send(fail(errorMessage.db));
+  if (result[0]?.COUNT > 0) {
+    return res.send(fail("아이디가 중복됩니다."));
+  }
+
   if (DEVICE_LIST) {
     deviceSQL = `
       INSERT INTO tb_device (
@@ -102,7 +115,7 @@ export const postShop = async (req: Request, res: Response) => {
     `;
   }
 
-  const { error } = await useDatabase(
+  const { error: error2 } = await useDatabase(
     `
     INSERT INTO tb_shop (
       SHOP_NM, SHOP_NUM, SHOP_ADD
@@ -123,7 +136,7 @@ export const postShop = async (req: Request, res: Response) => {
     [SHOP_NM, SHOP_NUM, SHOP_ADD, MNG_NM, MNG_NUM, MNG_GD, MNG_ID, MNG_PW]
   );
 
-  if (error) return res.send(fail(errorMessage.db));
+  if (error2) return res.send(fail(errorMessage.db));
 
   res.send(success());
 };
@@ -131,8 +144,7 @@ export const postShop = async (req: Request, res: Response) => {
 // 피부샵 활성화
 export const postShopActivate = async (req: Request, res: Response) => {
   const SHOP_SQ = req?.params?.SHOP_SQ;
-
-  if (isNaN(Number(SHOP_SQ))) return res.send(fail(errorMessage.parameter));
+  if (!useIsNumber(SHOP_SQ)) return res.send(fail(errorMessage.parameter));
 
   const { error } = await useDatabase(
     `
@@ -149,17 +161,33 @@ export const postShopActivate = async (req: Request, res: Response) => {
 // 피부샵 정보 수정 (미완성)
 export const putShop = async (req: Request, res: Response) => {
   const SHOP_SQ = req?.params?.SHOP_SQ;
+  if (!useIsNumber(SHOP_SQ)) return res.send(fail(errorMessage.parameter));
 
-  if (isNaN(Number(SHOP_SQ))) return res.send(fail(errorMessage.parameter));
+  const SHOP_NM = req?.query?.SHOP_NM ?? req?.body?.SHOP_NM;
+  const SHOP_NUM = req?.query?.SHOP_NUM ?? req?.body?.SHOP_NUM;
+  const SHOP_ADD = req?.query?.SHOP_ADD ?? req?.body?.SHOP_ADD;
 
-  res.send(success("피부샵 정보 수정 {SHOP_SQ: " + SHOP_SQ + "}"));
+  const validate = !SHOP_NM || !SHOP_NUM || !SHOP_ADD;
+  if (validate) return res.send(fail(errorMessage.parameter));
+
+  const { error } = await useDatabase(
+    `
+    UPDATE tb_shop SET
+    SHOP_NM = ?, SHOP_NUM = ?, SHOP_ADD = ?
+    WHERE SHOP_SQ = ?;
+  `,
+    [SHOP_NM, SHOP_NUM, SHOP_ADD, SHOP_SQ]
+  );
+
+  if (error) return res.send(fail(errorMessage.db));
+
+  res.send(success());
 };
 
 // 피부샵 비활성화
 export const deleteShop = async (req: Request, res: Response) => {
   const SHOP_SQ = req?.params?.SHOP_SQ;
-
-  if (isNaN(Number(SHOP_SQ))) return res.send(fail(errorMessage.parameter));
+  if (!useIsNumber(SHOP_SQ)) return res.send(fail(errorMessage.parameter));
 
   const { error } = await useDatabase(
     `

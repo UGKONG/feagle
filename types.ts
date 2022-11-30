@@ -204,6 +204,7 @@ export interface GasReq {
 export interface Post {
   POST_SQ?: n;
   POST_TP: PostType;
+  POST_TP_NM: s;
   MDL_SQ: n;
   BUILD_VN: s;
   POST_TTL: s;

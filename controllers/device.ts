@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { fail, success, useDatabase } from "../functions/utils";
+import { fail, success, useDatabase, useIsNumber } from "../functions/utils";
 import { errorMessage } from "../string";
 import type { Device } from "../types";
 
@@ -26,7 +26,7 @@ export const getDeviceList = async (req: Request, res: Response) => {
 // 장비 상세정보 조회
 export const getDeviceDetail = async (req: Request, res: Response) => {
   const DEVICE_SQ = req?.params?.DEVICE_SQ;
-  if (!DEVICE_SQ) return res.send(fail(errorMessage.parameter));
+  if (!useIsNumber(DEVICE_SQ)) return res.send(fail(errorMessage.parameter));
 
   const { error, result } = await useDatabase(
     `
@@ -144,7 +144,7 @@ export const putDevice = async (req: Request, res: Response) => {
 // 장비 정보 삭제 (실제 업데이트)
 export const deleteDevice = async (req: Request, res: Response) => {
   const DEVICE_SQ = req?.params?.DEVICE_SQ;
-  if (!DEVICE_SQ) return res.send(fail(errorMessage.parameter));
+  if (!useIsNumber(DEVICE_SQ)) return res.send(fail(errorMessage.parameter));
 
   const { error } = await useDatabase(
     `
