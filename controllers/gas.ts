@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { success, fail, useIsNumber, useDatabase } from "../functions/utils";
 import { errorMessage } from "../string";
 
-// 가스 요청 리스트 조회
+// 가스 주문 리스트 조회
 export const getGasRequestList = async (req: Request, res: Response) => {
   const { error, result } = await useDatabase(
     `
@@ -22,7 +22,7 @@ export const getGasRequestList = async (req: Request, res: Response) => {
   res.send(success(result));
 };
 
-// 가스 요청
+// 가스 주문
 export const postGasRequest = async (req: Request, res: Response) => {
   const SHOP_SQ = req?.query?.SHOP_SQ ?? req?.body?.SHOP_SQ;
   if (!useIsNumber(SHOP_SQ)) return res.send(fail(errorMessage.parameter));
@@ -39,7 +39,7 @@ export const postGasRequest = async (req: Request, res: Response) => {
   res.send(success());
 };
 
-// 가스 요청건 확인
+// 가스 주문건 확인
 export const putGasRequestCheck = async (req: Request, res: Response) => {
   const GR_SQ = req?.params?.GR_SQ;
   if (!useIsNumber(GR_SQ)) return res.send(fail(errorMessage.parameter));
