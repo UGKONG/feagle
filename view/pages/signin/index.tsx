@@ -7,7 +7,7 @@ import FullContainer from "../../common/FullContainer";
 import _Input from "../../common/Input";
 import Checkbox from "../../common/Checkbox";
 import Button from "../../common/Button";
-import { Key, Value } from "./index.type";
+import { Key, Value, KeyDownEvent } from "./index.type";
 import { useAxios } from "../../../functions/utils";
 
 export default function Signin() {
@@ -73,6 +73,7 @@ export default function Signin() {
           value={value.id}
           name="id"
           onChange={changeValue}
+          onKeyDown={(e: KeyDownEvent) => e?.keyCode === 13 && validate()}
         />
         <Input
           childRef={pwRef}
@@ -81,6 +82,7 @@ export default function Signin() {
           value={value.pw}
           name="pw"
           onChange={changeValue}
+          onKeyDown={(e: KeyDownEvent) => e?.keyCode === 13 && validate()}
         />
         <Options>
           <Checkbox label="로그인 유지" name="isKeep" onChange={changeValue} />

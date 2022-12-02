@@ -2,22 +2,6 @@ import { Request, Response } from "express";
 import { fail, success, useDatabase, useIsNumber } from "../functions/utils";
 import { errorMessage } from "../string";
 
-const commonSQL = `
-  SELECT
-  a.POST_SQ, a.POST_TP, b.COMM_NM AS POST_TP_NM,
-  a.MDL_SQ, c.MDL_NM, c.MDL_EN_NM, c.MDL_DESC, 
-  a.BUILD_VN, a.POST_TTL, a.POST_CN, a.MST_SQ,
-  d.MST_NM, a.BUILD_DT, a.POST_CRT_DT
-  FROM tb_post a
-  LEFT JOIN tb_common b
-    ON b.COMM_CODE = a.POST_TP
-    AND b.COMM_GRP = 3
-  LEFT JOIN tb_device_model c
-    ON c.MDL_SQ = a.MDL_SQ
-  LEFT JOIN tb_master d
-    ON d.MST_SQ = a.MST_SQ
-`;
-
 // 자료, 펌웨어, 소프트웨어 리스트 조회
 export const getBoardList = async (req: Request, res: Response) => {
   const POST_TP = req?.query?.POST_TP ?? req?.body?.POST_TP;
@@ -32,24 +16,46 @@ export const getBoardList = async (req: Request, res: Response) => {
   let whereSQL = "";
 
   if (POST_TP === "post") {
-    whereSQL = "WHERE a.POST_TP <> 4 AND a.POST_TP <> 5";
+    whereSQL = "WHERE h.POST_TP <> 4 AND h.POST_TP <> 5";
   } else if (POST_TP === "ware") {
-    whereSQL = "WHERE a.POST_TP = 4 OR a.POST_TP = 5";
+    whereSQL = "WHERE h.POST_TP = 4 OR h.POST_TP = 5";
   } else if (POST_TP === "sw") {
-    whereSQL = "WHERE a.POST_TP = 4";
+    whereSQL = "WHERE h.POST_TP = 4";
   } else if (POST_TP === "fw") {
-    whereSQL = "WHERE a.POST_TP = 5";
+    whereSQL = "WHERE h.POST_TP = 5";
   }
 
   const { error, result } = await useDatabase(
     `
-    ${commonSQL}
-    ${whereSQL}
+    SELECT
+    a.POST_SQ, a.POST_TP, b.COMM_NM AS POST_TP_NM,
+    a.MDL_SQ, c.MDL_NM, c.MDL_EN_NM, c.MDL_DESC,
+    a.BUILD_VN, a.POST_TTL, a.POST_CN, a.MST_SQ,
+    d.MST_NM, a.BUILD_DT, a.POST_CRT_DT, a.FILE_CNT
+    FROM (
+      SELECT
+      h.POST_SQ, h.POST_TP, h.MDL_SQ,
+      h.BUILD_VN, h.POST_TTL, h.POST_CN, h.MST_SQ,
+      h.BUILD_DT, h.POST_CRT_DT, COUNT(i.FILE_SQ) as FILE_CNT
+      FROM tb_post h
+      LEFT OUTER JOIN tb_file i 
+        ON h.POST_SQ = i.POST_SQ
+      ${whereSQL}
+      GROUP BY h.POST_SQ, h.POST_TP, h.MDL_SQ,
+      h.BUILD_VN, h.POST_TTL, h.POST_CN, h.MST_SQ,
+      h.BUILD_DT, h.POST_CRT_DT
+    ) a
+    LEFT JOIN tb_common b
+      ON b.COMM_CODE = a.POST_TP
+      AND b.COMM_GRP = 3
+    LEFT JOIN tb_device_model c
+      ON c.MDL_SQ = a.MDL_SQ
+    LEFT JOIN tb_master d
+      ON d.MST_SQ = a.MST_SQ
     ORDER BY a.POST_SQ DESC;
   `,
     []
   );
-
   if (error) return res.send(fail(errorMessage.db));
 
   res.send(success(result));
@@ -60,17 +66,39 @@ export const getBoardDetail = async (req: Request, res: Response) => {
   const POST_SQ = req?.params?.POST_SQ;
   if (!useIsNumber(POST_SQ)) return res.send(fail(errorMessage.parameter));
 
-  const { error, result } = await useDatabase(
+  const { error, result, sql } = await useDatabase(
     `
-    ${commonSQL}
-    WHERE a.POST_SQ = ?;
+    SELECT
+    a.POST_SQ, a.POST_TP, b.COMM_NM AS POST_TP_NM,
+    a.MDL_SQ, c.MDL_NM, c.MDL_EN_NM, c.MDL_DESC,
+    a.BUILD_VN, a.POST_TTL, a.POST_CN, a.MST_SQ,
+    d.MST_NM, a.BUILD_DT, a.POST_CRT_DT
+    FROM tb_post a
+    LEFT JOIN tb_common b
+      ON b.COMM_CODE = a.POST_TP
+      AND b.COMM_GRP = 3
+    LEFT JOIN tb_device_model c
+      ON c.MDL_SQ = a.MDL_SQ
+    LEFT JOIN tb_master d
+      ON d.MST_SQ = a.MST_SQ
+    WHERE a.POST_SQ = ?
+    LIMIT 1;
+
+    SELECT
+    FILE_SQ, FILE_PATH, FILE_HASH_NM, 
+    FILE_NM, FILE_SZ, FILE_EXT
+    FROM tb_file
+    WHERE POST_SQ = ?;
   `,
-    [POST_SQ]
+    [POST_SQ, POST_SQ]
   );
 
   if (error) return res.send(fail(errorMessage.db));
+  if (!result[0][0]) return res.send(success(null));
 
-  res.send(success(result[0] ?? null));
+  const post = { ...result[0][0], FILE_LIST: result[1] };
+
+  res.send(success(post));
 };
 
 // 자료, 펌웨어, 소프트웨어 추가

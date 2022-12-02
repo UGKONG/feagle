@@ -9,7 +9,8 @@ export const getShopList = async (req: Request, res: Response) => {
     SELECT
     SHOP_SQ, SHOP_NM, SHOP_NUM, SHOP_ADD
     FROM tb_shop
-    WHERE IS_DEL <> 1;
+    WHERE IS_DEL <> 1
+    ORDER BY SHOP_SQ DESC;
   `,
     []
   );
@@ -36,7 +37,8 @@ export const getShop = async (req: Request, res: Response) => {
     MNG_SQ, MNG_NM, MNG_NUM, MNG_GD, MNG_ID, OS, UUID
     FROM tb_manager
     WHERE IS_DEL = 0
-    AND SHOP_SQ = ?;
+    AND SHOP_SQ = ?
+    LIMIT 1;
 
     SELECT
     a.DEVICE_SQ, a.MDL_SQ, b.MDL_NM, b.MDL_EN_NM, b.MDL_DESC,
@@ -44,7 +46,8 @@ export const getShop = async (req: Request, res: Response) => {
     a.DEVICE_BUY_DT, a.DEVICE_INSTL_DT
     FROM tb_device a
     LEFT JOIN tb_device_model b ON b.MDL_SQ = a.MDL_SQ
-    WHERE a.SHOP_SQ = ?;
+    WHERE a.SHOP_SQ = ?
+    ORDER BY a.DEVICE_SQ DESC;
   `,
     [SHOP_SQ, SHOP_SQ, SHOP_SQ]
   );

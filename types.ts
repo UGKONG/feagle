@@ -206,19 +206,24 @@ export interface Post {
   POST_TP: PostType;
   POST_TP_NM: s;
   MDL_SQ: n;
+  MDL_NM: s;
+  MDL_DESC: s;
   BUILD_VN: s;
   POST_TTL: s;
   POST_CN: s;
   MST_SQ: n;
+  MST_NM: s;
   BUILD_DT: s;
   POST_MOD_DT?: s;
   POST_CRT_DT?: s;
+  FILE_CNT?: n;
+  FILE_LIST?: Array<File>;
 }
 
 // 첨부파일 테이블
 export interface File {
   FILE_SQ?: n;
-  POST_SQ: n;
+  POST_SQ?: n;
   FILE_PATH: s;
   FILE_HASH_NM: s;
   FILE_NM: s;

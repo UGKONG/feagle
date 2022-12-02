@@ -14,7 +14,10 @@ const managerCommonQuery = `
 
 // 매니저 리스트 조회
 export const getManagerList = async (req: Request, res: Response) => {
-  const { error, result } = await useDatabase(managerCommonQuery);
+  const { error, result } = await useDatabase(`
+    ${managerCommonQuery}
+    ORDER BY a.MNG_SQ DESC;
+  `);
   if (error) return res.send(fail(errorMessage.db));
   res.send(success(result));
 };
@@ -101,6 +104,6 @@ export const postLogin = async (req: any, res: Response) => {
   if (!user) return res.send(fail("아이디 또는 비밀번호가 일치하지 않습니다."));
 
   // 로그인 성공
-  req.session.user = user;
+  req.session.user = { ...user, ACT_TP: 3 };
   res.send(success(user));
 };

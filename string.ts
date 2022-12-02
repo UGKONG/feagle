@@ -19,3 +19,6 @@ export const menuList: Array<MenuList> = [
   { id: 6, path: "/board", name: "자료 관리" },
   { id: 7, path: "/user", name: "사용자" },
 ];
+
+// 파일 업로드 경로
+export const uploadDir = `${__dirname}/../upload`;

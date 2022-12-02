@@ -157,6 +157,6 @@ export const postLogin = async (req: any, res: Response) => {
   }
 
   // 로그인 성공
-  req.session.user = user;
+  req.session.user = { ...user, ACT_TP: 2 };
   res.send(success(user));
 };

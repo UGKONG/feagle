@@ -9,7 +9,8 @@ export const getBoardType = async (req: Request, res: Response) => {
     COMM_CODE, COMM_NM
     FROM tb_common
     WHERE COMM_GRP = 3
-    AND COMM_CODE > 0;
+    AND COMM_CODE > 0
+    ORDER BY COMM_CODE;
   `);
   if (error) return res.send(fail(errorMessage.db));
   res.send(success(result));
@@ -22,7 +23,8 @@ export const getActor = async (req: Request, res: Response) => {
     COMM_CODE, COMM_NM
     FROM tb_common
     WHERE COMM_GRP = 2
-    AND COMM_CODE > 0;
+    AND COMM_CODE > 0
+    ORDER BY COMM_CODE;
   `);
   if (error) return res.send(fail(errorMessage.db));
   res.send(success(result));
@@ -35,7 +37,8 @@ export const getAuthType = async (req: Request, res: Response) => {
     COMM_CODE, COMM_NM
     FROM tb_common
     WHERE COMM_GRP = 4
-    AND COMM_CODE > 0;
+    AND COMM_CODE > 0
+    ORDER BY COMM_CODE;
   `);
   if (error) return res.send(fail(errorMessage.db));
   res.send(success(result));

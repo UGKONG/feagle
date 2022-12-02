@@ -15,8 +15,8 @@ const requestRouter = Router();
 
 requestRouter
   .get("/version", getNewVersion)
-  .post("/version", postVersion)
   .get("/versionDownload", postVersionDownload)
+  .post("/version", postVersion)
   .post("/on", postOn)
   .post("/off", postOff)
   .post("/alive", postAlive)

@@ -17,7 +17,10 @@ const deviceCommonQuery = `
 
 // 장비 리스트 조회
 export const getDeviceList = async (req: Request, res: Response) => {
-  const { error, result } = await useDatabase(deviceCommonQuery);
+  const { error, result } = await useDatabase(`
+    ${deviceCommonQuery}
+    ORDER BY a.DEVICE_SQ DESC;
+  `);
 
   if (error) return res.send(fail(errorMessage.db));
   res.send(success(result));

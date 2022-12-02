@@ -3,6 +3,6 @@ import { postFileDownload } from "../controllers/file";
 
 const fileRouter = Router();
 
-fileRouter.post("/:fileSq", postFileDownload);
+fileRouter.get("/:FILE_SQ", postFileDownload);
 
 export default fileRouter;

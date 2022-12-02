@@ -55,4 +55,5 @@ const Container = styled.div`
   border: 1px solid #dddddd;
   flex: 1;
   display: flex;
+  position: relative;
 `;

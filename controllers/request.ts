@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { fail, success, useDatabase } from "../functions/utils";
-import { errorMessage } from "../string";
+import { errorMessage, uploadDir } from "../string";
 import fs from "fs";
 
 // 신규 버전 정보 조회 (서버 -> 장비)
@@ -103,7 +103,7 @@ export const postVersionDownload = async (req: Request, res: Response) => {
       SELECT POST_SQ FROM tb_post
       WHERE POST_TP = ?
       AND MDL_SQ = (
-        SELECT MDL_SQ FROM tb_device WHERE DEVICE_SN = ?
+        SELECT MDL_SQ FROM tb_device WHERE DEVICE_SN = ? LIMIT 1
       )
       AND BUILD_VN = ?
     )
@@ -117,8 +117,7 @@ export const postVersionDownload = async (req: Request, res: Response) => {
   if (!fileInfo) return res.send(null);
 
   // File 찾기
-  const { FILE_PATH, FILE_HASH_NM, FILE_EXT } = fileInfo;
-  const uploadDir = `${__dirname}/../upload`;
+  const { FILE_SQ, FILE_PATH, FILE_HASH_NM, FILE_EXT } = fileInfo;
   const filePath = `${uploadDir}${FILE_PATH}`;
   const fileName = `${FILE_HASH_NM}.${FILE_EXT}`;
 
@@ -126,8 +125,22 @@ export const postVersionDownload = async (req: Request, res: Response) => {
     const FILE_DATA = await fs.readFileSync(`${filePath}/${fileName}`);
     res.setHeader("Content-Disposition", `attachment; filename=${fileName}`);
     res.send(FILE_DATA); // File 리턴
+
+    // LOG
+    return useDatabase(
+      `
+      SET @DEVICE_SQ = (SELECT DEVICE_SQ FROM tb_device WHERE DEVICE_SN = ? LIMIT 1);
+
+      INSERT INTO tb_get_log (
+        FILE_SQ, ACT_TP, ACT_SQ, ACT_NM
+      ) VALUES (
+        ?, ?, @DEVICE_SQ, ?
+      )
+    `,
+      [DEVICE_SN, FILE_SQ, 1, DEVICE_SN]
+    );
   } catch {
-    res.send(null);
+    return res.send(null);
   }
 };
 

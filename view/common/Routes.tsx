@@ -5,7 +5,6 @@ import Fallback from "./Fallback";
 const Index = lazy(() => import("../pages/index"));
 const Signin = lazy(() => import("../pages/signin"));
 const Signup = lazy(() => import("../pages/signup"));
-const Docs = lazy(() => import("../pages/docs"));
 
 export default function Router() {
   return (
@@ -20,7 +19,6 @@ export default function Router() {
         <Route path="/ware" element={<Index />} />
         <Route path="/board" element={<Index />} />
         <Route path="/user" element={<Index />} />
-        <Route path="/docs" element={<Docs />} />
       </Routes>
     </Suspense>
   );

@@ -10,6 +10,6 @@ const gasRouter = Router();
 gasRouter
   .get("/", getGasRequestList)
   .post("/", postGasRequest)
-  .put("/:reqSq", putGasRequestCheck);
+  .put("/:GR_SQ", putGasRequestCheck);
 
 export default gasRouter;
