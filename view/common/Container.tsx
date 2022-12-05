@@ -1,3 +1,4 @@
+import { CircularProgress } from "@mui/material";
 import _React, { useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import styled from "styled-components";
@@ -19,7 +20,14 @@ export default function Container(props: any) {
     <ContainerTag {...props}>
       <Header activePage={activePage} />
       <Menu activePage={activePage} />
-      <Contents>{props?.children ?? null}</Contents>
+      <Contents>
+        {props?.children ?? null}
+        {props?.isLoading ? (
+          <Loading>
+            <CircularProgress />
+          </Loading>
+        ) : null}
+      </Contents>
     </ContainerTag>
   );
 }
@@ -38,4 +46,17 @@ const Contents = styled.section`
   border: 1px solid #ddd;
   border-radius: 10px;
   padding: 10px;
+  position: relative;
+  max-height: calc(100% - 60px);
+`;
+const Loading = styled.div`
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  top: 0;
+  left: 0;
+  background-color: #00000010;
 `;

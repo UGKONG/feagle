@@ -1,23 +1,55 @@
 import { Request, Response } from "express";
 import { fail, success, useDatabase, useIsNumber } from "../functions/utils";
 import { errorMessage } from "../string";
+import { OrNull } from "../types";
+
+type ShopList = Array<{
+  SHOP_SQ: OrNull<number>;
+  SHOP_NM: OrNull<string>;
+  SHOP_NUM: OrNull<string>;
+  SHOP_ADD: OrNull<string>;
+  MNG_NM: OrNull<string>;
+  SHOP_CRT_DT: OrNull<string>;
+  DEVICE_COUNT: number;
+}>;
+type AliveList = Array<{
+  DEVICE_SQ: number;
+  SHOP_SQ: number;
+}>;
 
 // 피부샵 리스트 조회
 export const getShopList = async (req: Request, res: Response) => {
   const { error, result } = await useDatabase(
     `
     SELECT
-    SHOP_SQ, SHOP_NM, SHOP_NUM, SHOP_ADD
-    FROM tb_shop
-    WHERE IS_DEL <> 1
-    ORDER BY SHOP_SQ DESC;
+    a.SHOP_SQ, a.SHOP_NM, a.SHOP_NUM, a.SHOP_ADD,
+    b.MNG_NM, a.SHOP_CRT_DT, IF(c.DEVICE_COUNT > 0, c.DEVICE_COUNT, 0) AS DEVICE_COUNT
+    FROM tb_shop a
+    LEFT JOIN tb_manager b ON b.SHOP_SQ = a.SHOP_SQ
+    LEFT JOIN (
+      SELECT SHOP_SQ, COUNT(*) AS DEVICE_COUNT FROM tb_device GROUP BY SHOP_SQ
+    ) c ON c.SHOP_SQ = a.SHOP_SQ
+    ORDER BY a.SHOP_SQ DESC;
+
+    SELECT
+    b.DEVICE_SQ, b.SHOP_SQ FROM tb_alive_device a
+    LEFT JOIN tb_device b ON b.DEVICE_SQ = a.DEVICE_SQ
+    WHERE (a.AL_ON <= NOW() AND a.AL_OFF IS NULL)
+    OR (a.AL_ON <= NOW() AND a.AL_ALIVE IS NOT NULL AND a.AL_OFF IS NULL);
   `,
     []
   );
 
   if (error) return res.send(fail(errorMessage.db));
 
-  res.send(success(result));
+  let [shopList, aliveList]: [ShopList, AliveList] = result;
+
+  shopList = shopList?.map((item) => {
+    let filter = aliveList?.filter((x) => x?.SHOP_SQ === item?.SHOP_SQ);
+    return { ...item, ACTIVE_COUNT: filter?.length };
+  });
+
+  res.send(success(shopList));
 };
 
 // 피부샵 상세정보 조회

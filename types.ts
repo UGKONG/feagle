@@ -10,6 +10,7 @@ export type sn = s | number;
 export type P<T = v> = Promise<T>;
 export type OrNull<T> = T | null;
 export type InputChangeEvent = React.ChangeEvent<HTMLInputElement>;
+export type SetState<T> = React.Dispatch<React.SetStateAction<T>>;
 
 // 성별 (1 - 남자 / 2 - 여자)
 export type Gender = 1 | 2;
@@ -65,7 +66,10 @@ export interface Shop {
   SHOP_NM: s;
   SHOP_NUM: s;
   SHOP_ADD: s;
-  IS_DEL: IsYes;
+  IS_DEL?: IsYes;
+  MNG_NM?: s;
+  DEVICE_COUNT?: n;
+  ACTIVE_COUNT?: n;
   SHOP_MOD_DT?: s;
   SHOP_CRT_DT?: s;
 }
