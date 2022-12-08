@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { InputChangeEvent, SetState } from "../../types";
 import { AiOutlineArrowUp, AiOutlineArrowDown } from "react-icons/ai";
 import _Input from "./Input";
+import _Button from "./Button";
 
 type Active = { sort: number; dir: "ASC" | "DESC"; filter: string };
 interface Props {
@@ -10,12 +11,14 @@ interface Props {
   active: Active;
   setActive: SetState<Active>;
   count?: number;
+  buttons?: Array<{ id: number; name: string; onClick: () => void }>;
 }
 export default function TableHeaderContainer({
   list,
   active,
   setActive,
   count = 0,
+  buttons = [],
 }: Props) {
   const isFilterActive = (id: number): boolean => active?.sort === id;
 
@@ -63,6 +66,11 @@ export default function TableHeaderContainer({
             setActive((prev) => ({ ...prev, filter: e?.target?.value }))
           }
         />
+        {buttons?.map((item) => (
+          <Button key={item?.id} onClick={item?.onClick}>
+            {item?.name}
+          </Button>
+        ))}
       </Side>
     </Container>
   );
@@ -160,4 +168,9 @@ const Count = styled.div`
   white-space: nowrap;
   font-size: 12px;
   color: #aaa;
+`;
+const Button = styled(_Button)`
+  height: 30px;
+  margin-left: 10px;
+  border-radius: 100px;
 `;

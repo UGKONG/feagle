@@ -18,6 +18,7 @@ const ButtonTag = styled.button`
   cursor: pointer;
   letter-spacing: 1px;
   transition: 0.2s;
+  white-space: nowrap;
 
   &:hover {
     background-color: #784dd0;

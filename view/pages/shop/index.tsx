@@ -7,6 +7,7 @@ import Button from "../../common/Button";
 import _Container from "../../common/Container";
 import Dot from "../../common/Dot";
 import TableHeaderContainer from "../../common/TableHeaderContainer";
+import CreateShopModal from "./CreateShopModal";
 import { Active, FilterList, HeaderList } from "./index.type";
 
 const filterList: FilterList = [
@@ -33,6 +34,7 @@ export default function Shop() {
   });
   const [isLoading, setIsLoading] = useState(true);
   const [shopList, setShopList] = useState<Shop[]>([]);
+  const [isCreateShopModal, setIsCreateShopModal] = useState<boolean>(false);
 
   const resultShopList = useMemo<Shop[]>(() => {
     let copy = [...shopList];
@@ -89,6 +91,13 @@ export default function Shop() {
         active={activeFilter}
         setActive={setActiveFilter}
         count={resultShopList?.length}
+        buttons={[
+          {
+            id: 1,
+            name: "피부샵 추가",
+            onClick: () => setIsCreateShopModal(true),
+          },
+        ]}
       />
       <List>
         <Table>
@@ -119,6 +128,14 @@ export default function Shop() {
           </TBody>
         </Table>
       </List>
+
+      {isCreateShopModal && (
+        <CreateShopModal
+          title="피부샵 추가"
+          getList={getShopList}
+          close={() => setIsCreateShopModal(false)}
+        />
+      )}
     </Container>
   );
 }

@@ -16,6 +16,7 @@ import fileRouter from "./routes/file";
 import gasRouter from "./routes/gas";
 import logRouter from "./routes/log";
 import managerRouter from "./routes/manager";
+import modelRouter from "./routes/model";
 
 // Setting
 require("dotenv").config();
@@ -61,6 +62,7 @@ viewRoutes.forEach((path: string) => {
 app.use("/api/test", multiparty, testRoute);
 app.use("/api/request", multiparty, requestRouter);
 app.use("/api/common", multiparty, commonRouter);
+app.use("/api/model", multiparty, modelRouter);
 app.use("/api/device", multiparty, deviceRouter);
 app.use("/api/master", multiparty, masterRouter);
 app.use("/api/manager", multiparty, managerRouter);

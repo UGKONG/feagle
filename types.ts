@@ -10,6 +10,7 @@ export type sn = s | number;
 export type P<T = v> = Promise<T>;
 export type OrNull<T> = T | null;
 export type InputChangeEvent = React.ChangeEvent<HTMLInputElement>;
+export type SelectChangeEvent = React.ChangeEvent<HTMLSelectElement>;
 export type SetState<T> = React.Dispatch<React.SetStateAction<T>>;
 
 // 성별 (1 - 남자 / 2 - 여자)
@@ -88,7 +89,9 @@ export interface DeviceModel {
 export interface Device {
   DEVICE_SQ?: n;
   MDL_SQ: n;
+  MDL_NM: s;
   SHOP_SQ: n;
+  SHOP_NM: s;
   DEVICE_SN: s;
   DEVICE_NM: s;
   DEVICE_SW_VN: s;
@@ -96,7 +99,10 @@ export interface Device {
   DEVICE_BUY_DT: s;
   DEVICE_INSTL_DT: s;
   DEVICE_LAST_DT: s;
-  IS_DEL: IsYes;
+  IS_DEL?: IsYes;
+  UDD_VAL?: n;
+  IS_ACTIVE?: 0 | 1;
+  ON_COUNT?: n;
   DEVICE_MOD_DT?: s;
   DEVICE_CRT_DT?: s;
 }

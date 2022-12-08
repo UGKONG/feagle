@@ -40,6 +40,7 @@ const ContainerTag = styled.main`
   flex-wrap: wrap;
 `;
 const Contents = styled.section`
+  overflow: hidden;
   flex: 1;
   align-self: stretch;
   background-color: #e7e7f1;
