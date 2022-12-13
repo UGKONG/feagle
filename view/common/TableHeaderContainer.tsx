@@ -4,17 +4,29 @@ import { InputChangeEvent, SetState } from "../../types";
 import { AiOutlineArrowUp, AiOutlineArrowDown } from "react-icons/ai";
 import _Input from "./Input";
 import _Button from "./Button";
+import Tab from "./Tab";
 
+export type PropsTab = {
+  active: number;
+  setActive: SetState<number>;
+  list: Array<{ id: number; name: string }>;
+};
 type Active = { sort: number; dir: "ASC" | "DESC"; filter: string };
 interface Props {
-  list: Array<{ id: number; name: string }>;
-  active: Active;
-  setActive: SetState<Active>;
+  tab?: PropsTab;
+  isSearch?: boolean;
+  isCount?: boolean;
+  list?: Array<{ id: number; name: string }>;
+  active?: Active;
+  setActive?: SetState<Active>;
   count?: number;
   buttons?: Array<{ id: number; name: string; onClick: () => void }>;
 }
 export default function TableHeaderContainer({
-  list,
+  tab,
+  isSearch = true,
+  isCount = true,
+  list = [],
   active,
   setActive,
   count = 0,
@@ -25,7 +37,16 @@ export default function TableHeaderContainer({
   return (
     <Container>
       <Side>
-        {list?.length > 0 ? (
+        {tab ? (
+          <Tab
+            height={30}
+            list={tab?.list}
+            active={tab?.active}
+            onChange={(e) => tab?.setActive(e)}
+          />
+        ) : null}
+
+        {active && setActive && list?.length > 0 ? (
           <>
             <Filter>
               {list?.map((item) => (
@@ -58,14 +79,16 @@ export default function TableHeaderContainer({
         ) : null}
       </Side>
       <Side>
-        <Count>{count ?? 0}개</Count>
-        <Input
-          value={active?.filter}
-          placeholder="검색"
-          onChange={(e: InputChangeEvent) =>
-            setActive((prev) => ({ ...prev, filter: e?.target?.value }))
-          }
-        />
+        {isCount && <Count>{count ?? 0}개</Count>}
+        {isSearch && active && setActive && (
+          <Input
+            value={active?.filter}
+            placeholder="검색"
+            onChange={(e: InputChangeEvent) =>
+              setActive((prev) => ({ ...prev, filter: e?.target?.value }))
+            }
+          />
+        )}
         {buttons?.map((item) => (
           <Button key={item?.id} onClick={item?.onClick}>
             {item?.name}

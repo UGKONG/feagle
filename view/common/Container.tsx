@@ -1,54 +1,34 @@
-import { CircularProgress } from "@mui/material";
-import _React, { useMemo } from "react";
-import { useLocation } from "react-router-dom";
+import _React from "react";
 import styled from "styled-components";
-import { MenuList, menuList } from "../../string";
-import Header from "./Header";
-import Menu from "./Menu";
+import { CircularProgress } from "@mui/material";
 
 export default function Container(props: any) {
-  const location = useLocation();
-  const path = location.pathname;
-
-  const activePage = useMemo<MenuList | null>(() => {
-    let pathString = path?.replace(/\//g, "");
-    let find = menuList?.find((x) => x.path?.replace(/\//g, "") === pathString);
-    return find ?? null;
-  }, [path]);
-
   return (
-    <ContainerTag {...props}>
-      <Header activePage={activePage} />
-      <Menu activePage={activePage} />
-      <Contents>
-        {props?.children ?? null}
-        {props?.isLoading ? (
-          <Loading>
-            <CircularProgress />
-          </Loading>
-        ) : null}
-      </Contents>
-    </ContainerTag>
+    <Contents {...props}>
+      {props?.children ?? null}
+      {props?.isLoading ? (
+        <Loading>
+          <CircularProgress />
+        </Loading>
+      ) : null}
+    </Contents>
   );
 }
-const ContainerTag = styled.main`
-  display: flex;
-  align-items: center;
-  align-content: flex-start;
-  justify-content: center;
-  flex: 1;
-  flex-wrap: wrap;
-`;
-const Contents = styled.section`
+
+const Contents = styled.section<{ isContents?: boolean }>`
   overflow: hidden;
   flex: 1;
   align-self: stretch;
-  background-color: #e7e7f1;
-  border: 1px solid #ddd;
+  background-color: ${(x) => (x?.isContents ? "transparent" : "#e7e7f1")};
   border-radius: 10px;
-  padding: 10px;
   position: relative;
   max-height: calc(100% - 60px);
+  border: ${(x) => (x?.isContents ? "none" : "1px solid #ddd")};
+  padding: ${(x) => (x?.isContents ? 0 : 10)}px;
+  & thead {
+    background-color: ${(x) =>
+      x?.isContents ? "transparent" : "#e7e7f1"} !important;
+  }
 `;
 const Loading = styled.div`
   position: absolute;

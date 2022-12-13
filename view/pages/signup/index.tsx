@@ -97,7 +97,12 @@ export default function Signup() {
 
   return (
     <Container>
-      <Header activePage="회원가입" iconHide={true} logoClick="/signin" />
+      <Header
+        isMainPage={true}
+        activePage="회원가입"
+        iconHide={true}
+        logoClick="/signin"
+      />
       <Contents>
         <Section>
           {termsList?.map((item) => (
@@ -206,11 +211,11 @@ export default function Signup() {
 
 const Container = styled(_Container)`
   width: 100%;
+  height: 100%;
 `;
 const Contents = styled.section`
-  width: calc(100% - 160px);
+  padding-left: 160px;
   height: calc(100% - 60px);
-  margin-left: 160px;
   overflow: auto;
   padding-right: 10px;
 `;

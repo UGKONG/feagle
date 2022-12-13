@@ -1,40 +1,83 @@
-import _React, { memo, useMemo } from "react";
+import _React, { memo, useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
 import { MenuList } from "../../string";
 import { FaBell, FaUserCircle } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { Store } from "../../functions/store";
+import { FiArrowLeft } from "react-icons/fi";
+import { useDispatch } from "react-redux";
+import { useAxios } from "../../functions/utils";
+import NoticeView from "./NoticeView";
 
 interface Props {
   activePage: MenuList | string | null;
+  isMainPage: boolean;
   iconHide?: boolean;
   logoClick?: string;
 }
-function Header({ activePage, iconHide, logoClick }: Props) {
+function Header({ activePage, isMainPage, iconHide, logoClick }: Props) {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
+  const customName = useSelector((x: Store) => x?.customTitle);
+  const noticeList = useSelector((x: Store) => x?.noticeList);
+  const [isNoticeView, setIsNoticeView] = useState<boolean>(false);
 
-  const name = useMemo(() => {
+  const getNoticeList = (): void => {
+    useAxios.get("/gas").then(({ data }) => {
+      dispatch({
+        type: "noticeList",
+        payload: data?.result ? data?.current : [],
+      });
+    });
+  };
+
+  const name = useMemo<string>(() => {
     if (typeof activePage === "string") return activePage;
-    return activePage?.name;
+    return activePage?.name ?? "-";
   }, [activePage]);
 
-  const onClick = () => {
+  const onClick = (): void => {
     if (!logoClick) return;
     navigate(logoClick);
   };
 
+  const back = (): void => navigate(-1);
+
+  useEffect(() => {
+    setIsNoticeView(false);
+    getNoticeList();
+  }, [location]);
+
   return (
-    <Container>
-      <Side>
-        <Logo onClick={onClick} />
-        <Title>{name ?? "-"}</Title>
-      </Side>
-      {!iconHide && (
+    <>
+      <Container>
         <Side>
-          <NoticeIcon />
-          <UserIcon />
+          <Logo onClick={onClick} />
+          {!isMainPage && (
+            <BackBtn onClick={back}>
+              <BackIcon />
+              뒤로가기
+            </BackBtn>
+          )}
+          <Title>{customName || name}</Title>
         </Side>
+        {!iconHide && (
+          <Side>
+            <NoticeIcon
+              color={isNoticeView ? "#6d3fcf" : "#aaaaaa"}
+              onClick={() => setIsNoticeView((prev) => !prev)}
+            />
+            <UserIcon />
+          </Side>
+        )}
+      </Container>
+
+      {isNoticeView && (
+        <NoticeView list={noticeList} getNoticeList={getNoticeList} />
       )}
-    </Container>
+    </>
   );
 }
 
@@ -55,7 +98,7 @@ const Side = styled.div`
   align-self: stretch;
 `;
 const Logo = styled.h1.attrs(() => ({}))`
-  width: 200px;
+  width: 160px;
   height: 100%;
   background-repeat: no-repeat;
   background-size: 85% auto;
@@ -65,6 +108,7 @@ const Logo = styled.h1.attrs(() => ({}))`
 `;
 const Title = styled.h2`
   font-size: 20px;
+  padding-bottom: 5px;
 `;
 const iconStyle = `
   border-radius: 50%;
@@ -85,4 +129,23 @@ const UserIcon = styled(FaUserCircle)`
   width: 36px;
   height: 36px;
   ${iconStyle}
+`;
+const BackIcon = styled(FiArrowLeft)`
+  margin-right: 3px;
+`;
+const BackBtn = styled.button`
+  border: none;
+  background-color: transparent;
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  color: #aaa;
+  padding-bottom: 5px;
+  margin-right: 10px;
+  font-weight: 500;
+  cursor: pointer;
+
+  &:hover {
+    color: #555555;
+  }
 `;

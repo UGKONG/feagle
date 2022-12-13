@@ -1,10 +1,9 @@
-import React, { useEffect, useMemo, useState } from "react";
+import _React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { useAxios } from "../../../functions/utils";
 import { Device } from "../../../types";
 import _Container from "../../common/Container";
-import Dot from "../../common/Dot";
 import TableHeaderContainer from "../../common/TableHeaderContainer";
 import { Active, FilterList, HeaderList, Props } from "./index.type";
 
@@ -12,23 +11,23 @@ const filterList: FilterList = [
   { id: 1, name: "일련번호" },
   { id: 2, name: "모델명" },
   { id: 3, name: "피부샵명" },
-  { id: 4, name: "누적사용시간" },
-  { id: 5, name: "가동 횟수" },
-  { id: 6, name: "최근사용일시" },
-  { id: 7, name: "현재상태" },
+  { id: 4, name: "플라즈마 전류" },
+  { id: 5, name: "가스 잔량" },
+  { id: 6, name: "펌웨어" },
+  { id: 7, name: "소프트웨어" },
 ];
 const headerList: HeaderList = [
   "No",
   "일련번호",
   "모델명",
   "피부샵명",
-  "누적사용시간",
-  "가동 횟수",
-  "최근사용일시",
-  "현재 상태",
+  "플라즈마 전류",
+  "가스 잔량",
+  "펌웨어",
+  "소프트웨어",
 ];
 
-export default function Device({
+export default function Shop({
   isHeader = true,
   currentList,
   isShopNameHide = false,
@@ -55,7 +54,7 @@ export default function Device({
     }
 
     // 솔팅 타입
-    // (1 - 일련번호, 2 - 모델명, 3 - 피부샵명, 4 - 누적사용시간, 5 - 가동 횟수, 6 - 최근사용일시, 7 - 현재상태)
+    // (1 - 일련번호, 2 - 모델명, 3 - 피부샵명, 4 - 플라즈마 전류, 5 - 가스 잔량, 6 - 펌웨어, 7 - 소프트웨어)
     if (sort === 1) {
       copy?.sort((a, b) => {
         let up =
@@ -88,28 +87,46 @@ export default function Device({
       });
     } else if (sort === 4) {
       copy?.sort((a, b) => {
-        let up: number = (a?.USE_TM_VAL ?? 0) - (b?.USE_TM_VAL ?? 0);
-        let down: number = (b?.USE_TM_VAL ?? 0) - (a?.USE_TM_VAL ?? 0);
+        let up: number = (a?.PLA_VAL ?? 0) - (b?.PLA_VAL ?? 0);
+        let down: number = (b?.PLA_VAL ?? 0) - (a?.PLA_VAL ?? 0);
         return isUp ? up : down;
       });
     } else if (sort === 5) {
       copy?.sort((a, b) => {
-        let up: number = (a?.ON_COUNT ?? 0) - (b?.ON_COUNT ?? 0);
-        let down: number = (b?.ON_COUNT ?? 0) - (a?.ON_COUNT ?? 0);
+        let up: number = (a?.GAS_VAL ?? 0) - (b?.GAS_VAL ?? 0);
+        let down: number = (b?.GAS_VAL ?? 0) - (a?.GAS_VAL ?? 0);
         return isUp ? up : down;
       });
     } else if (sort === 6) {
       copy?.sort((a, b) => {
-        let aDate: Date = new Date(a?.DEVICE_LAST_DT as string);
-        let bDate: Date = new Date(b?.DEVICE_LAST_DT as string);
-        let up: number = aDate.getTime() - bDate.getTime();
-        let down: number = bDate.getTime() - aDate.getTime();
+        let up =
+          a?.DEVICE_FW_VN < b?.DEVICE_FW_VN
+            ? -1
+            : a?.DEVICE_FW_VN > b?.DEVICE_FW_VN
+            ? 1
+            : 0;
+        let down =
+          a?.DEVICE_FW_VN > b?.DEVICE_FW_VN
+            ? -1
+            : a?.DEVICE_FW_VN < b?.DEVICE_FW_VN
+            ? 1
+            : 0;
         return isUp ? up : down;
       });
     } else if (sort === 7) {
       copy?.sort((a, b) => {
-        let up: number = (a?.IS_ACTIVE ?? 0) - (b?.IS_ACTIVE ?? 0);
-        let down: number = (b?.IS_ACTIVE ?? 0) - (a?.IS_ACTIVE ?? 0);
+        let up =
+          a?.DEVICE_SW_VN < b?.DEVICE_SW_VN
+            ? -1
+            : a?.DEVICE_SW_VN > b?.DEVICE_SW_VN
+            ? 1
+            : 0;
+        let down =
+          a?.DEVICE_SW_VN > b?.DEVICE_SW_VN
+            ? -1
+            : a?.DEVICE_SW_VN < b?.DEVICE_SW_VN
+            ? 1
+            : 0;
         return isUp ? up : down;
       });
     }
@@ -119,7 +136,6 @@ export default function Device({
 
   const getShopList = () => {
     if (currentList) return;
-
     useAxios.get("/device").then(({ data }) => {
       setIsLoading(false);
       setDeviceList(data?.current);
@@ -159,12 +175,10 @@ export default function Device({
                 <Td>{item?.DEVICE_SN ?? "-"}</Td>
                 <Td>{item?.MDL_NM ?? "-"}</Td>
                 {!isShopNameHide && <Td>{item?.SHOP_NM ?? "-"}</Td>}
-                <Td>{item?.USE_TM_VAL ? item?.USE_TM_VAL + "시간" : "-"}</Td>
-                <Td>{item?.ON_COUNT ? item?.ON_COUNT + "회" : "-"}</Td>
-                <Td>{item?.DEVICE_LAST_DT ?? "-"}</Td>
-                <Td>
-                  <Dot isActive={item?.IS_ACTIVE ? true : false} />
-                </Td>
+                <Td>{item?.PLA_VAL ? item?.PLA_VAL + "mA" : "-"}</Td>
+                <Td>{item?.GAS_VAL ? item?.GAS_VAL + "%" : "-"}</Td>
+                <Td>{item?.DEVICE_FW_VN ?? "-"}</Td>
+                <Td>{item?.DEVICE_SW_VN ?? "-"}</Td>
               </Tr>
             ))}
           </TBody>

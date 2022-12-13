@@ -75,6 +75,25 @@ export interface Shop {
   SHOP_CRT_DT?: s;
 }
 
+// 샵 상세정보
+export interface ShopDetail {
+  DEVICE: Device[];
+  HISTORY: History[];
+  IS_DEL: 0 | 1;
+  MNG: null | Manager;
+  SHOP_ADD: s;
+  SHOP_NM: s;
+  SHOP_NUM: s;
+  SHOP_SQ: n;
+}
+
+// 히스토리
+export interface History {
+  UDD_SQ: n;
+  UDD_TXT: s;
+  UDD_CRT_DT: s;
+}
+
 // 장비 모델 테이블
 export interface DeviceModel {
   MDL_SQ?: n;
@@ -92,6 +111,8 @@ export interface Device {
   MDL_NM: s;
   SHOP_SQ: n;
   SHOP_NM: s;
+  SHOP_NUM?: s;
+  SHOP_ADD?: s;
   DEVICE_SN: s;
   DEVICE_NM: s;
   DEVICE_SW_VN: s;
@@ -100,11 +121,16 @@ export interface Device {
   DEVICE_INSTL_DT: s;
   DEVICE_LAST_DT: s;
   IS_DEL?: IsYes;
-  UDD_VAL?: n;
+  USE_TM_VAL?: n;
+  PLA_VAL?: n;
+  GAS_VAL?: n;
+  GAS1_VAL?: n;
+  GAS2_VAL?: n;
   IS_ACTIVE?: 0 | 1;
   ON_COUNT?: n;
   DEVICE_MOD_DT?: s;
   DEVICE_CRT_DT?: s;
+  HISTORY: History[];
 }
 
 // 마스터 테이블 (피글 관계자들)
@@ -112,14 +138,14 @@ export interface Master {
   MST_SQ?: n;
   MST_NM: s;
   MST_NUM: s;
-  MST_GRP: s;
-  MST_PO: s;
+  MST_GRP?: s;
+  MST_PO?: s;
   MST_GD: Gender;
   MST_ID: s;
-  MST_PW: s;
+  MST_PW?: s;
   AUTH_SQ: Auth;
   AUTH_TEXT?: s;
-  IS_DEL: IsYes;
+  IS_DEL?: IsYes;
   MST_MOD_DT?: s;
   MST_CRT_DT?: s;
 }
@@ -139,7 +165,7 @@ export interface Master {
 // 매니저 테이블 (피부샵 관계자들)
 export interface Manager {
   MNG_SQ?: n;
-  SHOP_SQ: n;
+  SHOP_SQ?: n;
   MNG_NM: s;
   MNG_NUM: s;
   MNG_GD: Gender;
@@ -147,7 +173,7 @@ export interface Manager {
   MNG_PW?: s;
   OS: Os;
   UUID: s;
-  IS_DEL: IsYes;
+  IS_DEL?: IsYes;
   MNG_MOD_DT?: s;
   MNG_CRT_DT?: s;
 }
@@ -202,10 +228,10 @@ export interface UseDeviceData {
 
 // 가스 주문 테이블
 export interface GasReq {
-  GR_SQ?: n;
+  GR_SQ: n;
   SHOP_SQ: n;
+  SHOP_NM: s;
   IS_CHK: IsYes;
-  GR_DT: s;
   GR_MOD_DT?: s;
   GR_CRT_DT?: s;
 }
@@ -268,4 +294,15 @@ export interface Log {
   LOG_IP: s;
   LOG_TXT: s;
   LOG_CRT_DT?: s;
+}
+
+// 조치 이력
+export interface DeviceDo {
+  DO_SQ: n;
+  DO_CN: s;
+  MST_SQ: n;
+  MST_NM: s;
+  MST_GRP: s;
+  MST_PO: s;
+  DO_CRT_DT: s;
 }

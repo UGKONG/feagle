@@ -1,25 +1,26 @@
-import _React from "react";
-import { useNavigate } from "react-router-dom";
+import _React, { useMemo } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { Logout } from "@mui/icons-material";
 import { MenuList, menuList } from "../../string";
 import { useAxios } from "../../functions/utils";
 
-interface Props {
-  activePage: MenuList | null;
-}
-export default function Menu({ activePage }: Props) {
+export default function Menu() {
+  const location = useLocation();
   const navigate = useNavigate();
 
+  // 메뉴 클릭
   const menuClick = (path: string) => navigate(path);
 
+  // 로그아웃
   const logout = () => {
-    useAxios.get("/common/logout");
-    navigate("/signin");
+    useAxios.get("/common/logout").then(() => navigate("/signin"));
   };
 
-  const makeClassName = (id: number) => {
-    return id === activePage?.id ? "active" : "";
+  // 메뉴 활성화 여부
+  const isActive = (path: string): string => {
+    if (location?.pathname !== "/" && path === "/") return "";
+    return location?.pathname?.indexOf(path) > -1 ? "active" : "";
   };
 
   return (
@@ -28,7 +29,7 @@ export default function Menu({ activePage }: Props) {
         {menuList?.map((item) => (
           <MenuItem
             key={item?.path}
-            className={makeClassName(item?.id)}
+            className={isActive(item?.path)}
             onClick={() => menuClick(item?.path)}
           >
             {item?.name}
@@ -66,7 +67,6 @@ const MenuItem = styled.li`
     color: #8b6ad3;
   }
   &.active {
-    font-size: 16px;
     font-weight: 700;
     color: #6d3fcf;
   }

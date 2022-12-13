@@ -74,22 +74,87 @@ export const getShop = async (req: Request, res: Response) => {
 
     SELECT
     a.DEVICE_SQ, a.MDL_SQ, b.MDL_NM, b.MDL_EN_NM, b.MDL_DESC,
-    a.DEVICE_SN, a.DEVICE_NM, a.DEVICE_SW_VN, a.DEVICE_FW_VN,
-    a.DEVICE_BUY_DT, a.DEVICE_INSTL_DT
+    a.SHOP_SQ, c.SHOP_NM, a.DEVICE_SN, a.DEVICE_NM, a.DEVICE_SW_VN, a.DEVICE_FW_VN,
+    a.DEVICE_BUY_DT, a.DEVICE_INSTL_DT, d.UDD_VAL AS USE_TM_VAL, h.UDD_VAL AS GAS_VAL,
+    IF(e.IS_ACTIVE, e.IS_ACTIVE, 0) AS IS_ACTIVE, IF(f.ON_COUNT, f.ON_COUNT, 0) AS ON_COUNT,
+    a.DEVICE_LAST_DT, g.UDD_VAL AS PLA_VAL
     FROM tb_device a
     LEFT JOIN tb_device_model b ON b.MDL_SQ = a.MDL_SQ
-    WHERE a.SHOP_SQ = ?
+    LEFT JOIN tb_shop c ON c.SHOP_SQ = a.SHOP_SQ
+    LEFT JOIN (
+      SELECT DEVICE_SQ, MAX(UDD_VAL) AS UDD_VAL
+      FROM tb_use_device_data
+      WHERE UDD_TP = 4
+      GROUP BY DEVICE_SQ
+    ) d ON d.DEVICE_SQ = a.DEVICE_SQ
+    LEFT JOIN (
+      SELECT DEVICE_SQ, 1 AS IS_ACTIVE
+      FROM tb_alive_device
+      WHERE AL_OFF IS NULL
+    ) e ON e.DEVICE_SQ = a.DEVICE_SQ
+    LEFT JOIN (
+      SELECT DEVICE_SQ, COUNT(DEVICE_SQ) AS ON_COUNT
+      FROM tb_alive_device
+      GROUP BY DEVICE_SQ
+    ) f ON f.DEVICE_SQ = a.DEVICE_SQ
+    LEFT JOIN (
+      SELECT DEVICE_SQ, MAX(UDD_VAL) AS UDD_VAL
+      FROM tb_use_device_data
+      WHERE UDD_TP = 5
+      GROUP BY DEVICE_SQ
+    ) g ON g.DEVICE_SQ = a.DEVICE_SQ
+    LEFT JOIN (
+      SELECT DEVICE_SQ, MAX(UDD_VAL) AS UDD_VAL
+      FROM tb_use_device_data
+      WHERE UDD_TP = 1
+      GROUP BY DEVICE_SQ
+    ) h ON h.DEVICE_SQ = a.DEVICE_SQ
+    WHERE a.IS_DEL = 0
+    AND a.SHOP_SQ = ?
     ORDER BY a.DEVICE_SQ DESC;
+
+    SELECT 
+    a.UDD_SQ, a.UDD_TP, a.UDD_VAL, a.UDD_CRT_DT
+    FROM tb_use_device_data a
+    WHERE DEVICE_SQ IN (
+      SELECT DEVICE_SQ FROM tb_device WHERE SHOP_SQ = ?
+    );
   `,
-    [SHOP_SQ, SHOP_SQ, SHOP_SQ]
+    [SHOP_SQ, SHOP_SQ, SHOP_SQ, SHOP_SQ]
   );
 
   if (error) return res.send(fail(errorMessage.db));
 
   let data = result[0][0];
   if (!data) return res.send(success(null));
+  let history = result[3];
 
-  data = { ...data, MNG: result[1][0] ?? null, DEVICE: result[2] };
+  history = history?.map((item: any) => {
+    let tp = item?.UDD_TP;
+    let val = item?.UDD_VAL;
+    let txt = "";
+
+    if (tp === 1) {
+      txt = `가스 잔량이 ${val}% 남았습니다.`;
+    } else if (tp === 2) {
+      txt = `가스 얍력이 ${val}㎫ 입니다.`;
+    } else if (tp === 3) {
+      txt = `가스 유량이 ${val}ℓ/hr 입니다.`;
+    } else if (tp === 4) {
+      txt = `누적 사용시간이 ${val} 입니다.`;
+    } else if (tp === 5) {
+      txt = `플라즈마 전류가 ${val}㎃ 입니다.`;
+    }
+
+    return { UDD_SQ: item?.UDD_SQ, UDD_TXT: txt, UDD_CRT_DT: item?.UDD_CRT_DT };
+  });
+
+  data = {
+    ...data,
+    MNG: result[1][0] ?? null,
+    DEVICE: result[2],
+    HISTORY: history,
+  };
   res.send(success(data));
 };
 

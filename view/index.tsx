@@ -16,9 +16,9 @@ if (rootNode) {
   createRoot(rootNode).render(
     <React.StrictMode>
       <Provider store={store}>
-        <HashRouter>
+        <HistoryRouter>
           <App />
-        </HashRouter>
+        </HistoryRouter>
       </Provider>
     </React.StrictMode>
   );

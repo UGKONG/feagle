@@ -6,7 +6,7 @@ import { errorMessage } from "../string";
 const masterCommonQuery = `
   SELECT
   a.MST_SQ, a.MST_NM, a.MST_NUM, a.MST_GRP, a.MST_PO,
-  a.MST_GD, a.MST_ID, a.AUTH_SQ, b.COMM_NM AS AUTH_TEST
+  a.MST_GD, a.MST_ID, a.AUTH_SQ, b.COMM_NM AS AUTH_TEXT
   FROM tb_master a
   LEFT JOIN tb_common b ON b.COMM_CODE = a.AUTH_SQ
   AND b.COMM_GRP = 4 AND b.COMM_CODE > 0

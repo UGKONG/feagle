@@ -388,12 +388,12 @@ const SectionTitle = styled.p`
   letter-spacing: 1px;
   margin-bottom: 10px;
 `;
-const InputContainer = styled.div`
+export const InputContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
 `;
-const Input = styled(_Input)`
+export const Input = styled(_Input)`
   width: ${(x: { col: 1 | 2 | 3 }) =>
     x?.col === 1
       ? "100%"
@@ -404,7 +404,7 @@ const Input = styled(_Input)`
   line-height: 38px;
   margin-top: 5px;
 `;
-const GenderInput = styled.div`
+export const GenderInput = styled.div`
   width: 112px;
   height: 38px;
   margin-top: 5px;
@@ -414,7 +414,7 @@ const GenderInput = styled.div`
   border-radius: 100px;
   overflow: hidden;
 `;
-const GenderItem = styled.div`
+export const GenderItem = styled.div`
   width: 50%;
   display: flex;
   align-items: center;
@@ -433,7 +433,7 @@ const GenderItem = styled.div`
     color: #fff;
   }
 `;
-const DeviceRow = styled.div`
+export const DeviceRow = styled.div`
   width: 100%;
   display: flex;
   padding-left: 10px;
@@ -450,10 +450,10 @@ const DeviceRow = styled.div`
     position: absolute;
   }
 `;
-const Left = styled.div`
+export const Left = styled.div`
   flex: 1;
 `;
-const DeviceDelBtn = styled(_Button)`
+export const DeviceDelBtn = styled(_Button)`
   width: 50px;
   margin-top: 5px;
   height: calc(100% - 5px);
@@ -468,13 +468,13 @@ const DeviceDelBtn = styled(_Button)`
     background-color: #e02a2a;
   }
 `;
-const Select = styled(_Select)`
+export const Select = styled(_Select)`
   margin-top: 5px;
   margin-right: 5px;
   width: 170px;
   height: 38px;
 `;
-const DeviceInput = styled(Input)`
+export const DeviceInput = styled(Input)`
   width: unset;
   flex: 1;
   margin-right: 5px;
@@ -483,12 +483,12 @@ const DeviceInput = styled(Input)`
     color: #000000;
   }
 `;
-const DeviceAddBtn = styled(_Button)`
+export const DeviceAddBtn = styled(_Button)`
   width: 100%;
   height: 32px;
   margin: 10px 0;
 `;
-const Label = styled.label`
+export const Label = styled.label`
   font-size: 12px;
   color: #777777;
   margin-left: 5px;

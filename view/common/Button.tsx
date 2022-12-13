@@ -8,7 +8,7 @@ export default function Button(props: any) {
 const ButtonTag = styled.button`
   height: 40px;
   border-radius: 4px;
-  padding: 0 10px;
+  padding: 0 14px;
   font-size: 13px;
   outline: 0;
   border: none;

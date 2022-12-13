@@ -4,7 +4,12 @@ import Button from "./Button";
 
 interface Props {
   title: string;
-  buttons?: Array<{ id: number; name: string; onClick: () => void }>;
+  buttons?: Array<{
+    id: number;
+    name: string;
+    onClick: () => void;
+    color?: "red" | "gray";
+  }>;
   children?: JSX.Element;
   size?: number;
   bgColor?: string;
@@ -28,11 +33,11 @@ export default function Modal({
         <Padding>{children}</Padding>
         <ButtonContainer>
           {buttons?.map((item) => (
-            <Btn key={item?.id} onClick={item?.onClick}>
+            <Btn key={item?.id} onClick={item?.onClick} color={item?.color}>
               {item?.name}
             </Btn>
           ))}
-          <Btn type="close" onClick={close}>
+          <Btn color="gray" onClick={close}>
             닫 기
           </Btn>
         </ButtonContainer>
@@ -94,11 +99,22 @@ const Btn = styled(Button)`
   width: 100%;
   height: 36px;
   box-shadow: none;
-  background-color: ${(x) => (x?.type === "close" ? "#aaa" : "#8b61dc")};
+  background-color: ${(x) =>
+    x?.color === "gray" ? "#aaa" : x?.color === "red" ? "#ff7979" : "#8b61dc"};
   &:hover {
-    background-color: ${(x) => (x?.type === "close" ? "#999" : "#784dd0")};
+    background-color: ${(x) =>
+      x?.color === "gray"
+        ? "#999"
+        : x?.color === "red"
+        ? "#ff5a5a"
+        : "#784dd0"};
   }
   &:active {
-    background-color: ${(x) => (x?.type === "close" ? "#777" : "#5b30b2")};
+    background-color: ${(x) =>
+      x?.color === "gray"
+        ? "#777"
+        : x?.color === "red"
+        ? "#fc2424"
+        : "#5b30b2"};
   }
 `;

@@ -1,1 +1,16 @@
-["/", "/signin", "/signup", "/signout", "/docs", "/shop", "/useDevice"]
+[
+  "/",
+  "/signin",
+  "/signup",
+  "/signout",
+  "/docs",
+  "/shop",
+  "/shop/:id",
+  "/device",
+  "/device/:id",
+  "/state",
+  "/ware",
+  "/board",
+  "/board/:id",
+  "/user"
+]

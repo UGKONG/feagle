@@ -17,6 +17,7 @@ import gasRouter from "./routes/gas";
 import logRouter from "./routes/log";
 import managerRouter from "./routes/manager";
 import modelRouter from "./routes/model";
+import deviceDoRouter from "./routes/deviceDo";
 
 // Setting
 require("dotenv").config();
@@ -71,6 +72,7 @@ app.use("/api/board", multiparty, boardRouter);
 app.use("/api/file", multiparty, fileRouter);
 app.use("/api/gas", multiparty, gasRouter);
 app.use("/api/log", multiparty, logRouter);
+app.use("/api/deviceDo", multiparty, deviceDoRouter);
 
 // Start
 app.listen(port, serverStart);

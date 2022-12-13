@@ -1,19 +1,41 @@
-import _React, { useEffect } from "react";
+import _React, { useEffect, useMemo } from "react";
 import styled from "styled-components";
 import Routes from "./common/Routes";
 import bgImg from "./assets/images/bg.png";
 import { useDispatch } from "react-redux";
 import { useAxios } from "../functions/utils";
 import { Master } from "../types";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Alert from "./common/Alert";
+import Menu from "./common/Menu";
+import Header from "./common/Header";
+import { MenuList, menuList } from "../string";
 
 export default function App() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const location = useLocation();
+
+  const activePage = useMemo<MenuList | null>(() => {
+    const path = location.pathname;
+    let pathString = path?.split("/")[1];
+    let find = menuList?.find((x) => x.path?.replace(/\//g, "") === pathString);
+    return find ?? null;
+  }, [location.pathname]);
+
+  const isMainPage = useMemo<boolean>(() => {
+    let split = location.pathname?.split("/");
+    console.log(split);
+    return split?.length <= 2 || split[split?.length - 1] === "";
+  }, [location?.pathname]);
+
+  // 커스텀 타이틀 초기화
+  const customTitleReset = (): void => {
+    dispatch({ type: "customTitle", payload: "" });
+  };
 
   // 세션 체크
-  const sessionCheck = () => {
+  const sessionCheck = (): void => {
     useAxios
       .get("/common/session")
       .then(({ data }) => {
@@ -28,11 +50,21 @@ export default function App() {
 
   // useEffect(sessionCheck, []);
 
+  useEffect(customTitleReset, [location]);
+
   return (
     <>
       <Background>
         <Container>
-          <Routes />
+          <Wrap>
+            {activePage && (
+              <>
+                <Header activePage={activePage} isMainPage={isMainPage} />
+                {isMainPage && <Menu />}
+              </>
+            )}
+            <Routes />
+          </Wrap>
         </Container>
       </Background>
       <Alert />
@@ -56,4 +88,12 @@ const Container = styled.div`
   flex: 1;
   display: flex;
   position: relative;
+`;
+const Wrap = styled.main`
+  display: flex;
+  align-items: center;
+  align-content: flex-start;
+  justify-content: center;
+  flex: 1;
+  flex-wrap: wrap;
 `;
