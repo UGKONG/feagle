@@ -1,7 +1,7 @@
 import { Response } from "express";
 import { fail, success, useDatabase, useIsNumber } from "../functions/utils";
 import fs from "fs";
-import { errorMessage, uploadDir } from "../string";
+import { uploadDir } from "../string";
 
 // 파일 다운로드
 export const postFileDownload = async (req: any, res: Response) => {
@@ -49,6 +49,4 @@ export const postFileDownload = async (req: any, res: Response) => {
   } catch {
     return res.send(fail());
   }
-
-  res.send(success("파일 다운로드"));
 };

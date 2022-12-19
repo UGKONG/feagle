@@ -1,13 +1,23 @@
 import { Device, SetState } from "../../../types";
 
-export interface DefaultInfoBoxProps {
+export type DefaultInfoBoxProps = {
   data: null | Device;
-}
-export interface StateInfoBoxProps {
+};
+export type StateInfoBoxProps = {
   setIsDataChartModal: SetState<boolean>;
   setIsUseChartModal: SetState<boolean>;
   data: null | Device;
-}
-export interface ShopInfoBoxProps {
+};
+export type ShopInfoBoxProps = {
   data: null | Device;
-}
+};
+export type ChartDate = {
+  start: string;
+  end: string;
+  type?: number;
+};
+export type ChartData = {
+  COMM_CODE: number;
+  COMM_NM: string;
+  VALUE: number;
+};

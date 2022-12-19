@@ -20,7 +20,12 @@ interface Props {
   active?: Active;
   setActive?: SetState<Active>;
   count?: number;
-  buttons?: Array<{ id: number; name: string; onClick: () => void }>;
+  buttons?: Array<{
+    id: number;
+    name: string;
+    onClick: () => void;
+    color?: "gray";
+  }>;
 }
 export default function TableHeaderContainer({
   tab,
@@ -90,7 +95,7 @@ export default function TableHeaderContainer({
           />
         )}
         {buttons?.map((item) => (
-          <Button key={item?.id} onClick={item?.onClick}>
+          <Button key={item?.id} color={item?.color} onClick={item?.onClick}>
             {item?.name}
           </Button>
         ))}
@@ -192,8 +197,22 @@ const Count = styled.div`
   font-size: 12px;
   color: #aaa;
 `;
-const Button = styled(_Button)`
+const Button = styled(_Button)<{ color: "gray" }>`
   height: 30px;
   margin-left: 10px;
   border-radius: 100px;
+  ${(x) =>
+    x?.color
+      ? `
+    background-color: #999;
+    border: none;
+    box-shadow: none;
+    &:hover {
+      background-color: #888;
+    }
+    &:active {
+      background-color: #777;
+    }
+  `
+      : ""}
 `;

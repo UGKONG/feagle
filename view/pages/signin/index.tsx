@@ -49,6 +49,10 @@ export default function Signin() {
     }
 
     dispatch({ type: "master", payload: data?.current });
+    dispatch({
+      type: "alert",
+      payload: { type: "success", text: "로그인되었습니다." },
+    });
     navigate("/");
   };
 

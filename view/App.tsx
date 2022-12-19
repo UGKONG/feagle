@@ -25,8 +25,8 @@ export default function App() {
 
   const isMainPage = useMemo<boolean>(() => {
     let split = location.pathname?.split("/");
-    console.log(split);
-    return split?.length <= 2 || split[split?.length - 1] === "";
+    if (split?.length < 3) return true;
+    return split?.length <= 3 && split[split?.length - 1] === "";
   }, [location?.pathname]);
 
   // 커스텀 타이틀 초기화
@@ -59,7 +59,11 @@ export default function App() {
           <Wrap>
             {activePage && (
               <>
-                <Header activePage={activePage} isMainPage={isMainPage} />
+                <Header
+                  activePage={activePage}
+                  isMainPage={isMainPage}
+                  logoClick={"/"}
+                />
                 {isMainPage && <Menu />}
               </>
             )}

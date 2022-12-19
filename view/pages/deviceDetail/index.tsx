@@ -8,7 +8,6 @@ import _Button from "../../common/Button";
 import Modal from "../../common/Modal";
 import { Device, DeviceDo, InputChangeEvent } from "../../../types";
 import DefaultInfoBox from "./DefaultInfoBox";
-import { SectionTitle } from "../shopDetail";
 import StateInfoBox from "./StateInfoBox";
 import ShopInfoBox from "./ShopInfoBox";
 import HistoryList from "../history";
@@ -16,6 +15,8 @@ import DeviceDoList from "../deviceDo";
 import _Input from "../../common/Input";
 import { useSelector } from "react-redux";
 import { Store } from "../../../functions/store";
+import UseChartModal from "./UseChartModal";
+import DataChartModal from "./DataChartModal";
 
 export default function DeviceDetail() {
   const params = useParams();
@@ -24,8 +25,8 @@ export default function DeviceDetail() {
   const loginMST = useSelector((x: Store) => x?.master);
   const DEVICE_SQ = params?.id;
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [isDataChartModal, setIsDataChartModal] = useState<boolean>(false);
   const [isUseChartModal, setIsUseChartModal] = useState<boolean>(false);
+  const [isDataChartModal, setIsDataChartModal] = useState<boolean>(false);
   const [deviceData, setDeviceData] = useState<Device | null>(null);
   const [deviceDoList, setDeviceDoList] = useState<DeviceDo[]>([]);
   const [inputValue, setInputValue] = useState<string>("");
@@ -116,18 +117,6 @@ export default function DeviceDetail() {
         <HistoryList currentList={deviceData?.HISTORY} isHeader={false} />
       </Container>
 
-      {/* 데이터 통계 보기 */}
-      {isDataChartModal && (
-        <Modal
-          title="장비 데이터 통계"
-          size={1000}
-          bgColor="#E7E7F1"
-          close={() => setIsDataChartModal(false)}
-        >
-          <>내용..</>
-        </Modal>
-      )}
-
       {/* 사용 통계 보기 */}
       {isUseChartModal && (
         <Modal
@@ -136,13 +125,43 @@ export default function DeviceDetail() {
           bgColor="#E7E7F1"
           close={() => setIsUseChartModal(false)}
         >
-          <>내용..</>
+          <UseChartModal />
+        </Modal>
+      )}
+
+      {/* 데이터 통계 보기 */}
+      {isDataChartModal && (
+        <Modal
+          title="장비 데이터 통계"
+          size={1000}
+          bgColor="#E7E7F1"
+          close={() => setIsDataChartModal(false)}
+        >
+          <DataChartModal />
         </Modal>
       )}
     </>
   );
 }
+const SectionTitle = styled.p`
+  position: relative;
+  font-size: 16px;
+  font-weight: 500;
+  color: #222222;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
+  &::after {
+    content: "";
+    display: block;
+    flex: 1;
+    height: 2px;
+    background-color: #8b6ad3aa;
+    margin-left: 10px;
+  }
+`;
 const Container = styled(_Container)`
   overflow: auto;
   min-height: calc(100% - 60px);

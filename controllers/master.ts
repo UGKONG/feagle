@@ -6,11 +6,12 @@ import { errorMessage } from "../string";
 const masterCommonQuery = `
   SELECT
   a.MST_SQ, a.MST_NM, a.MST_NUM, a.MST_GRP, a.MST_PO,
-  a.MST_GD, a.MST_ID, a.AUTH_SQ, b.COMM_NM AS AUTH_TEXT
+  a.MST_GD, a.MST_ID, a.AUTH_SQ, b.COMM_NM AS AUTH_TEXT,
+  a.MST_JOIN_DT, a.MST_CRT_DT, a.IS_USE
   FROM tb_master a
   LEFT JOIN tb_common b ON b.COMM_CODE = a.AUTH_SQ
   AND b.COMM_GRP = 4 AND b.COMM_CODE > 0
-  WHERE a.IS_DEL = 0
+  WHERE a.IS_DEL = 0 AND a.AUTH_SQ IS NOT NULL
 `;
 
 // 마스터 리스트 조회
@@ -134,7 +135,14 @@ export const postLogin = async (req: any, res: Response) => {
 
   const { error, result } = await useDatabase(
     `
-    ${masterCommonQuery}
+    SELECT
+    a.MST_SQ, a.MST_NM, a.MST_NUM, a.MST_GRP, a.MST_PO,
+    a.MST_GD, a.MST_ID, a.AUTH_SQ, b.COMM_NM AS AUTH_TEXT,
+    a.MST_JOIN_DT, a.MST_CRT_DT, a.IS_USE
+    FROM tb_master a
+    LEFT JOIN tb_common b ON b.COMM_CODE = a.AUTH_SQ
+    AND b.COMM_GRP = 4 AND b.COMM_CODE > 0
+    WHERE a.IS_DEL = 0
     AND a.MST_ID = ? AND a.MST_PW = ?
     ORDER BY a.MST_SQ DESC LIMIT 1;
     ;
@@ -156,7 +164,96 @@ export const postLogin = async (req: any, res: Response) => {
     );
   }
 
+  // 사용중지
+  if (user?.AUTH_SQ == 5) {
+    return res.send(fail("사용중지된 계정입니다. 관리자에게 문의해주세요."));
+  }
+
   // 로그인 성공
   req.session.user = { ...user, ACT_TP: 2 };
   res.send(success(user));
+};
+
+// 가입 요청자 리스트
+export const getMasterJoinList = async (req: Request, res: Response) => {
+  const { error, result } = await useDatabase(
+    `
+    SELECT
+    a.MST_SQ, a.MST_NM, a.MST_NUM, a.MST_GRP, a.MST_PO,
+    a.MST_GD, a.MST_ID, a.AUTH_SQ, b.COMM_NM AS AUTH_TEXT,
+    a.MST_CRT_DT
+    FROM tb_master a
+    LEFT JOIN tb_common b ON b.COMM_CODE = a.AUTH_SQ
+    AND b.COMM_GRP = 4 AND b.COMM_CODE > 0
+    WHERE a.IS_DEL = 0 AND a.AUTH_SQ IS NULL
+    ORDER BY a.MST_SQ DESC;
+  `,
+    []
+  );
+
+  if (error) return res.send(fail(errorMessage.db));
+
+  res.send(success(result));
+};
+
+// 가입 요청자 수락
+export const putMasterJoin = async (req: Request, res: Response) => {
+  const MST_SQ = req?.params?.MST_SQ;
+  const AUTH_SQ = req?.query?.AUTH_SQ ?? req?.body?.AUTH_SQ;
+  const IS_OK = req?.query?.IS_OK ?? req?.body?.IS_OK;
+
+  if (!useIsNumber(MST_SQ) || !useIsNumber(AUTH_SQ)) {
+    return res.send(fail(errorMessage.parameter));
+  }
+
+  if (!Number(IS_OK)) {
+    const { error } = await useDatabase(
+      `
+      DELETE FROM tb_master
+      WHERE MST_SQ = ?;
+    `,
+      [MST_SQ]
+    );
+
+    if (error) return res.send(fail(errorMessage.db));
+
+    res.send(success());
+    return;
+  }
+
+  const { error } = await useDatabase(
+    `
+    UPDATE tb_master SET
+    AUTH_SQ = ?, MST_JOIN_DT = NOW()
+    WHERE MST_SQ = ?;
+  `,
+    [AUTH_SQ, MST_SQ]
+  );
+
+  if (error) return res.send(fail(errorMessage.db));
+
+  res.send(success());
+};
+
+// 마스터 권한 변경
+export const putMasterAuth = async (req: Request, res: Response) => {
+  const MST_SQ = req?.params?.MST_SQ;
+  const AUTH_SQ = req?.query?.AUTH_SQ ?? req?.body?.AUTH_SQ;
+
+  if (!useIsNumber(MST_SQ) || !useIsNumber(AUTH_SQ)) {
+    return res.send(fail(errorMessage.parameter));
+  }
+
+  const { error } = await useDatabase(
+    `
+    UPDATE tb_master SET
+    AUTH_SQ = ?
+    WHERE MST_SQ = ?;
+  `,
+    [AUTH_SQ, MST_SQ]
+  );
+
+  if (error) return res.send(fail(errorMessage.db));
+
+  res.send(success());
 };

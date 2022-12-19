@@ -6,13 +6,10 @@ import {
   EditBtn,
   Editing,
   EditInput,
-  Header,
-  InfoBoxContainer,
   OkBtn,
   Row,
   RowContents,
   RowTitle,
-  Title,
 } from ".";
 import { InputChangeEvent, ShopDetail } from "../../../types";
 import type { ShopInfoBoxProps } from "./index.type";
@@ -21,6 +18,7 @@ import { useDispatch } from "react-redux";
 import styled from "styled-components";
 import _Button from "../../common/Button";
 import { useParams } from "react-router-dom";
+import { InfoBox, InfoBoxTitle } from "../deviceDetail";
 
 export default function ShopInfoBox({
   data,
@@ -95,24 +93,26 @@ export default function ShopInfoBox({
   }, [isEdit]);
 
   return (
-    <InfoBoxContainer>
-      <Header>
-        <Title>피부샵 정보</Title>
-        {isEdit ? (
-          <>
-            <Editing />
-            <OkBtn onClick={validate} />
-            <CancelBtn onClick={() => setIsEdit(false)} />
-          </>
-        ) : (
-          <>
-            <EditBtn onClick={() => setIsEdit(true)} />
-            {data?.IS_DEL === 0 && (
-              <DelBtn onClick={() => setIsDelModal(true)} />
-            )}
-          </>
-        )}
-      </Header>
+    <Container>
+      <InfoBoxTitle>
+        피부샵 정보
+        <ButtonContainer>
+          {isEdit ? (
+            <>
+              <Editing />
+              <OkBtn onClick={validate} />
+              <CancelBtn onClick={() => setIsEdit(false)} />
+            </>
+          ) : (
+            <>
+              <EditBtn onClick={() => setIsEdit(true)} />
+              {data?.IS_DEL === 0 && (
+                <DelBtn onClick={() => setIsDelModal(true)} />
+              )}
+            </>
+          )}
+        </ButtonContainer>
+      </InfoBoxTitle>
       <Contents>
         <Row>
           <RowTitle>상호명</RowTitle>
@@ -164,10 +164,13 @@ export default function ShopInfoBox({
         </Row>
         {data?.IS_DEL === 1 && <UnDelBtn onClick={unDel}>비활성 해제</UnDelBtn>}
       </Contents>
-    </InfoBoxContainer>
+    </Container>
   );
 }
 
+const Container = styled(InfoBox)`
+  max-width: calc(50% - 5px);
+`;
 const UnDelBtn = styled(_Button)`
   box-shadow: none;
   background-color: #ff7979;
@@ -177,4 +180,7 @@ const UnDelBtn = styled(_Button)`
   &:active {
     background-color: #fc2424;
   }
+`;
+const ButtonContainer = styled.div`
+  display: flex;
 `;

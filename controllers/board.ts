@@ -109,10 +109,14 @@ export const postBoard = async (req: any, res: Response) => {
   const POST_TTL = req?.query?.POST_TTL ?? req?.body?.POST_TTL;
   const POST_CN = req?.query?.POST_CN ?? req?.body?.POST_CN;
   const BUILD_DT = req?.query?.BUILD_DT ?? req?.body?.BUILD_DT;
-  const MST_SQ = req?.session?.user?.MST_SQ;
+  const MST_SQ = req?.session?.user?.MST_SQ ?? req?.body?.MST_SQ;
+  const FILES = req?.files;
+
+  console.log(FILES);
+  console.log([POST_TP, MDL_SQ, MST_SQ]);
 
   if (!useIsNumber([POST_TP, MDL_SQ, MST_SQ])) {
-    return res.send(fail(errorMessage.parameter));
+    // return res.send(fail(errorMessage.parameter));
   }
 
   const validate1 =

@@ -119,11 +119,10 @@ export default function ShopDetail() {
       <Container
         isLoading={isLoading}
         style={{
-          overflow: "auto",
           backgroundColor: shopData?.IS_DEL === 1 ? "#ddd" : "",
         }}
       >
-        <InfoBox>
+        <InfoBoxWrap>
           <ShopInfoBox
             data={shopData}
             getShopData={getShopData}
@@ -133,7 +132,7 @@ export default function ShopDetail() {
             data={shopData?.MNG ?? null}
             getShopData={getShopData}
           />
-        </InfoBox>
+        </InfoBoxWrap>
 
         <SectionTitle>장비 정보</SectionTitle>
         <DeviceListHeader>
@@ -210,6 +209,12 @@ export default function ShopDetail() {
 const Container = styled(_Container)`
   overflow: auto;
   min-height: calc(100% - 60px);
+`;
+const InfoBoxWrap = styled.section`
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
 `;
 const InfoBox = styled.section`
   display: flex;
@@ -325,33 +330,23 @@ export const Row = styled.div`
   align-items: center;
   font-size: 14px;
   color: #555555;
-  text-indent: 8px;
   margin-bottom: 18px;
   overflow: hidden;
   position: relative;
-
-  &::before {
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: 0;
-    display: block;
-    width: 3px;
-    height: 80%;
-    transform: translateY(-50%);
-    background-color: #8b6ad3;
-  }
 `;
 export const RowTitle = styled.div`
   width: 60px;
+  color: #fff;
 `;
 export const RowContents = styled.div`
   flex: 1;
   text-overflow: ellipsis;
   white-space: nowrap;
   display: flex;
+  color: #fff;
 `;
 export const EditInput = styled(_Input)`
   width: calc(100% - 10px);
   height: 30px;
+  color: #333333;
 `;

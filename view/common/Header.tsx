@@ -1,7 +1,9 @@
 import _React, { memo, useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
 import { MenuList } from "../../string";
-import { FaBell, FaUserCircle } from "react-icons/fa";
+import { FaBell } from "react-icons/fa";
+import { FiLogOut } from "react-icons/fi";
+import { Logout } from "@mui/icons-material";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { Store } from "../../functions/store";
@@ -24,6 +26,11 @@ function Header({ activePage, isMainPage, iconHide, logoClick }: Props) {
   const noticeList = useSelector((x: Store) => x?.noticeList);
   const [isNoticeView, setIsNoticeView] = useState<boolean>(false);
 
+  // useAlert
+  const useAlert = (type: string, text: string): void => {
+    dispatch({ type: "alert", payload: { type, text } });
+  };
+
   const getNoticeList = (): void => {
     useAxios.get("/gas").then(({ data }) => {
       dispatch({
@@ -43,6 +50,19 @@ function Header({ activePage, isMainPage, iconHide, logoClick }: Props) {
     navigate(logoClick);
   };
 
+  // 로그아웃
+  const logout = () => {
+    let ask = confirm("로그아웃하시겠습니까?");
+    if (!ask) return;
+
+    useAxios.get("/common/logout").then(() => {
+      navigate("/signin");
+      dispatch({ type: "master", payload: null });
+      useAlert("success", "로그아웃되었습니다.");
+    });
+  };
+
+  // 뒤로가기
   const back = (): void => navigate(-1);
 
   useEffect(() => {
@@ -55,21 +75,21 @@ function Header({ activePage, isMainPage, iconHide, logoClick }: Props) {
       <Container>
         <Side>
           <Logo onClick={onClick} />
-          {!isMainPage && (
-            <BackBtn onClick={back}>
-              <BackIcon />
-              뒤로가기
-            </BackBtn>
-          )}
           <Title>{customName || name}</Title>
         </Side>
         {!iconHide && (
           <Side>
+            {!isMainPage && (
+              <BackBtn onClick={back}>
+                <BackIcon />
+                뒤로가기
+              </BackBtn>
+            )}
             <NoticeIcon
               color={isNoticeView ? "#6d3fcf" : "#aaaaaa"}
               onClick={() => setIsNoticeView((prev) => !prev)}
             />
-            <UserIcon />
+            <SignoutBtn onClick={logout} />
           </Side>
         )}
       </Container>
@@ -109,26 +129,29 @@ const Logo = styled.h1.attrs(() => ({}))`
 const Title = styled.h2`
   font-size: 20px;
   padding-bottom: 5px;
+  white-space: nowrap;
+  max-width: 500px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 const iconStyle = `
   border-radius: 50%;
   color: #aaa;
   cursor: pointer;
   margin-left: 20px;
+  width: 26px;
+  height: 26px;
 
   &:hover {
     color: #888;
   }
 `;
 const NoticeIcon = styled(FaBell)`
-  width: 26px;
-  height: 26px;
   ${iconStyle}
 `;
-const UserIcon = styled(FaUserCircle)`
-  width: 36px;
-  height: 36px;
+const SignoutBtn = styled(FiLogOut)`
   ${iconStyle}
+  margin-right: 10px;
 `;
 const BackIcon = styled(FiArrowLeft)`
   margin-right: 3px;
@@ -141,7 +164,6 @@ const BackBtn = styled.button`
   font-size: 14px;
   color: #aaa;
   padding-bottom: 5px;
-  margin-right: 10px;
   font-weight: 500;
   cursor: pointer;
 

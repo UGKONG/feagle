@@ -296,3 +296,65 @@ export const deleteDevice = async (req: Request, res: Response) => {
   if (error) return res.send(fail(errorMessage.db));
   res.send(success(null));
 };
+
+// 장비 사용 차트
+export const getDeviceUseChart = async (req: Request, res: Response) => {
+  const DEVICE_SQ = req?.params?.DEVICE_SQ;
+  const START: string = (req?.query?.start ?? "") as string;
+  const END: string = (req?.query?.end ?? "") as string;
+
+  if (!useIsNumber(DEVICE_SQ) || START?.length < 10 || END?.length < 10) {
+    return res.send(fail(errorMessage.parameter));
+  }
+
+  const { error, result } = await useDatabase(
+    `
+    SELECT
+    a.COMM_CODE, a.COMM_NM
+    FROM tb_common a
+    # LEFT JOIN #######
+    WHERE a.COMM_GRP = 5
+    AND a.COMM_CODE > 0
+    ORDER BY a.COMM_CODE ASC;
+  `,
+    [DEVICE_SQ]
+  );
+  if (error) return res.send(fail(errorMessage.db));
+  res.send(
+    success(result?.map((x: any) => ({ ...x, VALUE: Math.random() * 10 })))
+  );
+};
+
+// 장비 데이터 차트
+export const getDeviceDataChart = async (req: Request, res: Response) => {
+  const DEVICE_SQ = req?.params?.DEVICE_SQ;
+  const START: string = (req?.query?.start ?? "") as string;
+  const END: string = (req?.query?.end ?? "") as string;
+  const TYPE = req?.query?.type;
+
+  if (
+    !useIsNumber(DEVICE_SQ) ||
+    START?.length < 10 ||
+    END?.length < 10 ||
+    !TYPE
+  ) {
+    return res.send(fail(errorMessage.parameter));
+  }
+
+  const { error, result } = await useDatabase(
+    `
+    SELECT
+    a.COMM_CODE, a.COMM_NM
+    FROM tb_common a
+    # LEFT JOIN #######
+    WHERE a.COMM_GRP = 5
+    AND a.COMM_CODE > 0
+    ORDER BY a.COMM_CODE ASC;
+  `,
+    [DEVICE_SQ]
+  );
+  if (error) return res.send(fail(errorMessage.db));
+  res.send(
+    success(result?.map((x: any) => ({ ...x, VALUE: Math.random() * 10 })))
+  );
+};

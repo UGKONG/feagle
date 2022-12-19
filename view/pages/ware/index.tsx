@@ -53,25 +53,25 @@ export default function Shop({ isHeader = true, currentList }: Props) {
     // (1 - 카테고리, 2 - 제목, 3 - 버전, 4 - 적용 모델, 5 - 배포일, 6 - 작성자, 7 - 작성일)
     if (sort === 1) {
       copy?.sort((a, b) => {
-        let up =
-          a?.POST_TP_NM < b?.POST_TP_NM
+        let up: number =
+          (a?.POST_TP_NM ?? "") < (b?.POST_TP_NM ?? "")
             ? -1
-            : a?.POST_TP_NM > b?.POST_TP_NM
+            : (a?.POST_TP_NM ?? "") > (b?.POST_TP_NM ?? "")
             ? 1
             : 0;
-        let down =
-          a?.POST_TP_NM > b?.POST_TP_NM
+        let down: number =
+          (a?.POST_TP_NM ?? "") > (b?.POST_TP_NM ?? "")
             ? -1
-            : a?.POST_TP_NM < b?.POST_TP_NM
+            : (a?.POST_TP_NM ?? "") < (b?.POST_TP_NM ?? "")
             ? 1
             : 0;
         return isUp ? up : down;
       });
     } else if (sort === 2) {
       copy?.sort((a, b) => {
-        let up =
+        let up: number =
           a?.POST_TTL < b?.POST_TTL ? -1 : a?.POST_TTL > b?.POST_TTL ? 1 : 0;
-        let down =
+        let down: number =
           a?.POST_TTL > b?.POST_TTL ? -1 : a?.POST_TTL < b?.POST_TTL ? 1 : 0;
         return isUp ? up : down;
       });
@@ -86,9 +86,17 @@ export default function Shop({ isHeader = true, currentList }: Props) {
     } else if (sort === 4) {
       copy?.sort((a, b) => {
         let up: number =
-          a?.MDL_NM < b?.MDL_NM ? -1 : a?.MDL_NM > b?.MDL_NM ? 1 : 0;
+          (a?.MDL_NM ?? "") < (b?.MDL_NM ?? "")
+            ? -1
+            : (a?.MDL_NM ?? "") > (b?.MDL_NM ?? "")
+            ? 1
+            : 0;
         let down: number =
-          a?.MDL_NM > b?.MDL_NM ? -1 : a?.MDL_NM < b?.MDL_NM ? 1 : 0;
+          (a?.MDL_NM ?? "") > (b?.MDL_NM ?? "")
+            ? -1
+            : (a?.MDL_NM ?? "") < (b?.MDL_NM ?? "")
+            ? 1
+            : 0;
         return isUp ? up : down;
       });
     } else if (sort === 5) {
@@ -101,19 +109,29 @@ export default function Shop({ isHeader = true, currentList }: Props) {
       });
     } else if (sort === 6) {
       copy?.sort((a, b) => {
-        let up = a?.MST_NM < b?.MST_NM ? -1 : a?.MST_NM > b?.MST_NM ? 1 : 0;
-        let down = a?.MST_NM > b?.MST_NM ? -1 : a?.MST_NM < b?.MST_NM ? 1 : 0;
+        let up: number =
+          (a?.MST_NM ?? "") < (b?.MST_NM ?? "")
+            ? -1
+            : (a?.MST_NM ?? "") > (b?.MST_NM ?? "")
+            ? 1
+            : 0;
+        let down: number =
+          (a?.MST_NM ?? "") > (b?.MST_NM ?? "")
+            ? -1
+            : (a?.MST_NM ?? "") < (b?.MST_NM ?? "")
+            ? 1
+            : 0;
         return isUp ? up : down;
       });
     } else if (sort === 7) {
       copy?.sort((a, b) => {
-        let up =
+        let up: number =
           (a?.POST_CRT_DT ?? 0) < (b?.POST_CRT_DT ?? 0)
             ? -1
             : (a?.POST_CRT_DT ?? 0) > (b?.POST_CRT_DT ?? 0)
             ? 1
             : 0;
-        let down =
+        let down: number =
           (a?.POST_CRT_DT ?? 0) > (b?.POST_CRT_DT ?? 0)
             ? -1
             : (a?.POST_CRT_DT ?? 0) < (b?.POST_CRT_DT ?? 0)
@@ -144,6 +162,13 @@ export default function Shop({ isHeader = true, currentList }: Props) {
           active={activeFilter}
           setActive={setActiveFilter}
           count={resultDeviceList?.length}
+          buttons={[
+            {
+              id: 1,
+              name: "게시글 등록",
+              onClick: () => navigate("/board/add"),
+            },
+          ]}
         />
       )}
       <List height={currentList}>

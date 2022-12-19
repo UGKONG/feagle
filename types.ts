@@ -43,7 +43,7 @@ export type LogType = 1;
 export type DeviceMode = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
 
 // 자료 구분 (1 - 매뉴얼 / 2 - 가이드 / 3 - 유틸리티 / 4 - 소프트웨어 / 5 - 펌웨어)
-export type PostType = 1 | 2 | 3 | 4 | 5;
+export type PostType = 0 | 1 | 2 | 3 | 4 | 5;
 
 // 알림 타입 구분
 export type AlertType = "error" | "warning" | "info" | "success";
@@ -56,7 +56,7 @@ export interface AlertData {
 // 공통코드 테이블
 export interface CommonCode {
   COMM_SQ?: n;
-  COMM_GRP: n;
+  COMM_GRP?: n;
   COMM_CODE: n;
   COMM_NM: s;
 }
@@ -145,22 +145,18 @@ export interface Master {
   MST_PW?: s;
   AUTH_SQ: Auth;
   AUTH_TEXT?: s;
+  IS_USE?: IsYes;
   IS_DEL?: IsYes;
+  MST_JOIN_DT?: s;
   MST_MOD_DT?: s;
   MST_CRT_DT?: s;
 }
 
-// 마스터 권한 유형 테이블
-// export interface MasterAuth {
-//   MST_SQ?: n;
-//   SHOP_SQ: n;
-//   MST_NM: s;
-//   MST_NUM: s;
-//   AUTH_SQ: Auth;
-//   IS_DEL: IsYes;
-//   MST_MOD_DT?: s;
-//   MST_CRT_DT?: s;
-// }
+// 권한 유형 테이블
+export interface MasterAuth {
+  COMM_CODE: n;
+  COMM_NM: s;
+}
 
 // 매니저 테이블 (피부샵 관계자들)
 export interface Manager {
@@ -240,15 +236,16 @@ export interface GasReq {
 export interface Post {
   POST_SQ?: n;
   POST_TP: PostType;
-  POST_TP_NM: s;
+  POST_TP_NM?: s;
   MDL_SQ: n;
-  MDL_NM: s;
-  MDL_DESC: s;
+  MDL_NM?: s;
+  MDL_EN_NM?: s;
+  MDL_DESC?: s;
   BUILD_VN: s;
   POST_TTL: s;
   POST_CN: s;
-  MST_SQ: n;
-  MST_NM: s;
+  MST_SQ?: n;
+  MST_NM?: s;
   BUILD_DT: s;
   POST_MOD_DT?: s;
   POST_CRT_DT?: s;

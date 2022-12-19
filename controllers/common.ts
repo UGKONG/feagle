@@ -53,3 +53,35 @@ export const getSession = async (req: any, res: Response) => {
 export const getLogout = async (req: any, res: Response) => {
   req.session.destroy(() => res.send());
 };
+
+// 프로그램 모드 리스트 조회
+export const getProgramMode = async (req: any, res: Response) => {
+  const { error, result } = await useDatabase(`
+    SELECT
+    COMM_CODE, COMM_NM
+    FROM tb_common
+    WHERE COMM_GRP = 5
+    AND COMM_CODE > 0
+    ORDER BY COMM_CODE ASC;
+  `);
+
+  if (error) return res.send(fail(errorMessage.db));
+
+  res.send(success(result));
+};
+
+// 데이터 타입 리스트 조회
+export const getDataTypeList = async (req: any, res: Response) => {
+  const { error, result } = await useDatabase(`
+    SELECT
+    COMM_CODE, COMM_NM
+    FROM tb_common
+    WHERE COMM_GRP = 6
+    AND COMM_CODE > 0
+    ORDER BY COMM_CODE ASC;
+  `);
+
+  if (error) return res.send(fail(errorMessage.db));
+
+  res.send(success(result));
+};

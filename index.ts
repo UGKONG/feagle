@@ -23,6 +23,7 @@ import deviceDoRouter from "./routes/deviceDo";
 require("dotenv").config();
 const app = express();
 const port = process.env.SERVER_PORT || 8080;
+const bodyParser = require("body-parser");
 const multiparty = require("connect-multiparty")();
 const session = require("express-session");
 const MySQLStore = require("express-mysql-session")(session);
@@ -49,7 +50,7 @@ const basePath = __dirname + "/build";
 
 // Middleware
 app.use(cors());
-app.use(express.json());
+app.use(bodyParser.json());
 app.use(apiLogger);
 // app.use(sessionCheck);
 app.use(sessionConfig);

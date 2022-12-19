@@ -1,9 +1,7 @@
-import _React, { useMemo } from "react";
+import _React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { Logout } from "@mui/icons-material";
-import { MenuList, menuList } from "../../string";
-import { useAxios } from "../../functions/utils";
+import { menuList } from "../../string";
 
 export default function Menu() {
   const location = useLocation();
@@ -11,11 +9,6 @@ export default function Menu() {
 
   // 메뉴 클릭
   const menuClick = (path: string) => navigate(path);
-
-  // 로그아웃
-  const logout = () => {
-    useAxios.get("/common/logout").then(() => navigate("/signin"));
-  };
 
   // 메뉴 활성화 여부
   const isActive = (path: string): string => {
@@ -36,7 +29,6 @@ export default function Menu() {
           </MenuItem>
         ))}
       </MenuListContainer>
-      <SignoutBtn onClick={logout} />
     </Container>
   );
 }
@@ -69,12 +61,5 @@ const MenuItem = styled.li`
   &.active {
     font-weight: 700;
     color: #6d3fcf;
-  }
-`;
-const SignoutBtn = styled(Logout)`
-  color: #888888;
-  cursor: pointer;
-  &:hover {
-    color: #666666;
   }
 `;

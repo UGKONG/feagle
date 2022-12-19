@@ -41,16 +41,16 @@ export default function Shop({ isHeader = true, currentList }: Props) {
     // (1 - 카테고리, 2 - 제목, 3 - 작성자, 4 - 작성일)
     if (sort === 1) {
       copy?.sort((a, b) => {
-        let up =
-          a?.POST_TP_NM < b?.POST_TP_NM
+        let up: number =
+          (a?.POST_TP_NM ?? "") < (b?.POST_TP_NM ?? "")
             ? -1
-            : a?.POST_TP_NM > b?.POST_TP_NM
+            : (a?.POST_TP_NM ?? "") > (b?.POST_TP_NM ?? "")
             ? 1
             : 0;
-        let down =
-          a?.POST_TP_NM > b?.POST_TP_NM
+        let down: number =
+          (a?.POST_TP_NM ?? "") > (b?.POST_TP_NM ?? "")
             ? -1
-            : a?.POST_TP_NM < b?.POST_TP_NM
+            : (a?.POST_TP_NM ?? "") < (b?.POST_TP_NM ?? "")
             ? 1
             : 0;
         return isUp ? up : down;
@@ -66,20 +66,28 @@ export default function Shop({ isHeader = true, currentList }: Props) {
     } else if (sort === 3) {
       copy?.sort((a, b) => {
         let up: number =
-          a?.MST_NM < b?.MST_NM ? -1 : a?.MST_NM > b?.MST_NM ? 1 : 0;
+          (a?.MST_NM ?? "") < (b?.MST_NM ?? "")
+            ? -1
+            : (a?.MST_NM ?? "") > (b?.MST_NM ?? "")
+            ? 1
+            : 0;
         let down: number =
-          a?.MST_NM > b?.MST_NM ? -1 : a?.MST_NM < b?.MST_NM ? 1 : 0;
+          (a?.MST_NM ?? "") > (b?.MST_NM ?? "")
+            ? -1
+            : (a?.MST_NM ?? "") < (b?.MST_NM ?? "")
+            ? 1
+            : 0;
         return isUp ? up : down;
       });
     } else if (sort === 4) {
       copy?.sort((a, b) => {
-        let up =
+        let up: number =
           (a?.POST_CRT_DT ?? 0) < (b?.POST_CRT_DT ?? 0)
             ? -1
             : (a?.POST_CRT_DT ?? 0) > (b?.POST_CRT_DT ?? 0)
             ? 1
             : 0;
-        let down =
+        let down: number =
           (a?.POST_CRT_DT ?? 0) > (b?.POST_CRT_DT ?? 0)
             ? -1
             : (a?.POST_CRT_DT ?? 0) < (b?.POST_CRT_DT ?? 0)
@@ -110,6 +118,13 @@ export default function Shop({ isHeader = true, currentList }: Props) {
           active={activeFilter}
           setActive={setActiveFilter}
           count={resultDeviceList?.length}
+          buttons={[
+            {
+              id: 1,
+              name: "게시글 등록",
+              onClick: () => navigate("/board/add"),
+            },
+          ]}
         />
       )}
       <List height={currentList}>

@@ -1,11 +1,13 @@
 import _React, { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { useAxios } from "../../../functions/utils";
-import { Master } from "../../../types";
+import { Master, MasterAuth, SelectChangeEvent } from "../../../types";
 import _Container from "../../common/Container";
 import TableHeaderContainer from "../../common/TableHeaderContainer";
 import { Active, FilterList, HeaderList, Props } from "./index.type";
+import JoinList from "../joinList";
+import _Select from "../../common/Select";
+import { useDispatch } from "react-redux";
 
 const filterList: FilterList = [
   { id: 1, name: "이름" },
@@ -28,7 +30,7 @@ const headerList: HeaderList = [
 ];
 
 export default function Shop({ isHeader = true, currentList }: Props) {
-  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [activeFilter, setActiveFilter] = useState<Active>({
     sort: 1,
     dir: "ASC",
@@ -36,6 +38,8 @@ export default function Shop({ isHeader = true, currentList }: Props) {
   });
   const [isLoading, setIsLoading] = useState(currentList ? false : true);
   const [masterList, setMasterList] = useState<Master[]>(currentList ?? []);
+  const [joinListView, setJoinListView] = useState<boolean>(false);
+  const [authList, setAuthList] = useState<MasterAuth[]>([]);
 
   const resultMasterList = useMemo<Master[]>(() => {
     let copy = [...masterList];
@@ -50,16 +54,24 @@ export default function Shop({ isHeader = true, currentList }: Props) {
     }
 
     // 솔팅 타입
-    // (1 - 부서, 2 - 직급, 3 - 이름, 4 - 성별, 5 - 권한, 6 - 가입일)
+    // (1 - 이름, 2 - 부서, 3 - 직급, 4 - 성별, 5 - 권한, 6 - 가입일)
     if (sort === 1) {
       copy?.sort((a, b) => {
-        let up =
+        let up: number =
+          a?.MST_NM < b?.MST_NM ? -1 : a?.MST_NM > b?.MST_NM ? 1 : 0;
+        let down: number =
+          a?.MST_NM > b?.MST_NM ? -1 : a?.MST_NM < b?.MST_NM ? 1 : 0;
+        return isUp ? up : down;
+      });
+    } else if (sort === 2) {
+      copy?.sort((a, b) => {
+        let up: number =
           (a?.MST_GRP ?? "") < (b?.MST_GRP ?? "")
             ? -1
             : (a?.MST_GRP ?? "") > (b?.MST_GRP ?? "")
             ? 1
             : 0;
-        let down =
+        let down: number =
           (a?.MST_GRP ?? "") > (b?.MST_GRP ?? "")
             ? -1
             : (a?.MST_GRP ?? "") < (b?.MST_GRP ?? "")
@@ -67,28 +79,20 @@ export default function Shop({ isHeader = true, currentList }: Props) {
             : 0;
         return isUp ? up : down;
       });
-    } else if (sort === 2) {
+    } else if (sort === 3) {
       copy?.sort((a, b) => {
-        let up =
+        let up: number =
           (a?.MST_PO ?? "") < (b?.MST_PO ?? "")
             ? -1
             : (a?.MST_PO ?? "") > (b?.MST_PO ?? "")
             ? 1
             : 0;
-        let down =
+        let down: number =
           (a?.MST_PO ?? "") > (b?.MST_PO ?? "")
             ? -1
             : (a?.MST_PO ?? "") < (b?.MST_PO ?? "")
             ? 1
             : 0;
-        return isUp ? up : down;
-      });
-    } else if (sort === 3) {
-      copy?.sort((a, b) => {
-        let up: number =
-          a?.MST_NM < b?.MST_NM ? -1 : a?.MST_NM > b?.MST_NM ? 1 : 0;
-        let down: number =
-          a?.MST_NM > b?.MST_NM ? -1 : a?.MST_NM < b?.MST_NM ? 1 : 0;
         return isUp ? up : down;
       });
     } else if (sort === 4) {
@@ -118,15 +122,15 @@ export default function Shop({ isHeader = true, currentList }: Props) {
     } else if (sort === 6) {
       copy?.sort((a, b) => {
         let up =
-          (a?.MST_CRT_DT ?? 0) < (b?.MST_CRT_DT ?? 0)
+          (a?.MST_JOIN_DT ?? 0) < (b?.MST_JOIN_DT ?? 0)
             ? -1
-            : (a?.MST_CRT_DT ?? 0) > (b?.MST_CRT_DT ?? 0)
+            : (a?.MST_JOIN_DT ?? 0) > (b?.MST_JOIN_DT ?? 0)
             ? 1
             : 0;
         let down =
-          (a?.MST_CRT_DT ?? 0) > (b?.MST_CRT_DT ?? 0)
+          (a?.MST_JOIN_DT ?? 0) > (b?.MST_JOIN_DT ?? 0)
             ? -1
-            : (a?.MST_CRT_DT ?? 0) < (b?.MST_CRT_DT ?? 0)
+            : (a?.MST_JOIN_DT ?? 0) < (b?.MST_JOIN_DT ?? 0)
             ? 1
             : 0;
         return isUp ? up : down;
@@ -136,7 +140,20 @@ export default function Shop({ isHeader = true, currentList }: Props) {
     return copy;
   }, [masterList, activeFilter]);
 
-  const getPostList = () => {
+  // useAlert
+  const useAlert = (type: string, text: string): void => {
+    dispatch({ type: "alert", payload: { type, text } });
+  };
+
+  // 권한 리스트 조회
+  const getAuthList = () => {
+    useAxios
+      .get("/common/authType")
+      .then(({ data }) => setAuthList(data?.current));
+  };
+
+  // 사용자 리스트 조회
+  const getList = () => {
     if (currentList) return;
     useAxios.get("/master").then(({ data }) => {
       setIsLoading(false);
@@ -144,52 +161,92 @@ export default function Shop({ isHeader = true, currentList }: Props) {
     });
   };
 
-  useEffect(getPostList, []);
+  // 권한 변경
+  const authChange = (MST_SQ: number, AUTH_SQ: number) => {
+    useAxios.put("/master/auth/" + MST_SQ, { AUTH_SQ }).then(({ data }) => {
+      if (!data?.result) return;
+      useAlert("success", "변경되었습니다.");
+    });
+  };
 
-  return (
-    <Container isContents={currentList ? true : false} isLoading={isLoading}>
-      {isHeader && (
-        <TableHeaderContainer
-          list={currentList ? [] : filterList}
-          active={activeFilter}
-          setActive={setActiveFilter}
-          count={resultMasterList?.length}
-        />
-      )}
-      <List height={currentList}>
-        <Table>
-          <THeader>
-            <tr>
-              {headerList?.map((item) => (
-                <Column key={item}>{item}</Column>
+  useEffect(getAuthList, []);
+  useEffect(getList, []);
+  useEffect(() => {
+    if (joinListView) return;
+    getList();
+  }, [joinListView]);
+
+  if (joinListView) {
+    return <JoinList authList={authList} setJoinListView={setJoinListView} />;
+  } else {
+    return (
+      <Container isContents={currentList ? true : false} isLoading={isLoading}>
+        {isHeader && (
+          <TableHeaderContainer
+            list={currentList ? [] : filterList}
+            active={activeFilter}
+            setActive={setActiveFilter}
+            count={resultMasterList?.length}
+            buttons={[
+              {
+                id: 1,
+                name: "요청자 보기",
+                onClick: () => setJoinListView(true),
+              },
+            ]}
+          />
+        )}
+        <List height={currentList}>
+          <Table>
+            <THeader>
+              <tr>
+                {headerList?.map((item) => (
+                  <Column key={item}>{item}</Column>
+                ))}
+              </tr>
+            </THeader>
+            <TBody>
+              {resultMasterList?.map((item, i) => (
+                <Tr key={item?.MST_SQ}>
+                  <Td>{i + 1}</Td>
+                  <Td>{item?.MST_NM ?? "-"}</Td>
+                  <Td>{item?.MST_GRP ?? "-"}</Td>
+                  <Td>{item?.MST_PO ?? "-"}</Td>
+                  <Td>
+                    {item?.MST_GD === 1
+                      ? "남자"
+                      : item?.MST_GD == 2
+                      ? "여자"
+                      : "-"}
+                  </Td>
+                  <Td>{item?.MST_NUM ?? "-"}</Td>
+                  <Td>{item?.MST_ID ?? "-"}</Td>
+                  <Td>
+                    <Select
+                      defaultValue={item?.AUTH_SQ}
+                      onChange={(e: SelectChangeEvent) =>
+                        authChange(
+                          item?.MST_SQ as number,
+                          Number(e?.target?.value)
+                        )
+                      }
+                    >
+                      {authList?.map((x) => (
+                        <option key={x?.COMM_CODE} value={x?.COMM_CODE}>
+                          {x?.COMM_NM}
+                        </option>
+                      ))}
+                    </Select>
+                  </Td>
+                  <Td>{item?.MST_JOIN_DT ?? "-"}</Td>
+                </Tr>
               ))}
-            </tr>
-          </THeader>
-          <TBody>
-            {resultMasterList?.map((item, i) => (
-              <Tr key={item?.MST_SQ}>
-                <Td>{i + 1}</Td>
-                <Td>{item?.MST_NM ?? "-"}</Td>
-                <Td>{item?.MST_GRP ?? "-"}</Td>
-                <Td>{item?.MST_PO ?? "-"}</Td>
-                <Td>
-                  {item?.MST_GD === 1
-                    ? "남자"
-                    : item?.MST_GD == 2
-                    ? "여자"
-                    : "-"}
-                </Td>
-                <Td>{item?.MST_NUM ?? "-"}</Td>
-                <Td>{item?.MST_ID ?? "-"}</Td>
-                <Td>{item?.AUTH_SQ ?? "-"}</Td>
-                <Td>{item?.MST_CRT_DT ?? "-"}</Td>
-              </Tr>
-            ))}
-          </TBody>
-        </Table>
-      </List>
-    </Container>
-  );
+            </TBody>
+          </Table>
+        </List>
+      </Container>
+    );
+  }
 }
 
 const Container = styled(_Container)``;
@@ -228,4 +285,9 @@ const Tr = styled.tr`
 const Td = styled.td`
   padding: 8px 5px;
   font-size: 13px;
+`;
+const Select = styled(_Select)`
+  max-width: 150px;
+  height: 34px;
+  border-radius: 100px;
 `;

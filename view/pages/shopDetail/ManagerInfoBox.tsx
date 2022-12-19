@@ -20,6 +20,7 @@ import { InputChangeEvent, Manager } from "../../../types";
 import { useDispatch } from "react-redux";
 import { useAxios, usePhoneNumber } from "../../../functions/utils";
 import Tab from "../../common/Tab";
+import { InfoBox, InfoBoxTitle } from "../deviceDetail";
 
 const genderList = [
   { id: 1, name: "남자" },
@@ -83,21 +84,23 @@ export default function ManagerInfoBox({
   }, [isEdit]);
 
   return (
-    <InfoBoxContainer>
-      <Header>
-        <Title>매니저 정보</Title>
-        {isEdit ? (
-          <>
-            <Editing />
-            <OkBtn onClick={validate} />
-            <CancelBtn onClick={() => setIsEdit(false)} />
-          </>
-        ) : (
-          <>
-            <EditBtn onClick={() => setIsEdit(true)} />
-          </>
-        )}
-      </Header>
+    <Container>
+      <InfoBoxTitle>
+        매니저 정보
+        <ButtonContainer>
+          {isEdit ? (
+            <>
+              <Editing />
+              <OkBtn onClick={validate} />
+              <CancelBtn onClick={() => setIsEdit(false)} />
+            </>
+          ) : (
+            <>
+              <EditBtn onClick={() => setIsEdit(true)} />
+            </>
+          )}
+        </ButtonContainer>
+      </InfoBoxTitle>
       <Contents>
         <Row>
           <RowTitle>상호명</RowTitle>
@@ -152,6 +155,13 @@ export default function ManagerInfoBox({
           <RowContents>{data?.MNG_ID}</RowContents>
         </Row>
       </Contents>
-    </InfoBoxContainer>
+    </Container>
   );
 }
+
+const Container = styled(InfoBox)`
+  max-width: calc(50% - 5px);
+`;
+const ButtonContainer = styled.div`
+  display: flex;
+`;

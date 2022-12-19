@@ -97,5 +97,6 @@ module.exports = {
   devServer: {
     open: true,
     port: process.env.CLIENT_PORT || 8081,
+    historyApiFallback: true,
   },
 };
