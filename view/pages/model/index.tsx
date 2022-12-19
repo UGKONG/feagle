@@ -273,7 +273,7 @@ export default function Model() {
             { id: 1, name: "수 정", onClick: () => validate() },
             {
               id: 2,
-              name: "삭제",
+              name: "삭 제",
               color: "red",
               onClick: () => {
                 setDeleteModelSq(editModelData?.MDL_SQ ?? null);
