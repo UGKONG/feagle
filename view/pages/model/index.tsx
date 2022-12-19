@@ -224,7 +224,7 @@ export default function Model() {
           title="장비 모델 등록"
           size={400}
           close={() => modalClose()}
-          buttons={[{ id: 1, name: "등록", onClick: () => validate() }]}
+          buttons={[{ id: 1, name: "등 록", onClick: () => validate() }]}
         >
           <>
             <Row>
@@ -270,7 +270,7 @@ export default function Model() {
           size={400}
           close={() => setEditModelData(null)}
           buttons={[
-            { id: 1, name: "수정", onClick: () => validate() },
+            { id: 1, name: "수 정", onClick: () => validate() },
             {
               id: 2,
               name: "삭제",
@@ -326,7 +326,12 @@ export default function Model() {
           size={400}
           close={() => setDeleteModelSq(null)}
           buttons={[
-            { id: 1, name: "삭제", color: "red", onClick: () => deleteModel() },
+            {
+              id: 1,
+              name: "삭 제",
+              color: "red",
+              onClick: () => deleteModel(),
+            },
           ]}
         >
           <DeleteDesc>
