@@ -170,8 +170,9 @@ export const postLogin = async (req: any, res: Response) => {
   }
 
   // 로그인 성공
-  req.session.user = { ...user, ACT_TP: 2 };
-  res.send(success(user));
+  let userData = { ...user, ACT_TP: 2 };
+  req.session.user = userData;
+  res.send(success(userData));
 };
 
 // 가입 요청자 리스트

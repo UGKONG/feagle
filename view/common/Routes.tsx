@@ -1,7 +1,10 @@
-import _React, { lazy, Suspense } from "react";
+import _React, { lazy, Suspense, useMemo } from "react";
 import { Routes, Route } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { Store } from "../../functions/store";
 import Fallback from "./Fallback";
 import DevPage from "../pages/dev";
+import Container from "./Container";
 
 const Index = lazy(() => import("../pages/index"));
 const Signin = lazy(() => import("../pages/signin"));
@@ -19,23 +22,34 @@ const BoardCreate = lazy(() => import("../pages/boardCreate"));
 const User = lazy(() => import("../pages/user"));
 
 export default function Router() {
+  const loginUser = useSelector((x: Store) => x?.master);
+
+  const isLogin = useMemo<boolean>(
+    () => (loginUser ? true : false),
+    [loginUser]
+  );
+
+  const isNone = (component: JSX.Element) => {
+    return isLogin ? component : <Container />;
+  };
+
   return (
     <Suspense fallback={<Fallback />}>
       <Routes>
-        <Route path="/" element={<Index />} />
         <Route path="/signin" element={<Signin />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/shop" element={<Shop />} />
-        <Route path="/shop/:id" element={<ShopDetail />} />
-        <Route path="/model" element={<Model />} />
-        <Route path="/device" element={<Device />} />
-        <Route path="/device/:id" element={<DeviceDetail />} />
-        <Route path="/state" element={<DeviceState />} />
-        <Route path="/ware" element={<Ware />} />
-        <Route path="/board" element={<Board />} />
-        <Route path="/board/add" element={<BoardCreate />} />
-        <Route path="/board/:id" element={<BoardDetail />} />
-        <Route path="/user" element={<User />} />
+        <Route path="/" element={isNone(<Index />)} />
+        <Route path="/shop" element={isNone(<Shop />)} />
+        <Route path="/shop/:id" element={isNone(<ShopDetail />)} />
+        <Route path="/model" element={isNone(<Model />)} />
+        <Route path="/device" element={isNone(<Device />)} />
+        <Route path="/device/:id" element={isNone(<DeviceDetail />)} />
+        <Route path="/state" element={isNone(<DeviceState />)} />
+        <Route path="/ware" element={isNone(<Ware />)} />
+        <Route path="/board" element={isNone(<Board />)} />
+        <Route path="/board/add" element={isNone(<BoardCreate />)} />
+        <Route path="/board/:id" element={isNone(<BoardDetail />)} />
+        <Route path="/user" element={isNone(<User />)} />
       </Routes>
     </Suspense>
   );

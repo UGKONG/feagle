@@ -32,6 +32,7 @@ function Header({ activePage, isMainPage, iconHide, logoClick }: Props) {
   };
 
   const getNoticeList = (): void => {
+    if (activePage === "회원가입") return;
     useAxios.get("/gas").then(({ data }) => {
       dispatch({
         type: "noticeList",

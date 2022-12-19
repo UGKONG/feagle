@@ -51,7 +51,7 @@ export const getSession = async (req: any, res: Response) => {
 
 // 로그아웃
 export const getLogout = async (req: any, res: Response) => {
-  req.session.destroy(() => res.send());
+  req.session.destroy(() => res.redirect("/signin"));
 };
 
 // 프로그램 모드 리스트 조회

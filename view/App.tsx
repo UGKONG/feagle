@@ -34,21 +34,36 @@ export default function App() {
     dispatch({ type: "customTitle", payload: "" });
   };
 
+  // 로그인 필요 알림
+  const needLoginAlert = () => {
+    dispatch({
+      type: "alert",
+      payload: { type: "warning", text: "로그인이 필요합니다." },
+    });
+  };
+
   // 세션 체크
   const sessionCheck = (): void => {
+    if (location?.pathname?.indexOf("signin") > -1) return;
+    if (location?.pathname?.indexOf("signup") > -1) return;
+
     useAxios
       .get("/common/session")
       .then(({ data }) => {
         const master: Master = data || null;
+        if (!master) {
+          needLoginAlert();
+          return navigate("/signin");
+        }
         dispatch({ type: "master", payload: master });
-        if (!master) navigate("/signin");
       })
       .catch(() => {
+        needLoginAlert();
         navigate("/signin");
       });
   };
 
-  // useEffect(sessionCheck, []);
+  useEffect(sessionCheck, [location]);
 
   useEffect(customTitleReset, [location]);
 
