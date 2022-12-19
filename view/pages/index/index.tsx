@@ -1,119 +1,160 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import _Container from "../../common/Container";
-import { AddressData, ShopData } from "./index.type";
+import { Data } from "./index.type";
 import { BiChevronRight } from "react-icons/bi";
 import { useAxios } from "../../../functions/utils";
 import { Shop } from "../../../types";
 import Box from "./Box";
 import { CircularProgress } from "@mui/material";
+import { addrColors } from "../../../string";
 
-const currentDeps: string[] = ["지역별 보기"];
+const currentDepth: string[] = ["지역별 보기"];
 
+// 센터 수
+// 장비수, 누적횟수/시간, ON 장비수, START 장비수, 가스교체필요장비수, 플라즈마 전류 이상 장비 수
 export default function Index() {
-  const navigate = useNavigate();
   const [loading, setLoading] = useState<boolean>(true);
-  const [deps, setDeps] = useState<string[]>(currentDeps);
-  const [data, setData] = useState<(AddressData | ShopData)[]>([]);
+  const [depth, setDepth] = useState<string[]>(currentDepth);
+  const [data, setData] = useState<Data[]>([]);
 
-  const isAddr = useMemo<boolean>(() => deps?.length <= 1, [deps]);
+  // 지역 별 / 피부샵 별 구분
+  const isAddr = useMemo<boolean>(() => depth?.length <= 1, [depth]);
 
+  // 지역 별 리스트 조회
   const getAddressList = (): void => {
-    let list = [
+    let list: Data[] = [
       {
-        ADDR_NM: "강원도",
-        SHOP_COUNT: 100,
-        DEVICE_COUNT: 100,
-        USE_TIME: 100,
-        USE_COUNT: 100,
+        TITLE: "강원도",
+        SHOP_COUNT: 125,
+        DEVICE_COUNT: 147,
+        USE_TIME: 542,
+        USE_COUNT: 264,
+        ON_DEVICE_COUNT: 26,
+        START_DEVICE_COUNT: 53,
+        NEED_GAS_DEVICE_COUNT: 12,
+        NEED_PLA_DEVICE_COUNT: 3,
       },
       {
-        ADDR_NM: "경기도",
-        SHOP_COUNT: 100,
-        DEVICE_COUNT: 100,
-        USE_TIME: 100,
-        USE_COUNT: 100,
+        TITLE: "경기도",
+        SHOP_COUNT: 125,
+        DEVICE_COUNT: 147,
+        USE_TIME: 542,
+        USE_COUNT: 264,
+        ON_DEVICE_COUNT: 26,
+        START_DEVICE_COUNT: 53,
+        NEED_GAS_DEVICE_COUNT: 12,
+        NEED_PLA_DEVICE_COUNT: 3,
       },
       {
-        ADDR_NM: "경상도",
-        SHOP_COUNT: 100,
-        DEVICE_COUNT: 100,
-        USE_TIME: 100,
-        USE_COUNT: 100,
+        TITLE: "경상도",
+        SHOP_COUNT: 125,
+        DEVICE_COUNT: 147,
+        USE_TIME: 542,
+        USE_COUNT: 264,
+        ON_DEVICE_COUNT: 26,
+        START_DEVICE_COUNT: 53,
+        NEED_GAS_DEVICE_COUNT: 12,
+        NEED_PLA_DEVICE_COUNT: 3,
       },
       {
-        ADDR_NM: "전라도",
-        SHOP_COUNT: 100,
-        DEVICE_COUNT: 100,
-        USE_TIME: 100,
-        USE_COUNT: 100,
+        TITLE: "전라도",
+        SHOP_COUNT: 125,
+        DEVICE_COUNT: 147,
+        USE_TIME: 542,
+        USE_COUNT: 264,
+        ON_DEVICE_COUNT: 26,
+        START_DEVICE_COUNT: 53,
+        NEED_GAS_DEVICE_COUNT: 12,
+        NEED_PLA_DEVICE_COUNT: 3,
       },
       {
-        ADDR_NM: "충청도",
-        SHOP_COUNT: 100,
-        DEVICE_COUNT: 100,
-        USE_TIME: 100,
-        USE_COUNT: 100,
+        TITLE: "충청도",
+        SHOP_COUNT: 125,
+        DEVICE_COUNT: 147,
+        USE_TIME: 542,
+        USE_COUNT: 264,
+        ON_DEVICE_COUNT: 26,
+        START_DEVICE_COUNT: 53,
+        NEED_GAS_DEVICE_COUNT: 12,
+        NEED_PLA_DEVICE_COUNT: 3,
       },
       {
-        ADDR_NM: "제주도",
-        SHOP_COUNT: 100,
-        DEVICE_COUNT: 100,
-        USE_TIME: 100,
-        USE_COUNT: 100,
+        TITLE: "제주도",
+        SHOP_COUNT: 125,
+        DEVICE_COUNT: 147,
+        USE_TIME: 542,
+        USE_COUNT: 264,
+        ON_DEVICE_COUNT: 26,
+        START_DEVICE_COUNT: 53,
+        NEED_GAS_DEVICE_COUNT: 12,
+        NEED_PLA_DEVICE_COUNT: 3,
       },
     ];
 
     changeData(list);
   };
 
+  // 피부샵 별 리스트 조회
   const getShopList = (): void => {
     useAxios.get("/shop").then(({ data }) => {
       const list = data?.current?.map((x: Shop) => ({
         SHOP_SQ: x?.SHOP_SQ,
-        SHOP_NM: x?.SHOP_NM,
-        DEVICE_COUNT: 100,
-        USE_TIME: 100,
-        USE_COUNT: 100,
+        TITLE: x?.SHOP_NM,
+        DEVICE_COUNT: 2,
+        USE_TIME: 125,
+        USE_COUNT: 56,
+        ON_DEVICE_COUNT: 1,
+        START_DEVICE_COUNT: 2,
+        NEED_GAS_DEVICE_COUNT: 1,
+        NEED_PLA_DEVICE_COUNT: 0,
       }));
 
       changeData(list);
     });
   };
 
-  const changeData = (data: (AddressData | ShopData)[]): void => {
+  // 데이터 State에 삽입
+  const changeData = (data: Data[]): void => {
     setData(data);
-    setTimeout(() => setLoading(false), 200);
+    setLoading(false);
   };
 
+  // 상황에 따라 데이터 조회
   const getData = (): void => {
     setLoading(true);
     (isAddr ? getAddressList : getShopList)();
   };
 
-  const titleClick = (i: number): void => {
-    if (!i) return setDeps(currentDeps);
+  // Depth 클릭
+  const depthClick = (i: number): void => {
+    if (!i) return setDepth(currentDepth);
 
-    setDeps((prev) => {
+    setDepth((prev) => {
       let copy = [...prev];
       copy = copy?.slice(0, i + 1);
       return copy;
     });
   };
 
-  useEffect(getData, [deps]);
+  // color return
+  const colorData = (i: number): string => {
+    let calc = i < 10 ? i : i % 10;
+    return addrColors[calc];
+  };
+
+  useEffect(getData, [depth]);
 
   return (
     <Container>
       <Header>
         <HeaderSide dir="left">
-          {deps?.map((item, i) => (
+          {depth?.map((item, i) => (
             <React.Fragment key={i}>
-              <HeaderTitle color="#444" onClick={() => titleClick(i)}>
+              <HeaderTitle color="#444" onClick={() => depthClick(i)}>
                 {item}
               </HeaderTitle>
-              {i < deps?.length - 1 && <RightIcon />}
+              {i < depth?.length - 1 && <RightIcon />}
             </React.Fragment>
           ))}
         </HeaderSide>
@@ -133,14 +174,11 @@ export default function Index() {
           data?.map((item, i) => (
             <Box
               key={i}
-              id={isAddr ? 0 : (item as ShopData)?.SHOP_SQ}
-              type={isAddr ? "address" : "shop"}
-              name={
-                isAddr
-                  ? (item as AddressData)?.ADDR_NM
-                  : (item as ShopData)?.SHOP_NM
-              }
-              setDeps={setDeps}
+              id={item?.SHOP_SQ ?? 0}
+              name={item?.TITLE}
+              data={item}
+              setDepth={setDepth}
+              color={colorData(i)}
             />
           ))
         )}

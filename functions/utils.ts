@@ -115,8 +115,7 @@ export const success = (data: any = null): SuccessResponseData => {
 };
 
 export const useAxios = axios.create({
-  // baseURL: "/api",
-  baseURL: process.env.API_URL || "http://localhost:8080/api",
+  baseURL: "/api",
   timeout: 5000,
 });
 

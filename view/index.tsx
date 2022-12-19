@@ -9,6 +9,7 @@ import "@fontsource/roboto/300.css";
 import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
+import config from "../config";
 
 const rootNode = document.querySelector("#root");
 
@@ -16,9 +17,15 @@ if (rootNode) {
   createRoot(rootNode).render(
     <React.StrictMode>
       <Provider store={store}>
-        <HistoryRouter>
-          <App />
-        </HistoryRouter>
+        {config?.mode === "dev" ? (
+          <HashRouter>
+            <App />
+          </HashRouter>
+        ) : (
+          <HistoryRouter>
+            <App />
+          </HistoryRouter>
+        )}
       </Provider>
     </React.StrictMode>
   );

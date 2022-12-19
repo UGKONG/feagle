@@ -1,22 +1,22 @@
 import { SetState } from "../../../types";
 
+export type Type = "address" | "shop";
 export type BoxProps = {
-  type: "address" | "shop";
   id: number;
   name: string;
-  setDeps: SetState<string[]>;
+  data: Data;
+  color: string;
+  setDepth: SetState<string[]>;
 };
-export type AddressData = {
-  ADDR_NM: string;
-  SHOP_COUNT: number;
+export type Data = {
+  TITLE: string;
+  SHOP_SQ?: number;
+  SHOP_COUNT?: number;
   DEVICE_COUNT: number;
   USE_TIME: number;
   USE_COUNT: number;
-};
-export type ShopData = {
-  SHOP_SQ: number;
-  SHOP_NM: string;
-  DEVICE_COUNT: number;
-  USE_TIME: number;
-  USE_COUNT: number;
+  ON_DEVICE_COUNT: number;
+  START_DEVICE_COUNT: number;
+  NEED_GAS_DEVICE_COUNT: number;
+  NEED_PLA_DEVICE_COUNT: number;
 };

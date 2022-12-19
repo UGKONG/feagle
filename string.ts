@@ -1,5 +1,5 @@
 // 프로그램명
-export const programName = "feagle";
+export const programName: string = "feagle";
 
 // API 에러 메시지
 export const errorMessage = {
@@ -22,4 +22,22 @@ export const menuList: Array<MenuList> = [
 ];
 
 // 파일 업로드 경로
-export const uploadDir = `${__dirname}/upload`;
+export const uploadDir: string = `${__dirname}/upload`;
+
+// 지역별 색상
+export const addrColors: string[] = [
+  "#9480c3dd",
+  "#656cdadd",
+  "#4aab89dd",
+  "#aeb14bdd",
+  "#b17d4bdd",
+  "#a44bb1dd",
+  "#c05454dd",
+  "#9480c3dd",
+  "#656cdadd",
+  "#4aab89dd",
+  "#aeb14bdd",
+  "#b17d4bdd",
+  "#a44bb1dd",
+  "#c05454dd",
+];
