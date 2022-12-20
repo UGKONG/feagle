@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
 import _Container from "../../common/Container";
-import { Data } from "./index.type";
+import { Count, Data } from "./index.type";
 import { BiChevronRight } from "react-icons/bi";
 import { useAxios } from "../../../functions/utils";
 import { Shop } from "../../../types";
@@ -20,6 +20,24 @@ export default function Index() {
 
   // 지역 별 / 피부샵 별 구분
   const isAddr = useMemo<boolean>(() => depth?.length <= 1, [depth]);
+
+  // 피부샵 수, 장비 수
+  const count = useMemo<Count>(() => {
+    let shop: number = 0;
+    let device: number = 0;
+
+    if (isAddr) {
+      data?.forEach((item) => {
+        shop += item?.SHOP_COUNT ?? 0;
+        device += item?.DEVICE_COUNT ?? 0;
+      });
+    } else {
+      shop = data?.length;
+      data?.forEach((item) => (device += item?.DEVICE_COUNT ?? 0));
+    }
+
+    return { shop, device };
+  }, [data]);
 
   // 지역 별 리스트 조회
   const getAddressList = (): void => {
@@ -160,8 +178,12 @@ export default function Index() {
         </HeaderSide>
         <HeaderSide dir="right">
           <TotalText>
-            <HeaderText color="#22aa0b">피부샵 수: {100}개</HeaderText>
-            <HeaderText color="#ff8000">장비 수: {100}개</HeaderText>
+            <HeaderText color="#22aa0b">
+              피부샵 수: {count?.shop ?? 0}개
+            </HeaderText>
+            <HeaderText color="#ff8000">
+              장비 수: {count?.device ?? 0}개
+            </HeaderText>
           </TotalText>
         </HeaderSide>
       </Header>

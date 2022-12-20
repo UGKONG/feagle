@@ -20,3 +20,4 @@ export type Data = {
   NEED_GAS_DEVICE_COUNT: number;
   NEED_PLA_DEVICE_COUNT: number;
 };
+export type Count = { shop: number; device: number };
