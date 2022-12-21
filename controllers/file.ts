@@ -4,7 +4,7 @@ import fs from "fs";
 import { uploadDir } from "../string";
 
 // 파일 다운로드
-export const postFileDownload = async (req: any, res: Response) => {
+export const getFileDownload = async (req: any, res: Response) => {
   const FILE_SQ = req?.params?.FILE_SQ;
   const user = req?.session?.user;
   const ACT_TP = user?.ACT_TP ?? null;

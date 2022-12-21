@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { postFileDownload } from "../controllers/file";
+import { getFileDownload } from "../controllers/file";
 
 const fileRouter = Router();
 
-fileRouter.get("/:FILE_SQ", postFileDownload);
+fileRouter.get("/:FILE_SQ", getFileDownload);
 
 export default fileRouter;
