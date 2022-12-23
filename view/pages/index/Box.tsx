@@ -3,21 +3,27 @@ import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { BoxProps, Type } from "./index.type";
 
-export default function Box({ id, name, data, color, setDepth }: BoxProps) {
+export default function Box({
+  id,
+  name,
+  data,
+  color,
+  isAddr,
+  setDepth,
+  setActiveAddress,
+}: BoxProps) {
   const navigate = useNavigate();
 
   // box 클릭
   const boxClick = (): void => {
-    if (type === "address") {
+    if (isAddr) {
       setDepth((prev) => [...prev, name]);
+      setActiveAddress(id);
     } else {
       if (!id) return;
       navigate("/shop/" + id);
     }
   };
-
-  // 지역 별 / 피부샵 별 구분
-  const type = useMemo<Type>(() => (id === 0 ? "address" : "shop"), [id]);
 
   // 누적사용정보
   const use = useMemo<string>(() => {
@@ -41,8 +47,8 @@ export default function Box({ id, name, data, color, setDepth }: BoxProps) {
     <>
       <Container color={color} onClick={boxClick}>
         <Title>
-          {type === "shop" && "피부샵명: "}
-          {name} {type === "address" && <ShopCount />}
+          {!isAddr && "피부샵명: "}
+          {name} {isAddr && <ShopCount />}
         </Title>
 
         <SubTitle>
@@ -51,37 +57,34 @@ export default function Box({ id, name, data, color, setDepth }: BoxProps) {
 
         <Contents>
           <Row>
-            <RowTitle>현재 구동 장비</RowTitle>
-            <Progress
-              percent={percentData(data?.ON_DEVICE_COUNT)}
-              color="#89c963"
-            />
-            {data?.ON_DEVICE_COUNT ?? 0}대
+            <RowTitle>현재 켜진 장비</RowTitle>
+            <Progress percent={percentData(data?.ON_COUNT)} color="#89c963" />
+            {data?.ON_COUNT ?? 0}대
           </Row>
           <Row>
             <RowTitle>현재 사용 장비</RowTitle>
             <Progress
-              percent={percentData(data?.START_DEVICE_COUNT)}
+              percent={percentData(data?.START_COUNT)}
               color="#89c963"
             />
-            {data?.START_DEVICE_COUNT ?? 0}대
+            {data?.START_COUNT ?? 0}대
           </Row>
 
           <Row>
             <RowTitle>가스 교체 필요</RowTitle>
             <Progress
-              percent={percentData(data?.NEED_GAS_DEVICE_COUNT)}
+              percent={percentData(data?.GAS_DANGER_COUNT)}
               color="#e96262"
             />
-            {data?.NEED_GAS_DEVICE_COUNT ?? 0}대
+            {data?.GAS_DANGER_COUNT ?? 0}대
           </Row>
           <Row>
             <RowTitle>플라즈마 이상</RowTitle>
             <Progress
-              percent={percentData(data?.NEED_PLA_DEVICE_COUNT)}
+              percent={percentData(data?.PLA_DANGER_COUNT)}
               color="#e96262"
             />
-            {data?.NEED_PLA_DEVICE_COUNT ?? 0}대
+            {data?.PLA_DANGER_COUNT ?? 0}대
           </Row>
         </Contents>
       </Container>

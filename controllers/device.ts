@@ -59,11 +59,15 @@ export const getDeviceDetail = async (req: Request, res: Response) => {
   const { error, result } = await useDatabase(
     `
     SELECT
-    a.DEVICE_SQ, a.MDL_SQ, b.MDL_NM, b.MDL_EN_NM, b.MDL_DESC,
-    a.SHOP_SQ, c.SHOP_NM, c.SHOP_NUM, c.SHOP_ADD, a.DEVICE_SN, a.DEVICE_NM, a.DEVICE_SW_VN, a.DEVICE_FW_VN,
-    a.DEVICE_BUY_DT, a.DEVICE_INSTL_DT, IF(d.UDD_VAL, d.UDD_VAL, 0) AS UDD_VAL,
-    IF(e.IS_ACTIVE, e.IS_ACTIVE, 0) AS IS_ACTIVE, IF(f.ON_COUNT, f.ON_COUNT, 0) AS ON_COUNT,
-    a.DEVICE_LAST_DT, g.UDD_VAL AS PLA_VAL, h.UDD_VAL AS GAS_VAL, i.UDD_VAL AS GAS1_VAL,
+    a.DEVICE_SQ, a.MDL_SQ, b.MDL_NM, b.MDL_EN_NM,
+    b.MDL_DESC, a.SHOP_SQ, c.SHOP_NM, c.SHOP_NUM, 
+    c.SHOP_ADD, c.SHOP_ADD_DTL, a.DEVICE_SN, a.DEVICE_NM, 
+    a.DEVICE_SW_VN, a.DEVICE_FW_VN, a.DEVICE_BUY_DT, 
+    a.DEVICE_INSTL_DT, IF(d.UDD_VAL, d.UDD_VAL, 0) AS UDD_VAL,
+    IF(e.IS_ACTIVE, e.IS_ACTIVE, 0) AS IS_ACTIVE, 
+    IF(f.ON_COUNT, f.ON_COUNT, 0) AS ON_COUNT,
+    a.DEVICE_LAST_DT, g.UDD_VAL AS PLA_VAL, 
+    h.UDD_VAL AS GAS_VAL, i.UDD_VAL AS GAS1_VAL,
     j.UDD_VAL AS GAS2_VAL
     FROM tb_device a
     LEFT JOIN tb_device_model b ON b.MDL_SQ = a.MDL_SQ

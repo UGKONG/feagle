@@ -22,7 +22,7 @@ export const getShopList = async (req: Request, res: Response) => {
   const { error, result } = await useDatabase(
     `
     SELECT
-    a.SHOP_SQ, a.SHOP_NM, a.SHOP_NUM, a.SHOP_ADD,
+    a.SHOP_SQ, a.SHOP_NM, a.SHOP_NUM, a.SHOP_ADD, a.SHOP_ADD_DTL,
     b.MNG_NM, a.SHOP_CRT_DT, IF(c.DEVICE_COUNT > 0, c.DEVICE_COUNT, 0) AS DEVICE_COUNT
     FROM tb_shop a
     LEFT JOIN tb_manager b ON b.SHOP_SQ = a.SHOP_SQ
@@ -61,7 +61,7 @@ export const getShop = async (req: Request, res: Response) => {
   const { error, result } = await useDatabase(
     `
     SELECT
-    SHOP_SQ, SHOP_NM, SHOP_NUM, SHOP_ADD, IS_DEL
+    SHOP_SQ, SHOP_NM, SHOP_NUM, SHOP_ADD, SHOP_ADD_DTL, IS_DEL
     FROM tb_shop
     WHERE SHOP_SQ = ?;
 
@@ -163,6 +163,8 @@ export const postShop = async (req: Request, res: Response) => {
   const SHOP_NM = req?.query?.SHOP_NM ?? req?.body?.SHOP_NM;
   const SHOP_NUM = req?.query?.SHOP_NUM ?? req?.body?.SHOP_NUM;
   const SHOP_ADD = req?.query?.SHOP_ADD ?? req?.body?.SHOP_ADD;
+  const ADDR_TEXT = SHOP_ADD?.split(" ")[0];
+  const SHOP_ADD_DTL = req?.query?.SHOP_ADD_DTL ?? req?.body?.SHOP_ADD_DTL;
   const MNG_NM = req?.query?.MNG_NM ?? req?.body?.MNG_NM;
   const MNG_NUM = req?.query?.MNG_NUM ?? req?.body?.MNG_NUM;
   const MNG_GD = req?.query?.MNG_GD ?? req?.body?.MNG_GD;
@@ -181,11 +183,11 @@ export const postShop = async (req: Request, res: Response) => {
     !MNG_ID ||
     !MNG_PW;
   const validate2 =
-    (DEVICE_LIST && !DEVICE_LIST[0]?.MDL_SQ) ||
-    (DEVICE_LIST && !DEVICE_LIST[0]?.DEVICE_SN) ||
-    (DEVICE_LIST && !DEVICE_LIST[0]?.DEVICE_BUY_DT) ||
-    (DEVICE_LIST && !DEVICE_LIST[0]?.DEVICE_INSTL_DT);
-
+    (DEVICE_LIST?.length && !DEVICE_LIST[0]?.MDL_SQ) ||
+    (DEVICE_LIST?.length && !DEVICE_LIST[0]?.DEVICE_SN) ||
+    (DEVICE_LIST?.length && !DEVICE_LIST[0]?.DEVICE_BUY_DT) ||
+    (DEVICE_LIST?.length && !DEVICE_LIST[0]?.DEVICE_INSTL_DT);
+  console.log(validate1, validate2);
   if (validate1 || validate2) return res.send(fail(errorMessage.parameter));
 
   const { error: error1, result } = await useDatabase(
@@ -201,12 +203,11 @@ export const postShop = async (req: Request, res: Response) => {
     return res.send(fail("아이디가 중복됩니다."));
   }
 
-  if (DEVICE_LIST) {
+  if (DEVICE_LIST?.length) {
     deviceSQL = `
       INSERT INTO tb_device (
         MDL_SQ, SHOP_SQ, DEVICE_SN, DEVICE_NM, DEVICE_BUY_DT, DEVICE_INSTL_DT
-      ) VALUES 
-      ${DEVICE_LIST?.map(
+      ) VALUES ${DEVICE_LIST?.map(
         (x: any) => `(
         '${x?.MDL_SQ}', @SHOP_SQ, '${x?.DEVICE_SN}', '${x?.DEVICE_SN}', 
         '${x?.DEVICE_BUY_DT}', '${x?.DEVICE_INSTL_DT}'
@@ -217,11 +218,12 @@ export const postShop = async (req: Request, res: Response) => {
 
   const { error: error2 } = await useDatabase(
     `
+    
     INSERT INTO tb_shop (
-      SHOP_NM, SHOP_NUM, SHOP_ADD
-    ) VALUES (
-      ?, ?, ?
-    );
+      SHOP_NM, SHOP_NUM, SHOP_ADD_SQ, SHOP_ADD, SHOP_ADD_DTL
+    ) SELECT ?, ?, COMM_CODE, ?, ? 
+      FROM tb_common WHERE COMM_GRP = 7 
+      AND COMM_NM = ?;
 
     SET @SHOP_SQ = LAST_INSERT_ID();
 
@@ -233,7 +235,18 @@ export const postShop = async (req: Request, res: Response) => {
 
     ${deviceSQL}
   `,
-    [SHOP_NM, SHOP_NUM, SHOP_ADD, MNG_NM, MNG_NUM, MNG_GD, MNG_ID, MNG_PW]
+    [
+      SHOP_NM,
+      SHOP_NUM,
+      SHOP_ADD,
+      SHOP_ADD_DTL,
+      ADDR_TEXT,
+      MNG_NM,
+      MNG_NUM,
+      MNG_GD,
+      MNG_ID,
+      MNG_PW,
+    ]
   );
 
   if (error2) return res.send(fail(errorMessage.db));
@@ -266,17 +279,25 @@ export const putShop = async (req: Request, res: Response) => {
   const SHOP_NM = req?.query?.SHOP_NM ?? req?.body?.SHOP_NM;
   const SHOP_NUM = req?.query?.SHOP_NUM ?? req?.body?.SHOP_NUM;
   const SHOP_ADD = req?.query?.SHOP_ADD ?? req?.body?.SHOP_ADD;
+  const ADDR_TEXT = SHOP_ADD?.split(" ")[0];
+  const SHOP_ADD_DTL = req?.query?.SHOP_ADD_DTL ?? req?.body?.SHOP_ADD_DTL;
 
   const validate = !SHOP_NM || !SHOP_NUM || !SHOP_ADD;
   if (validate) return res.send(fail(errorMessage.parameter));
 
   const { error } = await useDatabase(
     `
+    SET @ADDR_SQ = (
+      SELECT COMM_CODE FROM tb_common 
+      WHERE COMM_GRP = 7 AND COMM_NM = ?
+    );
+
     UPDATE tb_shop SET
-    SHOP_NM = ?, SHOP_NUM = ?, SHOP_ADD = ?
+    SHOP_NM = ?, SHOP_NUM = ?, SHOP_ADD_SQ = @ADDR_SQ, 
+    SHOP_ADD = ?, SHOP_ADD_DTL = ?
     WHERE SHOP_SQ = ?;
   `,
-    [SHOP_NM, SHOP_NUM, SHOP_ADD, SHOP_SQ]
+    [ADDR_TEXT, SHOP_NM, SHOP_NUM, SHOP_ADD, SHOP_ADD_DTL, SHOP_SQ]
   );
 
   if (error) return res.send(fail(errorMessage.db));

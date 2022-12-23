@@ -13,6 +13,7 @@ export type Value = {
   SHOP_NM: string;
   SHOP_NUM: string;
   SHOP_ADD: string;
+  SHOP_ADD_DTL: string;
   MNG_NM: string;
   MNG_NUM: string;
   MNG_GD: 1 | 2;

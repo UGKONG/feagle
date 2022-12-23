@@ -5,9 +5,10 @@ import { Count, Data } from "./index.type";
 import { BiChevronRight } from "react-icons/bi";
 import { useAxios } from "../../../functions/utils";
 import { Shop } from "../../../types";
-import Box from "./Box";
 import { CircularProgress } from "@mui/material";
 import { addrColors } from "../../../string";
+import Box from "./Box";
+import { AddressData, ShopData } from "../../../controllers/dashboard";
 
 const currentDepth: string[] = ["지역별 보기"];
 
@@ -17,6 +18,7 @@ export default function Index() {
   const [loading, setLoading] = useState<boolean>(true);
   const [depth, setDepth] = useState<string[]>(currentDepth);
   const [data, setData] = useState<Data[]>([]);
+  const [activeAddress, setActiveAddress] = useState<number>(0);
 
   // 지역 별 / 피부샵 별 구분
   const isAddr = useMemo<boolean>(() => depth?.length <= 1, [depth]);
@@ -41,93 +43,28 @@ export default function Index() {
 
   // 지역 별 리스트 조회
   const getAddressList = (): void => {
-    let list: Data[] = [
-      {
-        TITLE: "강원도",
-        SHOP_COUNT: 125,
-        DEVICE_COUNT: 147,
-        USE_TIME: 542,
-        USE_COUNT: 264,
-        ON_DEVICE_COUNT: 26,
-        START_DEVICE_COUNT: 53,
-        NEED_GAS_DEVICE_COUNT: 12,
-        NEED_PLA_DEVICE_COUNT: 3,
-      },
-      {
-        TITLE: "경기도",
-        SHOP_COUNT: 125,
-        DEVICE_COUNT: 147,
-        USE_TIME: 542,
-        USE_COUNT: 264,
-        ON_DEVICE_COUNT: 26,
-        START_DEVICE_COUNT: 53,
-        NEED_GAS_DEVICE_COUNT: 12,
-        NEED_PLA_DEVICE_COUNT: 3,
-      },
-      {
-        TITLE: "경상도",
-        SHOP_COUNT: 125,
-        DEVICE_COUNT: 147,
-        USE_TIME: 542,
-        USE_COUNT: 264,
-        ON_DEVICE_COUNT: 26,
-        START_DEVICE_COUNT: 53,
-        NEED_GAS_DEVICE_COUNT: 12,
-        NEED_PLA_DEVICE_COUNT: 3,
-      },
-      {
-        TITLE: "전라도",
-        SHOP_COUNT: 125,
-        DEVICE_COUNT: 147,
-        USE_TIME: 542,
-        USE_COUNT: 264,
-        ON_DEVICE_COUNT: 26,
-        START_DEVICE_COUNT: 53,
-        NEED_GAS_DEVICE_COUNT: 12,
-        NEED_PLA_DEVICE_COUNT: 3,
-      },
-      {
-        TITLE: "충청도",
-        SHOP_COUNT: 125,
-        DEVICE_COUNT: 147,
-        USE_TIME: 542,
-        USE_COUNT: 264,
-        ON_DEVICE_COUNT: 26,
-        START_DEVICE_COUNT: 53,
-        NEED_GAS_DEVICE_COUNT: 12,
-        NEED_PLA_DEVICE_COUNT: 3,
-      },
-      {
-        TITLE: "제주도",
-        SHOP_COUNT: 125,
-        DEVICE_COUNT: 147,
-        USE_TIME: 542,
-        USE_COUNT: 264,
-        ON_DEVICE_COUNT: 26,
-        START_DEVICE_COUNT: 53,
-        NEED_GAS_DEVICE_COUNT: 12,
-        NEED_PLA_DEVICE_COUNT: 3,
-      },
-    ];
+    useAxios.get("/dashboard").then(({ data }) => {
+      if (!data?.result) return changeData([]);
 
-    changeData(list);
+      let list: Data[] = data?.current?.map((item: AddressData) => ({
+        ...item,
+        TITLE: item?.ADDR_NM,
+      }));
+      changeData(list);
+    });
   };
 
   // 피부샵 별 리스트 조회
   const getShopList = (): void => {
-    useAxios.get("/shop").then(({ data }) => {
-      const list = data?.current?.map((x: Shop) => ({
-        SHOP_SQ: x?.SHOP_SQ,
-        TITLE: x?.SHOP_NM,
-        DEVICE_COUNT: 2,
-        USE_TIME: 125,
-        USE_COUNT: 56,
-        ON_DEVICE_COUNT: 1,
-        START_DEVICE_COUNT: 2,
-        NEED_GAS_DEVICE_COUNT: 1,
-        NEED_PLA_DEVICE_COUNT: 0,
-      }));
+    if (!activeAddress) return;
 
+    useAxios.get("/dashboard/" + activeAddress).then(({ data }) => {
+      if (!data?.result) return changeData([]);
+
+      let list: Data[] = data?.current?.map((item: ShopData) => ({
+        ...item,
+        TITLE: item?.SHOP_NM,
+      }));
       changeData(list);
     });
   };
@@ -146,7 +83,10 @@ export default function Index() {
 
   // Depth 클릭
   const depthClick = (i: number): void => {
-    if (!i) return setDepth(currentDepth);
+    if (!i) {
+      setActiveAddress(0);
+      return setDepth(currentDepth);
+    }
 
     setDepth((prev) => {
       let copy = [...prev];
@@ -192,17 +132,21 @@ export default function Index() {
           <Loading>
             <CircularProgress />
           </Loading>
-        ) : (
+        ) : data?.length > 0 ? (
           data?.map((item, i) => (
             <Box
               key={i}
-              id={item?.SHOP_SQ ?? 0}
+              id={(isAddr ? item?.ADDR_SQ : item?.SHOP_SQ) as number}
               name={item?.TITLE}
               data={item}
-              setDepth={setDepth}
               color={colorData(i)}
+              isAddr={isAddr}
+              setDepth={setDepth}
+              setActiveAddress={setActiveAddress}
             />
           ))
+        ) : (
+          <NoneList />
         )}
       </Contents>
     </Container>
@@ -269,4 +213,18 @@ const Loading = styled.div`
   top: 0;
   left: 0;
   background-color: #00000010;
+`;
+const NoneList = styled.div`
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &::before {
+    content: "해당 지역에 피부샵이 없습니다.";
+    font-size: 30px;
+    font-weight: 500;
+    color: #ccc;
+  }
 `;

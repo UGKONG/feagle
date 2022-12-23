@@ -116,7 +116,7 @@ export const success = (data: any = null): SuccessResponseData => {
 
 export const useAxios = axios.create({
   baseURL: "/api",
-  timeout: 5000,
+  timeout: 10000,
 });
 
 /**
@@ -773,4 +773,60 @@ export const useIsNumber = (input: UseIsNumberProps): boolean => {
   }
 
   return true;
+};
+
+// 주소 검색 모듈
+type addressType = {
+  address: string;
+  addressEnglish: string;
+  addressType: string;
+  apartment: string;
+  autoJibunAddress: string;
+  autoJibunAddressEnglish: string;
+  autoRoadAddress: string;
+  autoRoadAddressEnglish: string;
+  bcode: string;
+  bname: string;
+  bname1: string;
+  bname1English: string;
+  bname2: string;
+  bname2English: string;
+  bnameEnglish: string;
+  buildingCode: string;
+  buildingName: string;
+  hname: string;
+  jibunAddress: string;
+  jibunAddressEnglish: string;
+  noSelected: string;
+  postcode: string;
+  postcode1: string;
+  postcode2: string;
+  postcodeSeq: string;
+  query: string;
+  roadAddress: string;
+  roadAddressEnglish: string;
+  roadname: string;
+  roadnameCode: string;
+  roadnameEnglish: string;
+  sido: string;
+  sidoEnglish: string;
+  sigungu: string;
+  sigunguCode: string;
+  sigunguEnglish: string;
+  userLanguageType: string;
+  userSelectedType: string;
+  zonecode: string;
+};
+export const useAddress = (callback: (data: addressType) => void) => {
+  if (!window?.document) return console.error("document 객체가 없습니다.");
+
+  import("scriptjs").then(({ default: $script }) => {
+    $script.get(
+      "https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js",
+      () => {
+        let fn = (window as any).daum.Postcode;
+        new fn({ oncomplete: (data: addressType) => callback(data) }).open();
+      }
+    );
+  });
 };

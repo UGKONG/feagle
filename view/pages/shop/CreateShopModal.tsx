@@ -10,7 +10,7 @@ import _Button from "../../common/Button";
 import Modal from "../../common/Modal";
 import { Device, Props, Value } from "./index.type";
 import _Select from "../../common/Select";
-import { useAxios, usePhoneNumber } from "../../../functions/utils";
+import { useAddress, useAxios, usePhoneNumber } from "../../../functions/utils";
 import { FiPlus, FiMinus } from "react-icons/fi";
 import { useDispatch } from "react-redux";
 
@@ -21,6 +21,7 @@ export default function CreateShopModal({ title, getList, close }: Props) {
     SHOP_NM: "",
     SHOP_NUM: "",
     SHOP_ADD: "",
+    SHOP_ADD_DTL: "",
     MNG_NM: "",
     MNG_NUM: "",
     MNG_GD: 1,
@@ -122,6 +123,7 @@ export default function CreateShopModal({ title, getList, close }: Props) {
       SHOP_NM: value?.SHOP_NM,
       SHOP_NUM: value?.SHOP_NUM,
       SHOP_ADD: value?.SHOP_ADD,
+      SHOP_ADD_DTL: value?.SHOP_ADD_DTL,
       MNG_NM: value?.MNG_NM,
       MNG_NUM: value?.MNG_NUM,
       MNG_GD: value?.MNG_GD,
@@ -226,12 +228,22 @@ export default function CreateShopModal({ title, getList, close }: Props) {
               }
             />
             <Input
-              col={1}
+              readOnly
+              col={2}
               childRef={shopAddRef}
-              placeholder="주소를 입력해주세요."
+              placeholder="주소검색 (클릭)"
               value={value?.SHOP_ADD}
+              onClick={() => {
+                useAddress(({ address }) => changeValue("SHOP_ADD", address));
+              }}
+              style={{ cursor: "pointer", color: "#999" }}
+            />
+            <Input
+              col={2}
+              placeholder="상세주소를 입력해주세요."
+              value={value?.SHOP_ADD_DTL}
               onChange={(e: InputChangeEvent) =>
-                changeValue("SHOP_ADD", e?.target?.value)
+                changeValue("SHOP_ADD_DTL", e?.target?.value)
               }
             />
           </InputContainer>

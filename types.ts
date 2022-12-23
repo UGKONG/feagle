@@ -67,6 +67,7 @@ export interface Shop {
   SHOP_NM: s;
   SHOP_NUM: s;
   SHOP_ADD: s;
+  SHOP_ADD_DTL: s;
   IS_DEL?: IsYes;
   MNG_NM?: s;
   DEVICE_COUNT?: n;
@@ -81,6 +82,7 @@ export interface ShopDetail {
   HISTORY: History[];
   IS_DEL: 0 | 1;
   MNG: null | Manager;
+  SHOP_ADD_DTL: s;
   SHOP_ADD: s;
   SHOP_NM: s;
   SHOP_NUM: s;
@@ -113,6 +115,7 @@ export interface Device {
   SHOP_NM: s;
   SHOP_NUM?: s;
   SHOP_ADD?: s;
+  SHOP_ADD_DTL?: s;
   DEVICE_SN: s;
   DEVICE_NM: s;
   DEVICE_SW_VN: s;
@@ -302,4 +305,10 @@ export interface DeviceDo {
   MST_GRP: s;
   MST_PO: s;
   DO_CRT_DT: s;
+}
+
+// 주소 리스트
+export interface Address {
+  ADDR_SQ: number;
+  ADDR_NM: string;
 }

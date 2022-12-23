@@ -13,7 +13,7 @@ import {
 } from ".";
 import { InputChangeEvent, ShopDetail } from "../../../types";
 import type { ShopInfoBoxProps } from "./index.type";
-import { useAxios, usePhoneNumber } from "../../../functions/utils";
+import { useAddress, useAxios, usePhoneNumber } from "../../../functions/utils";
 import { useDispatch } from "react-redux";
 import styled from "styled-components";
 import _Button from "../../common/Button";
@@ -124,6 +124,7 @@ export default function ShopInfoBox({
                 onChange={(e: InputChangeEvent) =>
                   setValue("SHOP_NM", e?.target?.value)
                 }
+                placeholder="상호명을 입력해주세요."
               />
             ) : (
               data?.SHOP_NM
@@ -140,6 +141,7 @@ export default function ShopInfoBox({
                 onChange={(e: InputChangeEvent) =>
                   setValue("SHOP_NUM", usePhoneNumber(e?.target?.value))
                 }
+                placeholder="연락처를 입력해주세요."
               />
             ) : (
               data?.SHOP_NUM
@@ -150,15 +152,34 @@ export default function ShopInfoBox({
           <RowTitle>주소</RowTitle>
           <RowContents>
             {isEdit ? (
-              <EditInput
-                childRef={shopAddRef}
-                value={editData?.SHOP_ADD}
-                onChange={(e: InputChangeEvent) =>
-                  setValue("SHOP_ADD", e?.target?.value)
-                }
-              />
+              <>
+                <EditInput
+                  readOnly
+                  placeholder="주소검색 (클릭)"
+                  childRef={shopAddRef}
+                  value={editData?.SHOP_ADD}
+                  style={{
+                    width: "calc(100% - 20px)",
+                    marginRight: 10,
+                    cursor: "pointer",
+                  }}
+                  onClick={() =>
+                    useAddress(({ address }) => setValue("SHOP_ADD", address))
+                  }
+                />
+                <EditInput
+                  value={editData?.SHOP_ADD_DTL}
+                  onChange={(e: InputChangeEvent) =>
+                    setValue("SHOP_ADD_DTL", e?.target?.value)
+                  }
+                  style={{ marginRight: 10 }}
+                  placeholder="상세주소를 입력해주세요."
+                />
+              </>
             ) : (
-              data?.SHOP_ADD
+              <>
+                {data?.SHOP_ADD ?? ""} {data?.SHOP_ADD_DTL ?? ""}
+              </>
             )}
           </RowContents>
         </Row>

@@ -3,7 +3,6 @@ import cors from "cors";
 import { programName } from "./string";
 import serverStart from "./functions/serverStart";
 import apiLogger from "./middlewares/apiLogger";
-import sessionCheck from "./middlewares/sessionCheck";
 import viewRoutes from "./routes/view.json";
 import testRoute from "./routes/test";
 import masterRouter from "./routes/master";
@@ -18,6 +17,7 @@ import logRouter from "./routes/log";
 import managerRouter from "./routes/manager";
 import modelRouter from "./routes/model";
 import deviceDoRouter from "./routes/deviceDo";
+import dashboardRoute from "./routes/dashboard";
 
 // Setting
 require("dotenv").config();
@@ -52,7 +52,6 @@ const basePath = __dirname + "/build";
 app.use(cors());
 app.use(bodyParser.json());
 app.use(apiLogger);
-// app.use(sessionCheck);
 app.use(sessionConfig);
 
 // View Router
@@ -74,6 +73,7 @@ app.use("/api/file", multiparty, fileRouter);
 app.use("/api/gas", multiparty, gasRouter);
 app.use("/api/log", multiparty, logRouter);
 app.use("/api/deviceDo", multiparty, deviceDoRouter);
+app.use("/api/dashboard", multiparty, dashboardRoute);
 
 // Start
 app.listen(port, serverStart);
