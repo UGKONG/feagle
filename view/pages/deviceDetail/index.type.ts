@@ -16,8 +16,13 @@ export type ChartDate = {
   end: string;
   type?: number;
 };
-export type ChartData = {
+export type UseChartData = {
   COMM_CODE: number;
   COMM_NM: string;
+  VALUE: number;
+};
+export type DataChartData = {
+  MONTH_SQ: number;
+  MONTH_NM: string;
   VALUE: number;
 };

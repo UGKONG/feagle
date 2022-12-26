@@ -43,7 +43,7 @@ const commonSQL = `
   IF(j.REF_MIN <= h.UDD_VAL AND h.UDD_VAL <= j.REF_MAX, 1, 0) AS IS_PLA_DANGER
   FROM tb_device a
   # 장비를 보유한 피부샵 정보 조회
-  LEFT JOIN tb_shop b
+  RIGHT JOIN tb_shop b
     ON b.SHOP_SQ = a.SHOP_SQ
   # 장비 켜짐 여부 조회
   LEFT JOIN (

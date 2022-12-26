@@ -1,6 +1,7 @@
 import _React from "react";
 import styled from "styled-components";
 import _Container from "../../common/Container";
+import NoneItem from "../../common/NoneItem";
 import { HeaderList, Props } from "./index.type";
 
 const headerList: HeaderList = ["No", "부서", "작성자", "내용", "일시"];
@@ -18,15 +19,19 @@ export default function DeviceDoList({ currentList }: Props) {
             </tr>
           </THeader>
           <TBody>
-            {currentList?.map((item, i) => (
-              <Tr key={item?.DO_SQ}>
-                <Td>{i + 1}</Td>
-                <Td>{item?.MST_GRP ?? "-"}</Td>
-                <Td>{item?.MST_NM ?? "-"}</Td>
-                <Td>{item?.DO_CN ?? "-"}</Td>
-                <Td>{item?.DO_CRT_DT ?? "-"}</Td>
-              </Tr>
-            ))}
+            {!currentList?.length ? (
+              <NoneItem colSpan={headerList} />
+            ) : (
+              currentList?.map((item, i) => (
+                <Tr key={item?.DO_SQ}>
+                  <Td>{i + 1}</Td>
+                  <Td>{item?.MST_GRP ?? "-"}</Td>
+                  <Td>{item?.MST_NM ?? "-"}</Td>
+                  <Td>{item?.DO_CN ?? "-"}</Td>
+                  <Td>{item?.DO_CRT_DT ?? "-"}</Td>
+                </Tr>
+              ))
+            )}
           </TBody>
         </Table>
       </List>

@@ -4,6 +4,7 @@ import styled from "styled-components";
 import { useAxios } from "../../../functions/utils";
 import { Device } from "../../../types";
 import _Container from "../../common/Container";
+import NoneItem from "../../common/NoneItem";
 import TableHeaderContainer from "../../common/TableHeaderContainer";
 import { Active, FilterList, HeaderList, Props } from "./index.type";
 
@@ -27,7 +28,7 @@ const headerList: HeaderList = [
   "소프트웨어",
 ];
 
-export default function Shop({
+export default function State({
   isHeader = true,
   currentList,
   isShopNameHide = false,
@@ -57,13 +58,13 @@ export default function Shop({
     // (1 - 일련번호, 2 - 모델명, 3 - 피부샵명, 4 - 플라즈마 전류, 5 - 가스 잔량, 6 - 펌웨어, 7 - 소프트웨어)
     if (sort === 1) {
       copy?.sort((a, b) => {
-        let up =
+        let up: number =
           a?.DEVICE_SN < b?.DEVICE_SN
             ? -1
             : a?.DEVICE_SN > b?.DEVICE_SN
             ? 1
             : 0;
-        let down =
+        let down: number =
           a?.DEVICE_SN > b?.DEVICE_SN
             ? -1
             : a?.DEVICE_SN < b?.DEVICE_SN
@@ -73,8 +74,10 @@ export default function Shop({
       });
     } else if (sort === 2) {
       copy?.sort((a, b) => {
-        let up = a?.MDL_NM < b?.MDL_NM ? -1 : a?.MDL_NM > b?.MDL_NM ? 1 : 0;
-        let down = a?.MDL_NM > b?.MDL_NM ? -1 : a?.MDL_NM < b?.MDL_NM ? 1 : 0;
+        let up: number =
+          a?.MDL_NM < b?.MDL_NM ? -1 : a?.MDL_NM > b?.MDL_NM ? 1 : 0;
+        let down: number =
+          a?.MDL_NM > b?.MDL_NM ? -1 : a?.MDL_NM < b?.MDL_NM ? 1 : 0;
         return isUp ? up : down;
       });
     } else if (sort === 3) {
@@ -99,13 +102,13 @@ export default function Shop({
       });
     } else if (sort === 6) {
       copy?.sort((a, b) => {
-        let up =
+        let up: number =
           a?.DEVICE_FW_VN < b?.DEVICE_FW_VN
             ? -1
             : a?.DEVICE_FW_VN > b?.DEVICE_FW_VN
             ? 1
             : 0;
-        let down =
+        let down: number =
           a?.DEVICE_FW_VN > b?.DEVICE_FW_VN
             ? -1
             : a?.DEVICE_FW_VN < b?.DEVICE_FW_VN
@@ -115,13 +118,13 @@ export default function Shop({
       });
     } else if (sort === 7) {
       copy?.sort((a, b) => {
-        let up =
+        let up: number =
           a?.DEVICE_SW_VN < b?.DEVICE_SW_VN
             ? -1
             : a?.DEVICE_SW_VN > b?.DEVICE_SW_VN
             ? 1
             : 0;
-        let down =
+        let down: number =
           a?.DEVICE_SW_VN > b?.DEVICE_SW_VN
             ? -1
             : a?.DEVICE_SW_VN < b?.DEVICE_SW_VN
@@ -142,7 +145,7 @@ export default function Shop({
     });
   };
 
-  useEffect(getShopList, []);
+  useEffect(getShopList, [currentList]);
 
   return (
     <Container isContents={currentList ? true : false} isLoading={isLoading}>
@@ -166,21 +169,25 @@ export default function Shop({
             </tr>
           </THeader>
           <TBody>
-            {resultDeviceList?.map((item, i) => (
-              <Tr
-                key={item?.DEVICE_SQ}
-                onClick={() => navigate("/device/" + item?.DEVICE_SQ)}
-              >
-                <Td>{i + 1}</Td>
-                <Td>{item?.DEVICE_SN ?? "-"}</Td>
-                <Td>{item?.MDL_NM ?? "-"}</Td>
-                {!isShopNameHide && <Td>{item?.SHOP_NM ?? "-"}</Td>}
-                <Td>{item?.PLA_VAL ? item?.PLA_VAL + "mA" : "-"}</Td>
-                <Td>{item?.GAS_VAL ? item?.GAS_VAL + "%" : "-"}</Td>
-                <Td>{item?.DEVICE_FW_VN ?? "-"}</Td>
-                <Td>{item?.DEVICE_SW_VN ?? "-"}</Td>
-              </Tr>
-            ))}
+            {!resultDeviceList?.length ? (
+              <NoneItem colSpan={headerList} />
+            ) : (
+              resultDeviceList?.map((item, i) => (
+                <Tr
+                  key={item?.DEVICE_SQ}
+                  onClick={() => navigate("/device/" + item?.DEVICE_SQ)}
+                >
+                  <Td>{i + 1}</Td>
+                  <Td>{item?.DEVICE_SN ?? "-"}</Td>
+                  <Td>{item?.MDL_NM ?? "-"}</Td>
+                  {!isShopNameHide && <Td>{item?.SHOP_NM ?? "-"}</Td>}
+                  <Td>{item?.PLA_VAL ? item?.PLA_VAL + "mA" : "-"}</Td>
+                  <Td>{item?.GAS_VAL ? item?.GAS_VAL + "%" : "-"}</Td>
+                  <Td>{item?.DEVICE_FW_VN ?? "-"}</Td>
+                  <Td>{item?.DEVICE_SW_VN ?? "-"}</Td>
+                </Tr>
+              ))
+            )}
           </TBody>
         </Table>
       </List>

@@ -8,6 +8,7 @@ import TableHeaderContainer from "../../common/TableHeaderContainer";
 import { Active, FilterList, HeaderList, Props } from "./index.type";
 import _Select from "../../common/Select";
 import { useDispatch } from "react-redux";
+import NoneItem from "../../common/NoneItem";
 
 const filterList: FilterList = [
   { id: 1, name: "이름" },
@@ -27,7 +28,7 @@ const headerList: HeaderList = [
   "요청처리",
 ];
 
-export default function Shop({
+export default function JoinList({
   isHeader = true,
   setJoinListView,
   authList,
@@ -182,65 +183,69 @@ export default function Shop({
             </tr>
           </THeader>
           <TBody>
-            {resultMasterList?.map((item, i) => (
-              <Tr key={item?.MST_SQ}>
-                <Td>{i + 1}</Td>
-                <Td>{item?.MST_NM ?? "-"}</Td>
-                <Td>{item?.MST_GRP ?? "-"}</Td>
-                <Td>{item?.MST_PO ?? "-"}</Td>
-                <Td>
-                  {item?.MST_GD === 1
-                    ? "남자"
-                    : item?.MST_GD == 2
-                    ? "여자"
-                    : "-"}
-                </Td>
-                <Td>{item?.MST_NUM ?? "-"}</Td>
-                <Td>{item?.MST_CRT_DT ?? "-"}</Td>
-                <Td>
-                  {!isChk ? (
-                    <>
-                      <YesBtn onClick={() => setIsChk("yes")} />
-                      <NoBtn onClick={() => setIsChk("no")} />
-                    </>
-                  ) : (
-                    <>
-                      {isChk === "yes" ? (
-                        <Select
-                          defaultValue={item?.AUTH_SQ}
-                          onChange={(e: SelectChangeEvent) =>
-                            join(
-                              item?.MST_SQ as number,
-                              Number(e?.target?.value),
-                              1
-                            )
-                          }
-                        >
-                          <option value="">권한을 선택해주세요.</option>
-                          {authList
-                            ?.filter((x) => x?.COMM_CODE !== 5)
-                            ?.map((x) => (
-                              <option key={x?.COMM_CODE} value={x?.COMM_CODE}>
-                                {x?.COMM_NM}
-                              </option>
-                            ))}
-                        </Select>
-                      ) : (
-                        <>
-                          <span style={{ marginRight: 10 }}>
-                            거절하시겠습니까?
-                          </span>
-                          <NoBtn
-                            onClick={() => join(item?.MST_SQ as number, 0, 0)}
-                          />
-                        </>
-                      )}
-                      <CancelBtn onClick={() => setIsChk(null)} />
-                    </>
-                  )}
-                </Td>
-              </Tr>
-            ))}
+            {!resultMasterList?.length ? (
+              <NoneItem colSpan={headerList} />
+            ) : (
+              resultMasterList?.map((item, i) => (
+                <Tr key={item?.MST_SQ}>
+                  <Td>{i + 1}</Td>
+                  <Td>{item?.MST_NM ?? "-"}</Td>
+                  <Td>{item?.MST_GRP ?? "-"}</Td>
+                  <Td>{item?.MST_PO ?? "-"}</Td>
+                  <Td>
+                    {item?.MST_GD === 1
+                      ? "남자"
+                      : item?.MST_GD == 2
+                      ? "여자"
+                      : "-"}
+                  </Td>
+                  <Td>{item?.MST_NUM ?? "-"}</Td>
+                  <Td>{item?.MST_CRT_DT ?? "-"}</Td>
+                  <Td>
+                    {!isChk ? (
+                      <>
+                        <YesBtn onClick={() => setIsChk("yes")} />
+                        <NoBtn onClick={() => setIsChk("no")} />
+                      </>
+                    ) : (
+                      <>
+                        {isChk === "yes" ? (
+                          <Select
+                            defaultValue={item?.AUTH_SQ}
+                            onChange={(e: SelectChangeEvent) =>
+                              join(
+                                item?.MST_SQ as number,
+                                Number(e?.target?.value),
+                                1
+                              )
+                            }
+                          >
+                            <option value="">권한을 선택해주세요.</option>
+                            {authList
+                              ?.filter((x) => x?.COMM_CODE !== 5)
+                              ?.map((x) => (
+                                <option key={x?.COMM_CODE} value={x?.COMM_CODE}>
+                                  {x?.COMM_NM}
+                                </option>
+                              ))}
+                          </Select>
+                        ) : (
+                          <>
+                            <span style={{ marginRight: 10 }}>
+                              거절하시겠습니까?
+                            </span>
+                            <NoBtn
+                              onClick={() => join(item?.MST_SQ as number, 0, 0)}
+                            />
+                          </>
+                        )}
+                        <CancelBtn onClick={() => setIsChk(null)} />
+                      </>
+                    )}
+                  </Td>
+                </Tr>
+              ))
+            )}
           </TBody>
         </Table>
       </List>

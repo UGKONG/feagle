@@ -118,7 +118,7 @@ export const getDeviceDetail = async (req: Request, res: Response) => {
     SELECT 
     a.UDD_SQ, a.UDD_TP, a.UDD_VAL, a.UDD_CRT_DT
     FROM tb_use_device_data a
-    WHERE DEVICE_SQ = ?;
+    WHERE a.DEVICE_SQ = ?;
   `,
     [DEVICE_SQ, DEVICE_SQ]
   );
@@ -345,20 +345,42 @@ export const getDeviceDataChart = async (req: Request, res: Response) => {
     return res.send(fail(errorMessage.parameter));
   }
 
-  const { error, result } = await useDatabase(
-    `
-    SELECT
-    a.COMM_CODE, a.COMM_NM
-    FROM tb_common a
-    # LEFT JOIN #######
-    WHERE a.COMM_GRP = 5
-    AND a.COMM_CODE > 0
-    ORDER BY a.COMM_CODE ASC;
-  `,
-    [DEVICE_SQ]
-  );
-  if (error) return res.send(fail(errorMessage.db));
+  // const { error, result } = await useDatabase(
+  //   `
+  //   SELECT
+  //   a.COMM_CODE, a.COMM_NM
+  //   FROM tb_common a
+  //   # LEFT JOIN #######
+  //   WHERE a.COMM_GRP = 5
+  //   AND a.COMM_CODE > 0
+  //   ORDER BY a.COMM_CODE ASC;
+  // `,
+  //   [DEVICE_SQ]
+  // );
+  // if (error) return res.send(fail(errorMessage.db));
+
+  const months = [
+    "1월",
+    "2월",
+    "3월",
+    "4월",
+    "5월",
+    "6월",
+    "7월",
+    "8월",
+    "9월",
+    "10월",
+    "11월",
+    "12월",
+  ];
+
   res.send(
-    success(result?.map((x: any) => ({ ...x, VALUE: Math.random() * 10 })))
+    success(
+      months?.map((x: string, i: number) => ({
+        MONTH_SQ: i + 1,
+        MONTH_NM: x,
+        VALUE: Math.random() * 10,
+      }))
+    )
   );
 };

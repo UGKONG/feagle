@@ -6,7 +6,7 @@ import { CommonCode, InputChangeEvent } from "../../../types";
 import BarChart from "../../common/BarChart";
 import Tab from "../../common/Tab";
 import { Header, Contents, Input, Margin, HeaderSide } from "./index.style";
-import { ChartData, ChartDate } from "./index.type";
+import { DataChartData, ChartDate } from "./index.type";
 
 export default function DataChartModal({}) {
   const params = useParams();
@@ -54,12 +54,13 @@ export default function DataChartModal({}) {
       return;
     }
 
-    let url = `/device/useChart/${DEVICE_SQ}?`;
+    let url = `/device/dataChart/${DEVICE_SQ}?`;
     let query = `start=${date?.start}&end=${date?.end}&type=${date?.type}`;
+
     useAxios.get(url + query).then(({ data }) => {
       if (!data?.result) return setData([]);
-      let list = data?.current?.map((x: ChartData) => ({
-        name: x?.COMM_NM,
+      let list = data?.current?.map((x: DataChartData) => ({
+        name: x?.MONTH_NM,
         value: x?.VALUE,
       }));
       setData(list);

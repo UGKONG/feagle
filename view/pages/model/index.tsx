@@ -7,6 +7,7 @@ import { AlertType, DeviceModel, InputChangeEvent } from "../../../types";
 import _Container from "../../common/Container";
 import _Input from "../../common/Input";
 import Modal from "../../common/Modal";
+import NoneItem from "../../common/NoneItem";
 import TableHeaderContainer from "../../common/TableHeaderContainer";
 import { Active, FilterList, HeaderList, Props } from "./index.type";
 
@@ -205,15 +206,19 @@ export default function Model() {
               </tr>
             </THeader>
             <TBody>
-              {resultDeviceList?.map((item, i) => (
-                <Tr key={item?.MDL_SQ} onClick={() => setEditModelData(item)}>
-                  <Td>{i + 1}</Td>
-                  <Td>{item?.MDL_NM ?? "-"}</Td>
-                  <Td>{item?.MDL_EN_NM ?? "-"}</Td>
-                  <Td>{item?.MDL_DESC ?? "-"}</Td>
-                  <Td>{item?.MDL_CRT_DT ?? "-"}</Td>
-                </Tr>
-              ))}
+              {!resultDeviceList?.length ? (
+                <NoneItem colSpan={headerList} />
+              ) : (
+                resultDeviceList?.map((item, i) => (
+                  <Tr key={item?.MDL_SQ} onClick={() => setEditModelData(item)}>
+                    <Td>{i + 1}</Td>
+                    <Td>{item?.MDL_NM ?? "-"}</Td>
+                    <Td>{item?.MDL_EN_NM ?? "-"}</Td>
+                    <Td>{item?.MDL_DESC ?? "-"}</Td>
+                    <Td>{item?.MDL_CRT_DT ?? "-"}</Td>
+                  </Tr>
+                ))
+              )}
             </TBody>
           </Table>
         </List>

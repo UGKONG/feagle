@@ -156,6 +156,7 @@ export default function ShopDetail() {
             currentList={shopData?.DEVICE}
             isHeader={false}
             isShopNameHide={true}
+            isJustList={true}
           />
         ) : (
           <StateList

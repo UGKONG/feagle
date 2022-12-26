@@ -8,6 +8,7 @@ import { Active, FilterList, HeaderList, Props } from "./index.type";
 import JoinList from "../joinList";
 import _Select from "../../common/Select";
 import { useDispatch } from "react-redux";
+import NoneItem from "../../common/NoneItem";
 
 const filterList: FilterList = [
   { id: 1, name: "이름" },
@@ -29,7 +30,7 @@ const headerList: HeaderList = [
   "가입일",
 ];
 
-export default function Shop({ isHeader = true, currentList }: Props) {
+export default function User({ isHeader = true, currentList }: Props) {
   const dispatch = useDispatch();
   const [activeFilter, setActiveFilter] = useState<Active>({
     sort: 1,
@@ -170,11 +171,11 @@ export default function Shop({ isHeader = true, currentList }: Props) {
   };
 
   useEffect(getAuthList, []);
-  useEffect(getList, []);
+  useEffect(getList, [currentList]);
   useEffect(() => {
     if (joinListView) return;
     getList();
-  }, [joinListView]);
+  }, [joinListView, currentList]);
 
   if (joinListView) {
     return <JoinList authList={authList} setJoinListView={setJoinListView} />;
@@ -206,41 +207,45 @@ export default function Shop({ isHeader = true, currentList }: Props) {
               </tr>
             </THeader>
             <TBody>
-              {resultMasterList?.map((item, i) => (
-                <Tr key={item?.MST_SQ}>
-                  <Td>{i + 1}</Td>
-                  <Td>{item?.MST_NM ?? "-"}</Td>
-                  <Td>{item?.MST_GRP ?? "-"}</Td>
-                  <Td>{item?.MST_PO ?? "-"}</Td>
-                  <Td>
-                    {item?.MST_GD === 1
-                      ? "남자"
-                      : item?.MST_GD == 2
-                      ? "여자"
-                      : "-"}
-                  </Td>
-                  <Td>{item?.MST_NUM ?? "-"}</Td>
-                  <Td>{item?.MST_ID ?? "-"}</Td>
-                  <Td>
-                    <Select
-                      defaultValue={item?.AUTH_SQ}
-                      onChange={(e: SelectChangeEvent) =>
-                        authChange(
-                          item?.MST_SQ as number,
-                          Number(e?.target?.value)
-                        )
-                      }
-                    >
-                      {authList?.map((x) => (
-                        <option key={x?.COMM_CODE} value={x?.COMM_CODE}>
-                          {x?.COMM_NM}
-                        </option>
-                      ))}
-                    </Select>
-                  </Td>
-                  <Td>{item?.MST_JOIN_DT ?? "-"}</Td>
-                </Tr>
-              ))}
+              {!resultMasterList?.length ? (
+                <NoneItem colSpan={headerList} />
+              ) : (
+                resultMasterList?.map((item, i) => (
+                  <Tr key={item?.MST_SQ}>
+                    <Td>{i + 1}</Td>
+                    <Td>{item?.MST_NM ?? "-"}</Td>
+                    <Td>{item?.MST_GRP ?? "-"}</Td>
+                    <Td>{item?.MST_PO ?? "-"}</Td>
+                    <Td>
+                      {item?.MST_GD === 1
+                        ? "남자"
+                        : item?.MST_GD == 2
+                        ? "여자"
+                        : "-"}
+                    </Td>
+                    <Td>{item?.MST_NUM ?? "-"}</Td>
+                    <Td>{item?.MST_ID ?? "-"}</Td>
+                    <Td>
+                      <Select
+                        defaultValue={item?.AUTH_SQ}
+                        onChange={(e: SelectChangeEvent) =>
+                          authChange(
+                            item?.MST_SQ as number,
+                            Number(e?.target?.value)
+                          )
+                        }
+                      >
+                        {authList?.map((x) => (
+                          <option key={x?.COMM_CODE} value={x?.COMM_CODE}>
+                            {x?.COMM_NM}
+                          </option>
+                        ))}
+                      </Select>
+                    </Td>
+                    <Td>{item?.MST_JOIN_DT ?? "-"}</Td>
+                  </Tr>
+                ))
+              )}
             </TBody>
           </Table>
         </List>

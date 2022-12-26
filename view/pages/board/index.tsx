@@ -4,6 +4,7 @@ import styled from "styled-components";
 import { useAxios } from "../../../functions/utils";
 import { Post } from "../../../types";
 import _Container from "../../common/Container";
+import NoneItem from "../../common/NoneItem";
 import TableHeaderContainer from "../../common/TableHeaderContainer";
 import { Active, FilterList, HeaderList, Props } from "./index.type";
 
@@ -15,7 +16,7 @@ const filterList: FilterList = [
 ];
 const headerList: HeaderList = ["No", "카테고리", "제목", "작성자", "작성일"];
 
-export default function Shop({ isHeader = true, currentList }: Props) {
+export default function Board({ isHeader = true, currentList }: Props) {
   const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState<Active>({
     sort: 1,
@@ -108,7 +109,7 @@ export default function Shop({ isHeader = true, currentList }: Props) {
     });
   };
 
-  useEffect(getPostList, []);
+  useEffect(getPostList, [currentList]);
 
   return (
     <Container isContents={currentList ? true : false} isLoading={isLoading}>
@@ -137,18 +138,22 @@ export default function Shop({ isHeader = true, currentList }: Props) {
             </tr>
           </THeader>
           <TBody>
-            {resultDeviceList?.map((item, i) => (
-              <Tr
-                key={item?.POST_SQ}
-                onClick={() => navigate("/board/" + item?.POST_SQ)}
-              >
-                <Td>{i + 1}</Td>
-                <Td>{item?.POST_TP_NM ?? "-"}</Td>
-                <Td>{item?.POST_TTL ?? "-"}</Td>
-                <Td>{item?.MST_NM ?? "-"}</Td>
-                <Td>{item?.POST_CRT_DT ?? "-"}</Td>
-              </Tr>
-            ))}
+            {!resultDeviceList?.length ? (
+              <NoneItem colSpan={headerList} />
+            ) : (
+              resultDeviceList?.map((item, i) => (
+                <Tr
+                  key={item?.POST_SQ}
+                  onClick={() => navigate("/board/" + item?.POST_SQ)}
+                >
+                  <Td>{i + 1}</Td>
+                  <Td>{item?.POST_TP_NM ?? "-"}</Td>
+                  <Td>{item?.POST_TTL ?? "-"}</Td>
+                  <Td>{item?.MST_NM ?? "-"}</Td>
+                  <Td>{item?.POST_CRT_DT ?? "-"}</Td>
+                </Tr>
+              ))
+            )}
           </TBody>
         </Table>
       </List>

@@ -6,6 +6,7 @@ import { Shop } from "../../../types";
 import Button from "../../common/Button";
 import _Container from "../../common/Container";
 import Dot from "../../common/Dot";
+import NoneItem from "../../common/NoneItem";
 import TableHeaderContainer from "../../common/TableHeaderContainer";
 import CreateShopModal from "./CreateShopModal";
 import { Active, FilterList, HeaderList } from "./index.type";
@@ -109,22 +110,26 @@ export default function Shop() {
             </tr>
           </THeader>
           <TBody>
-            {resultShopList?.map((item, i) => (
-              <Tr
-                key={item?.SHOP_SQ}
-                onClick={() => navigate("/shop/" + item?.SHOP_SQ)}
-              >
-                <Td>{i + 1}</Td>
-                <Td>{item?.SHOP_NM ?? "-"}</Td>
-                <Td>{item?.SHOP_NUM ?? "-"}</Td>
-                <Td>{item?.MNG_NM ?? "-"}</Td>
-                <Td>{item?.DEVICE_COUNT ?? "0"}개</Td>
-                <Td>{item?.SHOP_CRT_DT ?? "-"}</Td>
-                <Td>
-                  <Dot isActive={item?.ACTIVE_COUNT ? true : false} />
-                </Td>
-              </Tr>
-            ))}
+            {!resultShopList?.length ? (
+              <NoneItem colSpan={headerList} />
+            ) : (
+              resultShopList?.map((item, i) => (
+                <Tr
+                  key={item?.SHOP_SQ}
+                  onClick={() => navigate("/shop/" + item?.SHOP_SQ)}
+                >
+                  <Td>{i + 1}</Td>
+                  <Td>{item?.SHOP_NM ?? "-"}</Td>
+                  <Td>{item?.SHOP_NUM ?? "-"}</Td>
+                  <Td>{item?.MNG_NM ?? "-"}</Td>
+                  <Td>{item?.DEVICE_COUNT ?? "0"}개</Td>
+                  <Td>{item?.SHOP_CRT_DT ?? "-"}</Td>
+                  <Td>
+                    <Dot isActive={item?.ACTIVE_COUNT ? true : false} />
+                  </Td>
+                </Tr>
+              ))
+            )}
           </TBody>
         </Table>
       </List>

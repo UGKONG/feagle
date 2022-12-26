@@ -114,9 +114,14 @@ export const getShop = async (req: Request, res: Response) => {
     ORDER BY a.DEVICE_SQ DESC;
 
     SELECT 
-    a.UDD_SQ, a.UDD_TP, a.UDD_VAL, a.UDD_CRT_DT
+    a.UDD_SQ, a.UDD_TP, a.UDD_VAL, a.UDD_CRT_DT,
+    c.MDL_NM, b.DEVICE_SN
     FROM tb_use_device_data a
-    WHERE DEVICE_SQ IN (
+    LEFT JOIN tb_device b
+      ON b.DEVICE_SQ = a.DEVICE_SQ
+    LEFT JOIN tb_device_model c
+      ON c.MDL_SQ = b.MDL_SQ
+    WHERE a.DEVICE_SQ IN (
       SELECT DEVICE_SQ FROM tb_device WHERE SHOP_SQ = ?
     );
   `,
@@ -133,20 +138,28 @@ export const getShop = async (req: Request, res: Response) => {
     let tp = item?.UDD_TP;
     let val = item?.UDD_VAL;
     let txt = "";
+    let sn = item?.DEVICE_SN ?? "-";
+    let nm = item?.MDL_NM;
 
     if (tp === 1) {
-      txt = `가스 잔량이 ${val}% 남았습니다.`;
+      txt = `${sn} (모델명:${nm}) 장비의 가스 잔량이 ${val}% 남았습니다.`;
     } else if (tp === 2) {
-      txt = `가스 얍력이 ${val}㎫ 입니다.`;
+      txt = `${sn} (모델명:${nm}) 장비의 가스 얍력이 ${val}㎫ 입니다.`;
     } else if (tp === 3) {
-      txt = `가스 유량이 ${val}ℓ/hr 입니다.`;
+      txt = `${sn} (모델명:${nm}) 장비의 가스 유량이 ${val}ℓ/hr 입니다.`;
     } else if (tp === 4) {
-      txt = `누적 사용시간이 ${val} 입니다.`;
+      txt = `${sn} (모델명:${nm}) 장비의 누적 사용시간이 ${val} 입니다.`;
     } else if (tp === 5) {
-      txt = `플라즈마 전류가 ${val}㎃ 입니다.`;
+      txt = `${sn} (모델명:${nm}) 장비의 플라즈마 전류가 ${val}㎃ 입니다.`;
     }
 
-    return { UDD_SQ: item?.UDD_SQ, UDD_TXT: txt, UDD_CRT_DT: item?.UDD_CRT_DT };
+    return {
+      UDD_SQ: item?.UDD_SQ,
+      UDD_TXT: txt,
+      UDD_CRT_DT: item?.UDD_CRT_DT,
+      DEVICE_SN: item?.DEVICE_SN,
+      MDL_NM: item?.MDL_NM,
+    };
   });
 
   data = {

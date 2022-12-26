@@ -89,7 +89,7 @@ export default function Signin() {
           onKeyDown={(e: KeyDownEvent) => e?.keyCode === 13 && validate()}
         />
         <Options>
-          <Checkbox label="로그인 유지" name="isKeep" onChange={changeValue} />
+          <Checkbox label="자동 로그인" name="isKeep" onChange={changeValue} />
           <SignupBtn onClick={goSignUpPage}>회원가입</SignupBtn>
         </Options>
         <SigninBtn onClick={validate}>로그인</SigninBtn>

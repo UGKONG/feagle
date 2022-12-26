@@ -5,6 +5,7 @@ import { useAxios } from "../../../functions/utils";
 import { Device } from "../../../types";
 import _Container from "../../common/Container";
 import Dot from "../../common/Dot";
+import NoneItem from "../../common/NoneItem";
 import TableHeaderContainer from "../../common/TableHeaderContainer";
 import { Active, FilterList, HeaderList, Props } from "./index.type";
 
@@ -32,6 +33,7 @@ export default function Device({
   isHeader = true,
   currentList,
   isShopNameHide = false,
+  isJustList = false,
 }: Props) {
   const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState<Active>({
@@ -40,7 +42,7 @@ export default function Device({
     filter: "",
   });
   const [isLoading, setIsLoading] = useState(currentList ? false : true);
-  const [deviceList, setDeviceList] = useState<Device[]>(currentList ?? []);
+  const [deviceList, setDeviceList] = useState<Device[]>([]);
 
   const resultDeviceList = useMemo<Device[]>(() => {
     let copy = [...deviceList];
@@ -117,8 +119,11 @@ export default function Device({
     return copy;
   }, [deviceList, activeFilter]);
 
-  const getShopList = () => {
-    if (currentList) return;
+  const getList = () => {
+    if (isJustList || currentList) {
+      setIsLoading(false);
+      return setDeviceList(currentList ?? []);
+    }
 
     useAxios.get("/device").then(({ data }) => {
       setIsLoading(false);
@@ -126,7 +131,7 @@ export default function Device({
     });
   };
 
-  useEffect(getShopList, []);
+  useEffect(getList, [currentList]);
 
   return (
     <Container isContents={currentList ? true : false} isLoading={isLoading}>
@@ -150,23 +155,27 @@ export default function Device({
             </tr>
           </THeader>
           <TBody>
-            {resultDeviceList?.map((item, i) => (
-              <Tr
-                key={item?.DEVICE_SQ}
-                onClick={() => navigate("/device/" + item?.DEVICE_SQ)}
-              >
-                <Td>{i + 1}</Td>
-                <Td>{item?.DEVICE_SN ?? "-"}</Td>
-                <Td>{item?.MDL_NM ?? "-"}</Td>
-                {!isShopNameHide && <Td>{item?.SHOP_NM ?? "-"}</Td>}
-                <Td>{item?.USE_TM_VAL ? item?.USE_TM_VAL + "시간" : "-"}</Td>
-                <Td>{item?.ON_COUNT ? item?.ON_COUNT + "회" : "-"}</Td>
-                <Td>{item?.DEVICE_LAST_DT ?? "-"}</Td>
-                <Td>
-                  <Dot isActive={item?.IS_ACTIVE ? true : false} />
-                </Td>
-              </Tr>
-            ))}
+            {!resultDeviceList?.length ? (
+              <NoneItem colSpan={headerList} />
+            ) : (
+              resultDeviceList?.map((item, i) => (
+                <Tr
+                  key={item?.DEVICE_SQ}
+                  onClick={() => navigate("/device/" + item?.DEVICE_SQ)}
+                >
+                  <Td>{i + 1}</Td>
+                  <Td>{item?.DEVICE_SN ?? "-"}</Td>
+                  <Td>{item?.MDL_NM ?? "-"}</Td>
+                  {!isShopNameHide && <Td>{item?.SHOP_NM ?? "-"}</Td>}
+                  <Td>{item?.USE_TM_VAL ? item?.USE_TM_VAL + "시간" : "-"}</Td>
+                  <Td>{item?.ON_COUNT ? item?.ON_COUNT + "회" : "-"}</Td>
+                  <Td>{item?.DEVICE_LAST_DT ?? "-"}</Td>
+                  <Td>
+                    <Dot isActive={item?.IS_ACTIVE ? true : false} />
+                  </Td>
+                </Tr>
+              ))
+            )}
           </TBody>
         </Table>
       </List>

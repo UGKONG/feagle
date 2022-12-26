@@ -5,7 +5,7 @@ import { useAxios, useDate, useIsNumber } from "../../../functions/utils";
 import { InputChangeEvent } from "../../../types";
 import BarChart from "../../common/BarChart";
 import { Header, Contents, Input, Margin, HeaderSide } from "./index.style";
-import { ChartData, ChartDate } from "./index.type";
+import { UseChartData, ChartDate } from "./index.type";
 
 export default function UseChartModal() {
   const params = useParams();
@@ -39,7 +39,7 @@ export default function UseChartModal() {
     let query = `start=${date?.start}&end=${date?.end}`;
     useAxios.get(url + query).then(({ data }) => {
       if (!data?.result) return setData([]);
-      let list = data?.current?.map((x: ChartData) => ({
+      let list = data?.current?.map((x: UseChartData) => ({
         name: x?.COMM_NM,
         value: x?.VALUE,
       }));

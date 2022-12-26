@@ -7,4 +7,5 @@ export type Props = {
   isHeader?: boolean;
   currentList?: Device[];
   isShopNameHide?: boolean;
+  isJustList?: boolean;
 };
