@@ -11,6 +11,7 @@ import { FiArrowLeft } from "react-icons/fi";
 import { useDispatch } from "react-redux";
 import { useAxios } from "../../functions/utils";
 import NoticeView from "./NoticeView";
+import { storageKey } from "../pages/signin";
 
 interface Props {
   activePage: MenuList | string | null;
@@ -55,6 +56,8 @@ function Header({ activePage, isMainPage, iconHide, logoClick }: Props) {
   const logout = () => {
     let ask = confirm("로그아웃하시겠습니까?");
     if (!ask) return;
+
+    localStorage.removeItem(storageKey);
 
     useAxios.get("/common/logout").then(() => {
       navigate("/signin");

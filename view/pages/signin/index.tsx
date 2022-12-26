@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import styled from "styled-components";
@@ -9,6 +9,14 @@ import Checkbox from "../../common/Checkbox";
 import Button from "../../common/Button";
 import { Key, Value, KeyDownEvent } from "./index.type";
 import { useAxios } from "../../../functions/utils";
+import { encode, decode } from "js-base64";
+import { OrNull } from "../../../types";
+
+export const storageKey = "feagleAutoLogin";
+type Form = {
+  MST_ID: string;
+  MST_PW: string;
+};
 
 export default function Signin() {
   const navigate = useNavigate();
@@ -19,6 +27,21 @@ export default function Signin() {
 
   const onChange = (key: Key, val: string | boolean) => {
     setValue((prev) => ({ ...prev, [key]: val }));
+  };
+
+  // 자동 로그인 체크
+  const autoLoginCheck = (): void => {
+    let value: OrNull<string> = localStorage.getItem(storageKey);
+    if (!value) return;
+
+    let decodeText: string = decode(value);
+    try {
+      let json = JSON.parse(decodeText);
+      submit({ MST_ID: json?.id, MST_PW: json?.pw });
+    } catch {
+      localStorage.removeItem(storageKey);
+      return;
+    }
   };
 
   // value 변경
@@ -38,8 +61,9 @@ export default function Signin() {
   const goSignUpPage = () => navigate("/signup");
 
   // 로그인 정보 전송
-  const submit = async () => {
-    const form = { MST_ID: value?.id, MST_PW: value?.pw };
+  const submit = async (currentForm?: Form) => {
+    const isAuth: boolean = currentForm ? true : false;
+    const form: Form = currentForm ?? { MST_ID: value?.id, MST_PW: value?.pw };
     const { data } = await useAxios.post("/master/login", form);
 
     if (!data?.result || !data?.current) {
@@ -51,9 +75,16 @@ export default function Signin() {
     dispatch({ type: "master", payload: data?.current });
     dispatch({
       type: "alert",
-      payload: { type: "success", text: "로그인되었습니다." },
+      payload: {
+        type: "success",
+        text: (isAuth ? "자동 " : "") + "로그인되었습니다.",
+      },
     });
     navigate("/");
+
+    if (value?.isKeep) {
+      localStorage.setItem(storageKey, encode(JSON.stringify(value)));
+    }
   };
 
   // 로그인 정보 유효성 검사
@@ -66,6 +97,11 @@ export default function Signin() {
     }
     submit();
   };
+
+  useEffect(() => {
+    if (idRef) idRef?.current?.focus();
+    autoLoginCheck();
+  }, []);
 
   return (
     <Container>
