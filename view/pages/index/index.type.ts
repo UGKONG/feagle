@@ -1,5 +1,3 @@
-import { SetState } from "../../../types";
-
 export type Type = "address" | "shop";
 export type BoxProps = {
   id: number;
@@ -7,8 +5,6 @@ export type BoxProps = {
   data: Data;
   color: string;
   isAddr: boolean;
-  setDepth: SetState<string[]>;
-  setActiveAddress: SetState<number>;
 };
 export type Data = {
   ADDR_SQ?: number;

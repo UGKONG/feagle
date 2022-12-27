@@ -23,12 +23,17 @@ export const getShopList = async (req: Request, res: Response) => {
     `
     SELECT
     a.SHOP_SQ, a.SHOP_NM, a.SHOP_NUM, a.SHOP_ADD, a.SHOP_ADD_DTL,
-    b.MNG_NM, a.SHOP_CRT_DT, IF(c.DEVICE_COUNT > 0, c.DEVICE_COUNT, 0) AS DEVICE_COUNT
+    b.MNG_NM, a.SHOP_CRT_DT, 
+    IF(c.DEVICE_COUNT > 0, c.DEVICE_COUNT, 0) AS DEVICE_COUNT,
+    d.COMM_NM AS SHOP_ADD_NM
     FROM tb_shop a
     LEFT JOIN tb_manager b ON b.SHOP_SQ = a.SHOP_SQ
     LEFT JOIN (
       SELECT SHOP_SQ, COUNT(*) AS DEVICE_COUNT FROM tb_device GROUP BY SHOP_SQ
     ) c ON c.SHOP_SQ = a.SHOP_SQ
+    LEFT JOIN tb_common d
+      ON d.COMM_CODE = a.SHOP_ADD_SQ
+      AND d.COMM_GRP = 7
     ORDER BY a.SHOP_SQ DESC;
 
     SELECT

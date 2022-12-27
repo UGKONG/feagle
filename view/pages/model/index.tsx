@@ -45,7 +45,7 @@ export default function Model() {
   };
 
   const resultDeviceList = useMemo<DeviceModel[]>(() => {
-    let copy = [...list];
+    let copy = [...(list ?? [])];
     let json = JSON.stringify;
     let q = activeFilter?.filter?.replace(/ /g, "");
     let sort = activeFilter?.sort;
@@ -212,10 +212,10 @@ export default function Model() {
                 resultDeviceList?.map((item, i) => (
                   <Tr key={item?.MDL_SQ} onClick={() => setEditModelData(item)}>
                     <Td>{i + 1}</Td>
-                    <Td>{item?.MDL_NM ?? "-"}</Td>
-                    <Td>{item?.MDL_EN_NM ?? "-"}</Td>
-                    <Td>{item?.MDL_DESC ?? "-"}</Td>
-                    <Td>{item?.MDL_CRT_DT ?? "-"}</Td>
+                    <Td>{item?.MDL_NM || "-"}</Td>
+                    <Td>{item?.MDL_EN_NM || "-"}</Td>
+                    <Td>{item?.MDL_DESC || "-"}</Td>
+                    <Td>{item?.MDL_CRT_DT || "-"}</Td>
                   </Tr>
                 ))
               )}

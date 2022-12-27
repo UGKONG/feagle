@@ -44,7 +44,7 @@ export default function JoinList({
   const [isChk, setIsChk] = useState<null | "yes" | "no">(null);
 
   const resultMasterList = useMemo<Master[]>(() => {
-    let copy = [...list];
+    let copy = [...(list ?? [])];
     let json = JSON.stringify;
     let q = activeFilter?.filter?.replace(/ /g, "");
     let sort = activeFilter?.sort;

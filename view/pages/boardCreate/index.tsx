@@ -7,7 +7,6 @@ import {
   AlertType,
   CommonCode,
   DeviceModel,
-  File,
   InputChangeEvent,
   Post,
   SelectChangeEvent,
@@ -19,6 +18,7 @@ import _Input from "../../common/Input";
 import _Textarea from "../../common/Textarea";
 import { useSelector } from "react-redux";
 import { Store } from "../../../functions/store";
+import { AxiosRequestConfig } from "axios";
 
 export default function BoardCreate() {
   const dispatch = useDispatch();
@@ -26,15 +26,6 @@ export default function BoardCreate() {
   const navigate = useNavigate();
   const title = location?.state;
   const loginUser = useSelector((x: Store) => x?.master);
-
-  const titleRef = useRef<HTMLInputElement>(null);
-  const categoryRef = useRef<HTMLSelectElement>(null);
-  const modelRef = useRef<HTMLSelectElement>(null);
-  const versionRef = useRef<HTMLInputElement>(null);
-  const versionDateRef = useRef<HTMLInputElement>(null);
-  const contentsRef = useRef<HTMLTextAreaElement>(null);
-  const fileRef = useRef<HTMLInputElement>(null);
-
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [categoryList, setCategoryList] = useState<CommonCode[]>([]);
   const [modelList, setModelList] = useState<DeviceModel[]>([]);
@@ -48,6 +39,14 @@ export default function BoardCreate() {
     BUILD_DT: "",
     MST_SQ: loginUser?.MST_SQ ?? 0,
   });
+
+  const titleRef = useRef<HTMLInputElement>(null);
+  const categoryRef = useRef<HTMLSelectElement>(null);
+  const modelRef = useRef<HTMLSelectElement>(null);
+  const versionRef = useRef<HTMLInputElement>(null);
+  const versionDateRef = useRef<HTMLInputElement>(null);
+  const contentsRef = useRef<HTMLTextAreaElement>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
 
   // 알림
   const useAlert = (type: AlertType, text: string): void => {
@@ -80,20 +79,22 @@ export default function BoardCreate() {
   const submit = (): void => {
     let form = new FormData();
     let keys = Object.keys(value);
-    console.log(keys);
     keys.forEach((key) => form.append(key, (value as any)[key]));
 
     if (fileList) {
       for (let i = 0; i < fileList.length; i++) {
+        console.log(fileList[i]);
+
         form.append("FILES", fileList[i]);
       }
     }
 
-    for (let key of form.keys()) {
-      console.log(key, ":", form.get(key));
-    }
+    let config = {
+      headers: {
+        "content-type": "multipart/form-data",
+      },
+    } as AxiosRequestConfig<FormData>;
 
-    let config = { headers: { "content-type": "multipart/form-data" } };
     useAxios.post("/board", form, config).then(({ data }) => {
       if (!data?.result) return useAlert("error", "저장에 실패하였습니다.");
       useAlert("success", "저장되었습니다.");

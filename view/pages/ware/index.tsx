@@ -39,7 +39,7 @@ export default function Ware({ isHeader = true, currentList }: Props) {
   const [deviceList, setDeviceList] = useState<Post[]>(currentList ?? []);
 
   const resultDeviceList = useMemo<Post[]>(() => {
-    let copy = [...deviceList];
+    let copy = [...(deviceList ?? [])];
     let json = JSON.stringify;
     let q = activeFilter?.filter?.replace(/ /g, "");
     let sort = activeFilter?.sort;

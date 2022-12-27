@@ -564,6 +564,41 @@ export const useQueryString = (object: any): string => {
 
 /**
  * @example
+ * useQueryString('?id=1&name=전상욱');
+ * // {id: 1, name: '전상욱'}
+ * useQueryString('?animal=lion&animal=tiger');
+ * // {animal: ['lion', 'tiger']}
+ */
+export const useQueryObject = (string: string): any => {
+  let result: any = {};
+  let value: string = string;
+  if (string[0] === "?") value = value?.replace("?", "");
+
+  let split: string[] = value?.split("&");
+  let queryArray: string[] = [];
+
+  split?.forEach((x) => {
+    if (x) queryArray.push(x);
+  });
+
+  queryArray?.forEach((x) => {
+    let [key, value] = x?.split("=")?.map((y) => y ?? "");
+    if (result[key] !== null && result[key] !== undefined) {
+      if (typeof result[key] === "object") {
+        result[key].push(value);
+      } else {
+        result[key] = [result[key], value];
+      }
+    } else {
+      result[key] = value;
+    }
+  });
+
+  return result;
+};
+
+/**
+ * @example
  * useRandomArray([1, 2, 3, 4]);
  * // [4, 3, 1, 2]
  */

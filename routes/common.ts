@@ -7,6 +7,7 @@ import {
   getLogout,
   getProgramMode,
   getDataTypeList,
+  getCommAddrList,
 } from "../controllers/common";
 
 const commonRouter = Router();
@@ -18,6 +19,7 @@ commonRouter
   .get("/authType", getAuthType)
   .get("/session", getSession)
   .get("/logout", getLogout)
-  .get("/mode", getProgramMode);
+  .get("/mode", getProgramMode)
+  .get("/address", getCommAddrList);
 
 export default commonRouter;

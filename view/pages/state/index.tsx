@@ -12,16 +12,18 @@ const filterList: FilterList = [
   { id: 1, name: "일련번호" },
   { id: 2, name: "모델명" },
   { id: 3, name: "피부샵명" },
-  { id: 4, name: "플라즈마 전류" },
-  { id: 5, name: "가스 잔량" },
-  { id: 6, name: "펌웨어" },
-  { id: 7, name: "소프트웨어" },
+  { id: 4, name: "지역" },
+  { id: 5, name: "플라즈마 전류" },
+  { id: 6, name: "가스 잔량" },
+  { id: 7, name: "펌웨어" },
+  { id: 8, name: "소프트웨어" },
 ];
 const headerList: HeaderList = [
   "No",
   "일련번호",
   "모델명",
   "피부샵명",
+  "지역",
   "플라즈마 전류",
   "가스 잔량",
   "펌웨어",
@@ -43,7 +45,7 @@ export default function State({
   const [deviceList, setDeviceList] = useState<Device[]>(currentList ?? []);
 
   const resultDeviceList = useMemo<Device[]>(() => {
-    let copy = [...deviceList];
+    let copy = [...(deviceList ?? [])];
     let json = JSON.stringify;
     let q = activeFilter?.filter?.replace(/ /g, "");
     let sort = activeFilter?.sort;
@@ -55,7 +57,7 @@ export default function State({
     }
 
     // 솔팅 타입
-    // (1 - 일련번호, 2 - 모델명, 3 - 피부샵명, 4 - 플라즈마 전류, 5 - 가스 잔량, 6 - 펌웨어, 7 - 소프트웨어)
+    // (1 - 일련번호, 2 - 모델명, 3 - 피부샵명, 4 - 지역, 5 - 플라즈마 전류, 6 - 가스 잔량, 7 - 펌웨어, 8 - 소프트웨어)
     if (sort === 1) {
       copy?.sort((a, b) => {
         let up: number =
@@ -90,17 +92,33 @@ export default function State({
       });
     } else if (sort === 4) {
       copy?.sort((a, b) => {
+        let up: number =
+          (a?.SHOP_ADD_NM ?? 0) < (b?.SHOP_ADD_NM ?? 0)
+            ? -1
+            : (a?.SHOP_ADD_NM ?? 0) > (b?.SHOP_ADD_NM ?? 0)
+            ? 1
+            : 0;
+        let down: number =
+          (a?.SHOP_ADD_NM ?? 0) > (b?.SHOP_ADD_NM ?? 0)
+            ? -1
+            : (a?.SHOP_ADD_NM ?? 0) < (b?.SHOP_ADD_NM ?? 0)
+            ? 1
+            : 0;
+        return isUp ? up : down;
+      });
+    } else if (sort === 5) {
+      copy?.sort((a, b) => {
         let up: number = (a?.PLA_VAL ?? 0) - (b?.PLA_VAL ?? 0);
         let down: number = (b?.PLA_VAL ?? 0) - (a?.PLA_VAL ?? 0);
         return isUp ? up : down;
       });
-    } else if (sort === 5) {
+    } else if (sort === 6) {
       copy?.sort((a, b) => {
         let up: number = (a?.GAS_VAL ?? 0) - (b?.GAS_VAL ?? 0);
         let down: number = (b?.GAS_VAL ?? 0) - (a?.GAS_VAL ?? 0);
         return isUp ? up : down;
       });
-    } else if (sort === 6) {
+    } else if (sort === 7) {
       copy?.sort((a, b) => {
         let up: number =
           a?.DEVICE_FW_VN < b?.DEVICE_FW_VN
@@ -116,7 +134,7 @@ export default function State({
             : 0;
         return isUp ? up : down;
       });
-    } else if (sort === 7) {
+    } else if (sort === 8) {
       copy?.sort((a, b) => {
         let up: number =
           a?.DEVICE_SW_VN < b?.DEVICE_SW_VN
@@ -181,6 +199,7 @@ export default function State({
                   <Td>{item?.DEVICE_SN ?? "-"}</Td>
                   <Td>{item?.MDL_NM ?? "-"}</Td>
                   {!isShopNameHide && <Td>{item?.SHOP_NM ?? "-"}</Td>}
+                  <Td>{item?.SHOP_ADD_NM ?? "-"}</Td>
                   <Td>{item?.PLA_VAL ? item?.PLA_VAL + "mA" : "-"}</Td>
                   <Td>{item?.GAS_VAL ? item?.GAS_VAL + "%" : "-"}</Td>
                   <Td>{item?.DEVICE_FW_VN ?? "-"}</Td>

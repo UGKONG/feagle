@@ -14,7 +14,10 @@ export type ShopInfoBoxProps = {
 export type ChartDate = {
   start: string;
   end: string;
-  type?: number;
+};
+export type DataChartDate = {
+  year: string;
+  type: number;
 };
 export type UseChartData = {
   COMM_CODE: number;

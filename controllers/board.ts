@@ -113,24 +113,25 @@ export const postBoard = async (req: any, res: Response) => {
   const FILES = req?.files;
 
   console.log(FILES);
-  console.log([POST_TP, MDL_SQ, MST_SQ]);
 
   if (!useIsNumber([POST_TP, MDL_SQ, MST_SQ])) {
     // return res.send(fail(errorMessage.parameter));
   }
 
-  const validate1 =
-    !POST_TP ||
-    !MDL_SQ ||
-    !BUILD_VN ||
-    !POST_TTL ||
-    !POST_CN ||
-    !BUILD_DT ||
-    !MST_SQ;
-  const validate2 = BUILD_DT?.length < 10;
-  if (validate1 || validate2) {
-    return res.send(fail(errorMessage.parameter));
-  }
+  // const validate1 =
+  //   !POST_TP ||
+  //   !MDL_SQ ||
+  //   !BUILD_VN ||
+  //   !POST_TTL ||
+  //   !POST_CN ||
+  //   !BUILD_DT ||
+  //   !MST_SQ;
+  // const validate2 = BUILD_DT?.length < 10;
+  // if (validate1 || validate2) {
+  //   return res.send(fail(errorMessage.parameter));
+  // }
+
+  return res.send(fail("개발중.."));
 
   const { error } = await useDatabase(
     `

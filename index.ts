@@ -18,15 +18,16 @@ import managerRouter from "./routes/manager";
 import modelRouter from "./routes/model";
 import deviceDoRouter from "./routes/deviceDo";
 import dashboardRoute from "./routes/dashboard";
+import { postBoard } from "./controllers/board";
 
 // Setting
 require("dotenv").config();
 const app = express();
 const port = process.env.SERVER_PORT || 8080;
 const bodyParser = require("body-parser");
-const multiparty = require("connect-multiparty")();
 const session = require("express-session");
 const MySQLStore = require("express-mysql-session")(session);
+const multipart = require("connect-multiparty")();
 const sessionConfig = session({
   secret: programName,
   resave: false,
@@ -60,20 +61,20 @@ viewRoutes.forEach((path: string) => {
 });
 
 // Api Router
-app.use("/api/test", multiparty, testRoute);
-app.use("/api/request", multiparty, requestRouter);
-app.use("/api/common", multiparty, commonRouter);
-app.use("/api/model", multiparty, modelRouter);
-app.use("/api/device", multiparty, deviceRouter);
-app.use("/api/master", multiparty, masterRouter);
-app.use("/api/manager", multiparty, managerRouter);
-app.use("/api/shop", multiparty, shopRouter);
-app.use("/api/board", multiparty, boardRouter);
-app.use("/api/file", multiparty, fileRouter);
-app.use("/api/gas", multiparty, gasRouter);
-app.use("/api/log", multiparty, logRouter);
-app.use("/api/deviceDo", multiparty, deviceDoRouter);
-app.use("/api/dashboard", multiparty, dashboardRoute);
+app.use("/api/test", multipart, testRoute);
+app.use("/api/request", multipart, requestRouter);
+app.use("/api/common", multipart, commonRouter);
+app.use("/api/model", multipart, modelRouter);
+app.use("/api/device", multipart, deviceRouter);
+app.use("/api/master", multipart, masterRouter);
+app.use("/api/manager", multipart, managerRouter);
+app.use("/api/shop", multipart, shopRouter);
+app.use("/api/board", multipart, boardRouter);
+app.use("/api/file", multipart, fileRouter);
+app.use("/api/gas", multipart, gasRouter);
+app.use("/api/log", multipart, logRouter);
+app.use("/api/deviceDo", multipart, deviceDoRouter);
+app.use("/api/dashboard", multipart, dashboardRoute);
 
 // Start
 app.listen(port, serverStart);

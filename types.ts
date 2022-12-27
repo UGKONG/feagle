@@ -67,7 +67,8 @@ export interface Shop {
   SHOP_NM: s;
   SHOP_NUM: s;
   SHOP_ADD: s;
-  SHOP_ADD_DTL: s;
+  SHOP_ADD_DTL?: s;
+  SHOP_ADD_NM?: s;
   IS_DEL?: IsYes;
   MNG_NM?: s;
   DEVICE_COUNT?: n;
@@ -116,6 +117,7 @@ export interface Device {
   SHOP_NUM?: s;
   SHOP_ADD?: s;
   SHOP_ADD_DTL?: s;
+  SHOP_ADD_NM?: s;
   DEVICE_SN: s;
   DEVICE_NM: s;
   DEVICE_SW_VN: s;

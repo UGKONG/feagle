@@ -2,6 +2,18 @@ import { Request, Response } from "express";
 import { fail, success, useDatabase, useIsNumber } from "../functions/utils";
 import { errorMessage } from "../string";
 
+type DataChartResult = {
+  UDD_SQ: number;
+  UDD_TP: number;
+  UDD_VAL: number;
+  MONTH: string;
+};
+type DataChartData = {
+  MONTH_SQ: number;
+  MONTH_NM: string;
+  VALUE: number;
+};
+
 // 장비 리스트 조회
 export const getDeviceList = async (req: Request, res: Response) => {
   const { error, result } = await useDatabase(`
@@ -10,7 +22,7 @@ export const getDeviceList = async (req: Request, res: Response) => {
     a.SHOP_SQ, c.SHOP_NM, a.DEVICE_SN, a.DEVICE_NM, a.DEVICE_SW_VN, a.DEVICE_FW_VN,
     a.DEVICE_BUY_DT, a.DEVICE_INSTL_DT, d.UDD_VAL AS USE_TM_VAL,
     h.UDD_VAL AS GAS_VAL, IF(e.IS_ACTIVE, e.IS_ACTIVE, 0) AS IS_ACTIVE, 
-    f.ON_COUNT AS ON_COUNT, a.DEVICE_LAST_DT, 
+    f.ON_COUNT AS ON_COUNT, a.DEVICE_LAST_DT, i.COMM_NM AS SHOP_ADD_NM,
     g.UDD_VAL AS PLA_VAL
     FROM tb_device a
     LEFT JOIN tb_device_model b ON b.MDL_SQ = a.MDL_SQ
@@ -43,6 +55,9 @@ export const getDeviceList = async (req: Request, res: Response) => {
       WHERE UDD_TP = 1
       GROUP BY DEVICE_SQ
     ) h ON h.DEVICE_SQ = a.DEVICE_SQ
+    LEFT JOIN tb_common i
+      ON i.COMM_CODE = c.SHOP_ADD_SQ
+      AND i.COMM_GRP = 7
     WHERE a.IS_DEL = 0
     ORDER BY a.DEVICE_SQ DESC;
   `);
@@ -314,73 +329,76 @@ export const getDeviceUseChart = async (req: Request, res: Response) => {
   const { error, result } = await useDatabase(
     `
     SELECT
-    a.COMM_CODE, a.COMM_NM
+    a.COMM_CODE, a.COMM_NM, IF(b.COUNT > 0, b.COUNT, 0) AS VALUE
     FROM tb_common a
-    # LEFT JOIN #######
+    LEFT JOIN (
+      SELECT UD_MODE, COUNT(UD_MODE) AS COUNT
+      FROM tb_use_device
+      WHERE CONVERT(?, DATE) <= CONVERT(UD_START, DATE)
+      AND CONVERT(UD_END, DATE) <= CONVERT(?, DATE)
+      AND DEVICE_SQ = ?
+      GROUP BY UD_MODE
+    ) b ON b.UD_MODE = a.COMM_CODE 
     WHERE a.COMM_GRP = 5
     AND a.COMM_CODE > 0
-    ORDER BY a.COMM_CODE ASC;
+    ORDER BY a.COMM_CODE;
   `,
-    [DEVICE_SQ]
+    [START, END, DEVICE_SQ]
   );
+
   if (error) return res.send(fail(errorMessage.db));
-  res.send(
-    success(result?.map((x: any) => ({ ...x, VALUE: Math.random() * 10 })))
-  );
+
+  res.send(success(result));
 };
 
 // 장비 데이터 차트
 export const getDeviceDataChart = async (req: Request, res: Response) => {
   const DEVICE_SQ = req?.params?.DEVICE_SQ;
-  const START: string = (req?.query?.start ?? "") as string;
-  const END: string = (req?.query?.end ?? "") as string;
-  const TYPE = req?.query?.type;
+  const YEAR: string = (req?.query?.year ?? "") as string;
+  const TYPE = (req?.query?.type ?? "") as string;
 
-  if (
-    !useIsNumber(DEVICE_SQ) ||
-    START?.length < 10 ||
-    END?.length < 10 ||
-    !TYPE
-  ) {
+  if (!useIsNumber(DEVICE_SQ) || !YEAR || !TYPE) {
     return res.send(fail(errorMessage.parameter));
   }
 
-  // const { error, result } = await useDatabase(
-  //   `
-  //   SELECT
-  //   a.COMM_CODE, a.COMM_NM
-  //   FROM tb_common a
-  //   # LEFT JOIN #######
-  //   WHERE a.COMM_GRP = 5
-  //   AND a.COMM_CODE > 0
-  //   ORDER BY a.COMM_CODE ASC;
-  // `,
-  //   [DEVICE_SQ]
-  // );
-  // if (error) return res.send(fail(errorMessage.db));
-
-  const months = [
-    "1월",
-    "2월",
-    "3월",
-    "4월",
-    "5월",
-    "6월",
-    "7월",
-    "8월",
-    "9월",
-    "10월",
-    "11월",
-    "12월",
-  ];
-
-  res.send(
-    success(
-      months?.map((x: string, i: number) => ({
-        MONTH_SQ: i + 1,
-        MONTH_NM: x,
-        VALUE: Math.random() * 10,
-      }))
-    )
+  const { error, result } = await useDatabase(
+    `
+    SELECT
+    UDD_SQ, UDD_TP, UDD_VAL,
+    DATE_FORMAT(UDD_CRT_DT, '%d') AS 'MONTH'
+    FROM tb_use_device_data
+    WHERE DEVICE_SQ = ?
+    AND DATE_FORMAT(UDD_CRT_DT, '%Y') = ? 
+    AND UDD_TP = ?
+    ORDER BY UDD_SQ;
+  `,
+    [DEVICE_SQ, YEAR, TYPE]
   );
+
+  if (error) return res.send(fail(errorMessage.db));
+
+  const monthList: string[] = Array(12)
+    .fill("")
+    .map((m, i) => {
+      let n = i + 1;
+      return n < 10 ? "0" + n : String(n);
+    });
+
+  let data: DataChartData[] = [];
+
+  monthList.forEach((month, i) => {
+    let count = 0;
+    let list: DataChartResult[] = result?.filter(
+      (x: DataChartResult) => x?.MONTH === month
+    );
+    list.forEach((item) => (count += item?.UDD_VAL));
+
+    data.push({
+      MONTH_SQ: Number(month),
+      MONTH_NM: month + "월",
+      VALUE: count / list?.length,
+    });
+  });
+
+  res.send(success(data));
 };

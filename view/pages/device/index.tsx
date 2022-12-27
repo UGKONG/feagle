@@ -13,16 +13,18 @@ const filterList: FilterList = [
   { id: 1, name: "일련번호" },
   { id: 2, name: "모델명" },
   { id: 3, name: "피부샵명" },
-  { id: 4, name: "누적사용시간" },
-  { id: 5, name: "가동 횟수" },
-  { id: 6, name: "최근사용일시" },
-  { id: 7, name: "현재상태" },
+  { id: 4, name: "지역" },
+  { id: 5, name: "누적사용시간" },
+  { id: 6, name: "가동 횟수" },
+  { id: 7, name: "최근사용일시" },
+  { id: 8, name: "현재상태" },
 ];
 const headerList: HeaderList = [
   "No",
   "일련번호",
   "모델명",
   "피부샵명",
+  "지역",
   "누적사용시간",
   "가동 횟수",
   "최근사용일시",
@@ -45,7 +47,7 @@ export default function Device({
   const [deviceList, setDeviceList] = useState<Device[]>([]);
 
   const resultDeviceList = useMemo<Device[]>(() => {
-    let copy = [...deviceList];
+    let copy = [...(deviceList ?? [])];
     let json = JSON.stringify;
     let q = activeFilter?.filter?.replace(/ /g, "");
     let sort = activeFilter?.sort;
@@ -57,7 +59,7 @@ export default function Device({
     }
 
     // 솔팅 타입
-    // (1 - 일련번호, 2 - 모델명, 3 - 피부샵명, 4 - 누적사용시간, 5 - 가동 횟수, 6 - 최근사용일시, 7 - 현재상태)
+    // (1 - 일련번호, 2 - 모델명, 3 - 피부샵명, 4 - 지역, 5 - 누적사용시간, 6 - 가동 횟수, 7 - 최근사용일시, 8 - 현재상태)
     if (sort === 1) {
       copy?.sort((a, b) => {
         let up =
@@ -90,17 +92,33 @@ export default function Device({
       });
     } else if (sort === 4) {
       copy?.sort((a, b) => {
+        let up: number =
+          (a?.SHOP_ADD_NM ?? 0) < (b?.SHOP_ADD_NM ?? 0)
+            ? -1
+            : (a?.SHOP_ADD_NM ?? 0) > (b?.SHOP_ADD_NM ?? 0)
+            ? 1
+            : 0;
+        let down: number =
+          (a?.SHOP_ADD_NM ?? 0) > (b?.SHOP_ADD_NM ?? 0)
+            ? -1
+            : (a?.SHOP_ADD_NM ?? 0) < (b?.SHOP_ADD_NM ?? 0)
+            ? 1
+            : 0;
+        return isUp ? up : down;
+      });
+    } else if (sort === 5) {
+      copy?.sort((a, b) => {
         let up: number = (a?.USE_TM_VAL ?? 0) - (b?.USE_TM_VAL ?? 0);
         let down: number = (b?.USE_TM_VAL ?? 0) - (a?.USE_TM_VAL ?? 0);
         return isUp ? up : down;
       });
-    } else if (sort === 5) {
+    } else if (sort === 6) {
       copy?.sort((a, b) => {
         let up: number = (a?.ON_COUNT ?? 0) - (b?.ON_COUNT ?? 0);
         let down: number = (b?.ON_COUNT ?? 0) - (a?.ON_COUNT ?? 0);
         return isUp ? up : down;
       });
-    } else if (sort === 6) {
+    } else if (sort === 7) {
       copy?.sort((a, b) => {
         let aDate: Date = new Date(a?.DEVICE_LAST_DT as string);
         let bDate: Date = new Date(b?.DEVICE_LAST_DT as string);
@@ -108,7 +126,7 @@ export default function Device({
         let down: number = bDate.getTime() - aDate.getTime();
         return isUp ? up : down;
       });
-    } else if (sort === 7) {
+    } else if (sort === 8) {
       copy?.sort((a, b) => {
         let up: number = (a?.IS_ACTIVE ?? 0) - (b?.IS_ACTIVE ?? 0);
         let down: number = (b?.IS_ACTIVE ?? 0) - (a?.IS_ACTIVE ?? 0);
@@ -167,6 +185,7 @@ export default function Device({
                   <Td>{item?.DEVICE_SN ?? "-"}</Td>
                   <Td>{item?.MDL_NM ?? "-"}</Td>
                   {!isShopNameHide && <Td>{item?.SHOP_NM ?? "-"}</Td>}
+                  <Td>{item?.SHOP_ADD_NM ?? "-"}</Td>
                   <Td>{item?.USE_TM_VAL ? item?.USE_TM_VAL + "시간" : "-"}</Td>
                   <Td>{item?.ON_COUNT ? item?.ON_COUNT + "회" : "-"}</Td>
                   <Td>{item?.DEVICE_LAST_DT ?? "-"}</Td>

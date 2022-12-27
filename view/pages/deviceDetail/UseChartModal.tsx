@@ -23,7 +23,7 @@ export default function UseChartModal() {
     let end = useDate(now, false);
     now.setDate(1);
     let start = useDate(now, false);
-    setDate({ start, end, type: 1 });
+    setDate({ start, end });
   };
 
   const getData = (): void => {
@@ -70,7 +70,7 @@ export default function UseChartModal() {
         </HeaderSide>
       </Header>
       <Contents>
-        <BarChart data={data} />
+        <BarChart data={data} label="합계" />
       </Contents>
     </Container>
   );

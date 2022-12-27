@@ -1,4 +1,5 @@
 import { createStore } from "redux";
+import { composeWithDevTools } from "redux-devtools-extension";
 import { AlertData, GasReq, Master, OrNull } from "../types";
 
 // Store Dispatch Interface
@@ -18,17 +19,6 @@ export interface Store {
 // Store Current State
 const currentState: Store = {
   master: null,
-  // master: {
-  //   MST_SQ: 1,
-  //   MST_NM: "전상욱",
-  //   MST_NUM: "010-0000-0000",
-  //   MST_GRP: "리안소프트",
-  //   MST_PO: "프로젝트 담당자",
-  //   MST_GD: 1,
-  //   MST_ID: "test",
-  //   AUTH_SQ: 1,
-  //   AUTH_TEXT: "전체 관리자",
-  // },
   alert: null,
   customTitle: "",
   noticeList: [],
@@ -43,7 +33,7 @@ const reducer = (state: Store = currentState, action: Dispatch): Store => {
 };
 
 // Create Store
-const store = createStore(reducer);
+const store = createStore(reducer, composeWithDevTools());
 
 // Store Export
 export default store;

@@ -13,12 +13,14 @@ import { Active, FilterList, HeaderList } from "./index.type";
 
 const filterList: FilterList = [
   { id: 1, name: "이름" },
-  { id: 2, name: "장비수" },
-  { id: 3, name: "생성일" },
+  { id: 2, name: "지역" },
+  { id: 3, name: "장비수" },
+  { id: 4, name: "생성일" },
 ];
 const headerList: HeaderList = [
   "No",
   "이름",
+  "지역",
   "연락처",
   "매니저 이름",
   "장비수",
@@ -38,7 +40,7 @@ export default function Shop() {
   const [isCreateShopModal, setIsCreateShopModal] = useState<boolean>(false);
 
   const resultShopList = useMemo<Shop[]>(() => {
-    let copy = [...shopList];
+    let copy = [...(shopList ?? [])];
     let json = JSON.stringify;
     let q = activeFilter?.filter?.replace(/ /g, "");
     let sort = activeFilter?.sort;
@@ -49,7 +51,7 @@ export default function Shop() {
       copy = copy?.filter((x) => json(x)?.replace(/ /g, "")?.indexOf(q) > -1);
     }
 
-    // 솔팅 타입 (1 - 이름 / 2 - 장비수 / 3 - 생성일)
+    // 솔팅 타입 (1 - 이름 / 2 - 지역 / 3 - 장비수 / 4 - 생성일)
     if (sort === 1) {
       copy?.sort((a, b) => {
         let up = a?.SHOP_NM < b?.SHOP_NM ? -1 : a?.SHOP_NM > b?.SHOP_NM ? 1 : 0;
@@ -59,11 +61,27 @@ export default function Shop() {
       });
     } else if (sort === 2) {
       copy?.sort((a, b) => {
+        let up: number =
+          (a?.SHOP_ADD_NM ?? 0) < (b?.SHOP_ADD_NM ?? 0)
+            ? -1
+            : (a?.SHOP_ADD_NM ?? 0) > (b?.SHOP_ADD_NM ?? 0)
+            ? 1
+            : 0;
+        let down: number =
+          (a?.SHOP_ADD_NM ?? 0) > (b?.SHOP_ADD_NM ?? 0)
+            ? -1
+            : (a?.SHOP_ADD_NM ?? 0) < (b?.SHOP_ADD_NM ?? 0)
+            ? 1
+            : 0;
+        return isUp ? up : down;
+      });
+    } else if (sort === 3) {
+      copy?.sort((a, b) => {
         let up = (a?.DEVICE_COUNT ?? 0) - (b?.DEVICE_COUNT ?? 0);
         let down = (b?.DEVICE_COUNT ?? 0) - (a?.DEVICE_COUNT ?? 0);
         return isUp ? up : down;
       });
-    } else if (sort === 3) {
+    } else if (sort === 4) {
       copy?.sort((a, b) => {
         let aDate: Date = new Date(a?.SHOP_CRT_DT as string);
         let bDate: Date = new Date(b?.SHOP_CRT_DT as string);
@@ -120,6 +138,7 @@ export default function Shop() {
                 >
                   <Td>{i + 1}</Td>
                   <Td>{item?.SHOP_NM ?? "-"}</Td>
+                  <Td>{item?.SHOP_ADD_NM ?? "-"}</Td>
                   <Td>{item?.SHOP_NUM ?? "-"}</Td>
                   <Td>{item?.MNG_NM ?? "-"}</Td>
                   <Td>{item?.DEVICE_COUNT ?? "0"}개</Td>

@@ -1,24 +1,15 @@
 import _React, { useMemo } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
-import { BoxProps, Type } from "./index.type";
+import { BoxProps } from "./index.type";
 
-export default function Box({
-  id,
-  name,
-  data,
-  color,
-  isAddr,
-  setDepth,
-  setActiveAddress,
-}: BoxProps) {
+export default function Box({ id, name, data, color, isAddr }: BoxProps) {
   const navigate = useNavigate();
 
   // box 클릭
   const boxClick = (): void => {
     if (isAddr) {
-      setDepth((prev) => [...prev, name]);
-      setActiveAddress(id);
+      navigate("/?addr=" + id);
     } else {
       if (!id) return;
       navigate("/shop/" + id);

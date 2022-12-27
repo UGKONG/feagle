@@ -3,25 +3,58 @@ import styled from "styled-components";
 import _Container from "../../common/Container";
 import { Count, Data } from "./index.type";
 import { BiChevronRight } from "react-icons/bi";
-import { useAxios } from "../../../functions/utils";
-import { Shop } from "../../../types";
+import {
+  useAxios,
+  useIsNumber,
+  useQueryObject,
+} from "../../../functions/utils";
 import { CircularProgress } from "@mui/material";
 import { addrColors } from "../../../string";
 import Box from "./Box";
 import { AddressData, ShopData } from "../../../controllers/dashboard";
+import { useLocation, useNavigate } from "react-router-dom";
+import { CommonCode } from "../../../types";
 
 const currentDepth: string[] = ["지역별 보기"];
 
 // 센터 수
 // 장비수, 누적횟수/시간, ON 장비수, START 장비수, 가스교체필요장비수, 플라즈마 전류 이상 장비 수
 export default function Index() {
+  const location = useLocation();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState<boolean>(true);
-  const [depth, setDepth] = useState<string[]>(currentDepth);
   const [data, setData] = useState<Data[]>([]);
-  const [activeAddress, setActiveAddress] = useState<number>(0);
+  const [commAddrList, setCommAddrList] = useState<CommonCode[]>([]);
+
+  const getCommAddrList = (): void => {
+    useAxios.get("/common/address").then(({ data }) => {
+      setCommAddrList(data?.current ?? []);
+    });
+  };
+
+  const query = useMemo<{ [key: string]: string }>(() => {
+    return useQueryObject(location?.search);
+  }, [location]);
 
   // 지역 별 / 피부샵 별 구분
-  const isAddr = useMemo<boolean>(() => depth?.length <= 1, [depth]);
+  const isAddr = useMemo<boolean>(() => {
+    let keys = Object.keys(query);
+    if (!keys?.length) return true;
+    return false;
+  }, [location]);
+
+  const activeAddress = useMemo(() => {
+    let addr = query?.addr;
+    if (!useIsNumber(addr)) return 0;
+    return Number(query?.addr);
+  }, [location]);
+
+  const depth = useMemo<string[]>(() => {
+    if (!activeAddress) return [...currentDepth];
+    let find = commAddrList?.find((x) => x?.COMM_CODE === activeAddress);
+    if (!find) return [...currentDepth];
+    return [...currentDepth, find?.COMM_NM];
+  }, [activeAddress, commAddrList]);
 
   // 피부샵 수, 장비 수
   const count = useMemo<Count>(() => {
@@ -83,16 +116,7 @@ export default function Index() {
 
   // Depth 클릭
   const depthClick = (i: number): void => {
-    if (!i) {
-      setActiveAddress(0);
-      return setDepth(currentDepth);
-    }
-
-    setDepth((prev) => {
-      let copy = [...prev];
-      copy = copy?.slice(0, i + 1);
-      return copy;
-    });
+    if (!i) return navigate("/");
   };
 
   // color return
@@ -101,7 +125,8 @@ export default function Index() {
     return addrColors[calc];
   };
 
-  useEffect(getData, [depth]);
+  useEffect(getData, [location]);
+  useEffect(getCommAddrList, []);
 
   return (
     <Container>
@@ -141,8 +166,6 @@ export default function Index() {
               data={item}
               color={colorData(i)}
               isAddr={isAddr}
-              setDepth={setDepth}
-              setActiveAddress={setActiveAddress}
             />
           ))
         ) : (

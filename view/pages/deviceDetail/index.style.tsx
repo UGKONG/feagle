@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import _Input from "../../common/Input";
+import _Select from "../../common/Select";
 
 export const Header = styled.header`
   width: 100%;
@@ -15,6 +16,11 @@ export const HeaderSide = styled.div`
 export const Input = styled(_Input).attrs(() => ({
   type: "date",
 }))`
+  width: 130px;
+  height: 34px;
+  color: #555555;
+`;
+export const Select = styled(_Select)`
   width: 130px;
   height: 34px;
   color: #555555;

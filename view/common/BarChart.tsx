@@ -3,8 +3,9 @@ import { CChart } from "@coreui/react-chartjs";
 
 type Props = {
   data?: Array<{ name: string; value: number }>;
+  label?: string;
 };
-export default function BarChart({ data = [] }: Props) {
+export default function BarChart({ data = [], label = "통계" }: Props) {
   return (
     <CChart
       type="bar"
@@ -12,7 +13,7 @@ export default function BarChart({ data = [] }: Props) {
         labels: data?.map((x) => x?.name),
         datasets: [
           {
-            label: "통계",
+            label,
             backgroundColor: "#f8797970",
             data: data?.map((x) => x?.value),
             borderColor: "#f87979",

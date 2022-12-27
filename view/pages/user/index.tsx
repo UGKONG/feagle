@@ -43,7 +43,7 @@ export default function User({ isHeader = true, currentList }: Props) {
   const [authList, setAuthList] = useState<MasterAuth[]>([]);
 
   const resultMasterList = useMemo<Master[]>(() => {
-    let copy = [...masterList];
+    let copy = [...(masterList ?? [])];
     let json = JSON.stringify;
     let q = activeFilter?.filter?.replace(/ /g, "");
     let sort = activeFilter?.sort;

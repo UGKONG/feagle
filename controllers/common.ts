@@ -62,7 +62,7 @@ export const getProgramMode = async (req: any, res: Response) => {
     FROM tb_common
     WHERE COMM_GRP = 5
     AND COMM_CODE > 0
-    ORDER BY COMM_CODE ASC;
+    ORDER BY COMM_CODE;
   `);
 
   if (error) return res.send(fail(errorMessage.db));
@@ -78,7 +78,23 @@ export const getDataTypeList = async (req: any, res: Response) => {
     FROM tb_common
     WHERE COMM_GRP = 6
     AND COMM_CODE > 0
-    ORDER BY COMM_CODE ASC;
+    ORDER BY COMM_CODE;
+  `);
+
+  if (error) return res.send(fail(errorMessage.db));
+
+  res.send(success(result));
+};
+
+// 주소 리스트 조회
+export const getCommAddrList = async (req: any, res: Response) => {
+  const { error, result } = await useDatabase(`
+    SELECT
+    COMM_CODE, COMM_NM
+    FROM tb_common
+    WHERE COMM_GRP = 7
+    AND COMM_CODE > 0
+    ORDER BY COMM_CODE;
   `);
 
   if (error) return res.send(fail(errorMessage.db));
