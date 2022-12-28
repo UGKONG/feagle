@@ -1,6 +1,5 @@
 [
   "/",
-  "/:id",
   "/signin",
   "/signup",
   "/signout",
@@ -14,5 +13,6 @@
   "/board",
   "/board/add/",
   "/board/:id/",
-  "/user"
+  "/user",
+  "/dev"
 ]

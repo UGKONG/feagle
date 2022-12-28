@@ -1,6 +1,6 @@
+import fs from "fs";
 import { Response } from "express";
 import { fail, success, useDatabase, useIsNumber } from "../functions/utils";
-import fs from "fs";
 import { uploadDir } from "../string";
 
 // 파일 다운로드
@@ -49,4 +49,14 @@ export const getFileDownload = async (req: any, res: Response) => {
   } catch {
     return res.send(fail());
   }
+};
+
+// 파일 업로드
+export const postFileUpload = async (req: any, res: Response) => {
+  const files = req?.files;
+  console.log(files);
+
+  let isFile = Object.keys(files)?.length ? true : false;
+
+  res.send((isFile ? success : fail)());
 };

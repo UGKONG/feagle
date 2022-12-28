@@ -1,9 +1,17 @@
-import express from "express";
-import cors from "cors";
+const express = require("express");
+const cors = require("cors");
+const dotenv = require("dotenv");
+const bodyParser = require("body-parser");
+const session = require("express-session");
+const MySQLStore = require("express-mysql-session")(session);
+const multer = require("multer");
+const multipart = require("connect-multiparty");
+const expressFileUpload = require("express-fileupload");
+
 import { programName } from "./string";
 import serverStart from "./functions/serverStart";
 import apiLogger from "./middlewares/apiLogger";
-import viewRoutes from "./routes/view.json";
+import view from "./routes/view.json";
 import testRoute from "./routes/test";
 import masterRouter from "./routes/master";
 import requestRouter from "./routes/request";
@@ -18,16 +26,13 @@ import managerRouter from "./routes/manager";
 import modelRouter from "./routes/model";
 import deviceDoRouter from "./routes/deviceDo";
 import dashboardRoute from "./routes/dashboard";
-import { postBoard } from "./controllers/board";
 
 // Setting
-require("dotenv").config();
+dotenv.config();
 const app = express();
 const port = process.env.SERVER_PORT || 8080;
-const bodyParser = require("body-parser");
-const session = require("express-session");
-const MySQLStore = require("express-mysql-session")(session);
-const multipart = require("connect-multiparty")();
+const basePath = __dirname + "/build";
+const multipartMiddleware = multipart();
 const sessionConfig = session({
   secret: programName,
   resave: false,
@@ -47,34 +52,33 @@ const sessionConfig = session({
     database: process.env.DB_DATABASE,
   }),
 });
-const basePath = __dirname + "/build";
+const upload = multer({ dest: __dirname + "/upload/" });
 
 // Middleware
 app.use(cors());
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: "50mb" }));
+app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 app.use(apiLogger);
 app.use(sessionConfig);
+app.use(expressFileUpload({ createParentPath: true }));
 
-// View Router
-viewRoutes.forEach((path: string) => {
-  app.use(path, express.static(basePath));
-});
+view.forEach((path: string) => app.use(path, express.static(basePath)));
 
 // Api Router
-app.use("/api/test", multipart, testRoute);
-app.use("/api/request", multipart, requestRouter);
-app.use("/api/common", multipart, commonRouter);
-app.use("/api/model", multipart, modelRouter);
-app.use("/api/device", multipart, deviceRouter);
-app.use("/api/master", multipart, masterRouter);
-app.use("/api/manager", multipart, managerRouter);
-app.use("/api/shop", multipart, shopRouter);
-app.use("/api/board", multipart, boardRouter);
-app.use("/api/file", multipart, fileRouter);
-app.use("/api/gas", multipart, gasRouter);
-app.use("/api/log", multipart, logRouter);
-app.use("/api/deviceDo", multipart, deviceDoRouter);
-app.use("/api/dashboard", multipart, dashboardRoute);
+app.use("/api/test", testRoute);
+app.use("/api/request", requestRouter);
+app.use("/api/common", commonRouter);
+app.use("/api/model", modelRouter);
+app.use("/api/device", deviceRouter);
+app.use("/api/master", masterRouter);
+app.use("/api/manager", managerRouter);
+app.use("/api/shop", shopRouter);
+app.use("/api/board", boardRouter);
+app.use("/api/file", fileRouter);
+app.use("/api/gas", gasRouter);
+app.use("/api/log", logRouter);
+app.use("/api/deviceDo", deviceDoRouter);
+app.use("/api/dashboard", dashboardRoute);
 
 // Start
 app.listen(port, serverStart);

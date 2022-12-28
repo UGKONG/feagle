@@ -9,6 +9,7 @@ import { useSelector } from "react-redux";
 import { Store } from "../../../functions/store";
 import Button from "../../common/Button";
 import FileList from "../file";
+import Modal from "../../common/Modal";
 
 export default function BoardDetail() {
   const params = useParams();
@@ -17,6 +18,7 @@ export default function BoardDetail() {
   const loginUser = useSelector((x: Store) => x?.master);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [boardData, setBoardData] = useState<null | Post>(null);
+  const [isDelModal, setIsDelModal] = useState<boolean>(false);
 
   // 게시글 시퀀스
   const POST_SQ = useMemo<number>(() => {
@@ -47,10 +49,8 @@ export default function BoardDetail() {
     useAxios.get("/board/" + POST_SQ).then(({ data }) => {
       setIsLoading(false);
       if (!data?.result) {
-        dispatch({
-          type: "alert",
-          payload: { type: "error", text: "게시글 정보가 없습니다." },
-        });
+        let payload = { type: "error", text: "게시글 정보가 없습니다." };
+        dispatch({ type: "alert", payload });
         return navigate(-1);
       }
 
@@ -58,63 +58,103 @@ export default function BoardDetail() {
     });
   };
 
+  const edit = (): void => {
+    navigate("/board/add", { state: { ...boardData, isEdit: true } });
+  };
+
+  const del = (): void => {
+    useAxios.delete("/board/" + POST_SQ).then(({ data }) => {
+      if (!data?.result) {
+        let payload = { type: "error", text: "게시글 삭제에 실패하였습니다." };
+        dispatch({ type: "alert", payload });
+        return navigate(-1);
+      }
+
+      let payload = { type: "success", text: "게시글이 삭제되었습니다." };
+      dispatch({ type: "alert", payload });
+      navigate(-1);
+    });
+  };
+
   useEffect(getData, [POST_SQ]);
 
   return (
-    <Container isLoading={isLoading}>
-      {isMyPost && (
-        <Header>
-          <EditBtn />
-          <DelBtn />
-        </Header>
-      )}
-      <Title>제목: {boardData?.POST_TTL ?? "-"}</Title>
-      <Row style={{ fontSize: 16, marginBottom: 20 }}>
-        <RowTitle>카테고리 :</RowTitle>
-        {boardData?.POST_TP_NM ?? "-"}
-      </Row>
-      <Row>
-        <RowTitle>적용모델 :</RowTitle>
-        <Desc title={boardData?.MDL_DESC ?? "-"}>{MDL_NM ?? "-"}</Desc>
-      </Row>
-      <Row>
-        <RowTitle>빌드정보 :</RowTitle>
-        {boardData?.BUILD_VN} (빌드일: {BUILD_DT})
-      </Row>
-      <Row>
-        <RowTitle>작성일시 :</RowTitle>
-        {boardData?.POST_CRT_DT ?? "-"}
-      </Row>
-      <Row>
-        <RowTitle>작성자명 :</RowTitle>
-        {boardData?.MST_NM ?? "-"}
-      </Row>
-      <Row
-        style={{
-          flexDirection: "column",
-          alignItems: "flex-start",
-          marginTop: 30,
-          minHeight: 250,
-        }}
-      >
-        <RowTitle style={{ marginBottom: 6 }}>내용</RowTitle>
-        <span style={{ color: "#444", lineHeight: "26px" }}>
-          {boardData?.POST_CN ?? "-"}
-        </span>
-      </Row>
-      {(boardData?.FILE_LIST as File[])?.length > 0 && (
+    <>
+      <Container isLoading={isLoading}>
+        {isMyPost && (
+          <Header>
+            <EditBtn onClick={edit} />
+            <DelBtn onClick={() => setIsDelModal(true)} />
+          </Header>
+        )}
+        <Title>제목: {boardData?.POST_TTL ?? "-"}</Title>
+        <Row style={{ fontSize: 16, marginBottom: 20 }}>
+          <RowTitle>카테고리 :</RowTitle>
+          {boardData?.POST_TP_NM ?? "-"}
+        </Row>
+        <Row>
+          <RowTitle>적용모델 :</RowTitle>
+          <Desc title={boardData?.MDL_DESC ?? "-"}>{MDL_NM ?? "-"}</Desc>
+        </Row>
+        <Row>
+          <RowTitle>빌드정보 :</RowTitle>
+          {boardData?.BUILD_VN} (빌드일: {BUILD_DT})
+        </Row>
+        <Row>
+          <RowTitle>작성일시 :</RowTitle>
+          {boardData?.POST_CRT_DT ?? "-"}
+        </Row>
+        <Row>
+          <RowTitle>작성자명 :</RowTitle>
+          {boardData?.MST_NM ?? "-"}
+        </Row>
         <Row
           style={{
             flexDirection: "column",
             alignItems: "flex-start",
-            marginTop: 50,
+            marginTop: 30,
+            minHeight: 250,
           }}
         >
-          <RowTitle style={{ marginBottom: 6 }}>첨부파일</RowTitle>
-          <FileList currentList={boardData?.FILE_LIST as File[]} />
+          <RowTitle style={{ marginBottom: 6 }}>내용</RowTitle>
+          <span style={{ color: "#444", lineHeight: "26px" }}>
+            {boardData?.POST_CN ?? "-"}
+          </span>
         </Row>
+        {(boardData?.FILE_LIST as File[])?.length > 0 && (
+          <Row
+            style={{
+              flexDirection: "column",
+              alignItems: "flex-start",
+              marginTop: 50,
+            }}
+          >
+            <RowTitle style={{ marginBottom: 6 }}>첨부파일</RowTitle>
+            <FileList currentList={boardData?.FILE_LIST as File[]} />
+          </Row>
+        )}
+      </Container>
+      {isDelModal && (
+        <Modal
+          title="게시글 삭제"
+          close={() => setIsDelModal(false)}
+          buttons={[
+            { id: 1, name: "삭제", color: "red", onClick: () => del() },
+          ]}
+        >
+          <span
+            style={{
+              fontSize: 15,
+              color: "#ff0000",
+              marginBottom: 20,
+              display: "inline-block",
+            }}
+          >
+            해당 게시글을 삭제하시겠습니까?
+          </span>
+        </Modal>
       )}
-    </Container>
+    </>
   );
 }
 

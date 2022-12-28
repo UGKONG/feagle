@@ -3,7 +3,6 @@ import styled from "styled-components";
 import { MenuList } from "../../string";
 import { FaBell } from "react-icons/fa";
 import { FiLogOut } from "react-icons/fi";
-import { Logout } from "@mui/icons-material";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { Store } from "../../functions/store";

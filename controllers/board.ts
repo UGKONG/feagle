@@ -110,38 +110,65 @@ export const postBoard = async (req: any, res: Response) => {
   const POST_CN = req?.query?.POST_CN ?? req?.body?.POST_CN;
   const BUILD_DT = req?.query?.BUILD_DT ?? req?.body?.BUILD_DT;
   const MST_SQ = req?.session?.user?.MST_SQ ?? req?.body?.MST_SQ;
-  const FILES = req?.files;
-
-  console.log(FILES);
 
   if (!useIsNumber([POST_TP, MDL_SQ, MST_SQ])) {
-    // return res.send(fail(errorMessage.parameter));
+    return res.send(fail(errorMessage.parameter));
   }
 
-  // const validate1 =
-  //   !POST_TP ||
-  //   !MDL_SQ ||
-  //   !BUILD_VN ||
-  //   !POST_TTL ||
-  //   !POST_CN ||
-  //   !BUILD_DT ||
-  //   !MST_SQ;
-  // const validate2 = BUILD_DT?.length < 10;
-  // if (validate1 || validate2) {
-  //   return res.send(fail(errorMessage.parameter));
-  // }
-
-  return res.send(fail("개발중.."));
+  const validate1 = !POST_TP || !POST_TTL || !POST_CN || !MST_SQ;
+  const validate2 = (POST_TP == 4 || POST_TP == 5) && BUILD_DT?.length < 10;
+  const validate3 = (POST_TP == 4 || POST_TP == 5) && (!BUILD_VN || !BUILD_DT);
+  if (validate1 || validate2 || validate3) {
+    return res.send(fail(errorMessage.parameter));
+  }
 
   const { error } = await useDatabase(
     `
     INSERT INTO tb_post (
-      POST_TP, MDL_SQ, BUILD_VN, POST_TTL, POST_CN, MST_SQ, BUILD_DT
+      POST_TP, MDL_SQ, BUILD_VN, POST_TTL, 
+      POST_CN, MST_SQ, BUILD_DT
     ) VALUES (
       ?, ?, ?, ?, ?, ?, ?
     )
   `,
     [POST_TP, MDL_SQ, BUILD_VN, POST_TTL, POST_CN, MST_SQ, BUILD_DT]
+  );
+
+  if (error) return res.send(fail(errorMessage.db));
+
+  res.send(success());
+};
+
+// 자료, 펌웨어, 소프트웨어 수정
+export const putBoard = async (req: any, res: Response) => {
+  const POST_SQ = req?.params?.POST_SQ;
+  const POST_TP = req?.query?.POST_TP ?? req?.body?.POST_TP;
+  const MDL_SQ = req?.query?.MDL_SQ ?? req?.body?.MDL_SQ;
+  const BUILD_VN = req?.query?.BUILD_VN ?? req?.body?.BUILD_VN;
+  const POST_TTL = req?.query?.POST_TTL ?? req?.body?.POST_TTL;
+  const POST_CN = req?.query?.POST_CN ?? req?.body?.POST_CN;
+  const BUILD_DT = req?.query?.BUILD_DT ?? req?.body?.BUILD_DT;
+  const MST_SQ = req?.session?.user?.MST_SQ ?? req?.body?.MST_SQ;
+
+  if (!useIsNumber([POST_TP, MDL_SQ, MST_SQ])) {
+    return res.send(fail(errorMessage.parameter));
+  }
+
+  const validate1 = !POST_TP || !POST_TTL || !POST_CN || !MST_SQ;
+  const validate2 = BUILD_DT?.length < 10;
+  const validate3 = (POST_TP == 4 || POST_TP == 5) && (!BUILD_VN || !BUILD_DT);
+  if (validate1 || validate2 || validate3) {
+    return res.send(fail(errorMessage.parameter));
+  }
+
+  const { error } = await useDatabase(
+    `
+    UPDATE tb_post SET
+    POST_TP = ?, MDL_SQ = ?, BUILD_VN = ?, 
+    POST_TTL = ?, POST_CN = ?, BUILD_DT = ?
+    WHERE POST_SQ = ?
+  `,
+    [POST_TP, MDL_SQ, BUILD_VN, POST_TTL, POST_CN, BUILD_DT, POST_SQ]
   );
 
   if (error) return res.send(fail(errorMessage.db));

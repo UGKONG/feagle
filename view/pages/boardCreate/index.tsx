@@ -1,4 +1,4 @@
-import _React, { useEffect, useRef, useState } from "react";
+import _React, { useEffect, useMemo, useRef, useState } from "react";
 import styled from "styled-components";
 import { useDispatch } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -8,6 +8,7 @@ import {
   CommonCode,
   DeviceModel,
   InputChangeEvent,
+  OrNull,
   Post,
   SelectChangeEvent,
 } from "../../../types";
@@ -24,7 +25,6 @@ export default function BoardCreate() {
   const dispatch = useDispatch();
   const location = useLocation();
   const navigate = useNavigate();
-  const title = location?.state;
   const loginUser = useSelector((x: Store) => x?.master);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [categoryList, setCategoryList] = useState<CommonCode[]>([]);
@@ -53,12 +53,21 @@ export default function BoardCreate() {
     dispatch({ type: "alert", payload: { type, text } });
   };
 
+  const isEdit = useMemo(() => {
+    return location?.state?.isEdit;
+  }, [location]);
+
+  const editFileList = useMemo(() => {
+    if (!isEdit) return [];
+    let list = value?.FILE_LIST;
+    return list ?? [];
+  }, [location, value]);
+
   // 모델 리스트 조회
   const getList = (): void => {
-    dispatch({
-      type: "customTitle",
-      payload: `신규 ${title || "게시글"} 작성`,
-    });
+    let payload = isEdit ? "게시글 수정" : "신규 게시글";
+    dispatch({ type: "customTitle", payload });
+
     useAxios.get("/model").then(({ data }) => {
       setModelList(data?.result ? data?.current : []);
 
@@ -66,6 +75,13 @@ export default function BoardCreate() {
       useAxios.get("/common/boardType").then(({ data }) => {
         setIsLoading(false);
         setCategoryList(data?.result ? data?.current : []);
+
+        if (isEdit) {
+          let BUILD_DT = location?.state?.BUILD_DT;
+          BUILD_DT = BUILD_DT ? BUILD_DT?.split(" ")[0] : "";
+          setIsLoading(false);
+          setValue((prev) => ({ ...prev, ...location?.state, BUILD_DT }));
+        }
       });
     });
   };
@@ -77,29 +93,38 @@ export default function BoardCreate() {
 
   // 전송
   const submit = (): void => {
-    let form = new FormData();
-    let keys = Object.keys(value);
-    keys.forEach((key) => form.append(key, (value as any)[key]));
+    let method: "put" | "post" = isEdit ? "put" : "post";
+    let url: string = "/board" + (isEdit ? "/" + value?.POST_SQ : "");
 
-    if (fileList) {
-      for (let i = 0; i < fileList.length; i++) {
-        console.log(fileList[i]);
-
-        form.append("FILES", fileList[i]);
-      }
-    }
-
-    let config = {
-      headers: {
-        "content-type": "multipart/form-data",
-      },
-    } as AxiosRequestConfig<FormData>;
-
-    useAxios.post("/board", form, config).then(({ data }) => {
+    useAxios[method](url, value).then(({ data }) => {
       if (!data?.result) return useAlert("error", "저장에 실패하였습니다.");
-      useAlert("success", "저장되었습니다.");
-      navigate(-1);
+      fileSubmit();
     });
+  };
+
+  const fileSubmit = (): void => {
+    let form = new FormData();
+    let files = fileRef.current?.files;
+    if (!files?.length) return;
+
+    let file = files[0];
+    if (!file) return;
+
+    form.append("FILE", file, file?.name ?? "");
+
+    useAxios
+      .post("/file", form, {
+        "Content-Type": "multipart/form-data",
+        onUploadProgress: ({ loaded, total }) => {
+          let percent: number = Math.round((loaded / (total ?? 0)) * 100);
+          console.log(percent + "%");
+        },
+      } as AxiosRequestConfig<FormData>)
+      .then(({ data }) => {
+        if (!data?.result) return useAlert("error", "저장에 실패하였습니다.");
+        useAlert("success", "저장되었습니다.");
+        navigate(-1);
+      });
   };
 
   // 유효성 검사
@@ -107,10 +132,16 @@ export default function BoardCreate() {
     if (!value?.POST_TTL) return titleRef.current?.focus();
     if (!value?.POST_TP) return categoryRef.current?.focus();
     if (!value?.MDL_SQ) return modelRef.current?.focus();
-    if (!value?.BUILD_VN) return versionRef.current?.focus();
-    if (!value?.BUILD_DT) return versionDateRef.current?.focus();
     if (!value?.POST_CN) return contentsRef.current?.focus();
-    if (value?.BUILD_DT?.length < 10) {
+
+    let TP = value?.POST_TP;
+    if ((TP === 4 || TP === 5) && !value?.BUILD_VN) {
+      return versionRef.current?.focus();
+    }
+    if ((TP === 4 || TP === 5) && !value?.BUILD_DT) {
+      return versionDateRef.current?.focus();
+    }
+    if ((TP === 4 || TP === 5) && value?.BUILD_DT?.length < 10) {
       useAlert("warning", "빌드일자를 정확히 선택해주세요.");
       return versionDateRef.current?.focus();
     }
@@ -126,10 +157,11 @@ export default function BoardCreate() {
   // 파일 삭제
   const fileDelete = (): void => {
     if (fileRef.current) fileRef.current.value = "";
+    setValue((prev) => ({ ...prev, FILE_LIST: [] }));
     setFileList(null);
   };
 
-  useEffect(getList, []);
+  useEffect(getList, [isEdit]);
 
   return (
     <Container isLoading={isLoading}>
@@ -183,28 +215,30 @@ export default function BoardCreate() {
           ))}
         </Select>
       </Row>
-      <Row>
-        <RowTitle>빌드정보 :</RowTitle>
-        <Input
-          value={value?.BUILD_VN ?? ""}
-          onChange={(e: InputChangeEvent) =>
-            changeValue("BUILD_VN", e?.target?.value)
-          }
-          childRef={versionRef}
-          style={{ width: 200 }}
-          placeholder="빌드 버전"
-        />
-        <Input
-          value={value?.BUILD_DT ?? ""}
-          onChange={(e: InputChangeEvent) =>
-            changeValue("BUILD_DT", e?.target?.value)
-          }
-          childRef={versionDateRef}
-          type="date"
-          style={{ width: 130 }}
-          placeholder="빌드 일시"
-        />
-      </Row>
+      {value?.POST_TP > 3 && (
+        <Row>
+          <RowTitle>빌드정보 :</RowTitle>
+          <Input
+            value={value?.BUILD_VN ?? ""}
+            onChange={(e: InputChangeEvent) =>
+              changeValue("BUILD_VN", e?.target?.value)
+            }
+            childRef={versionRef}
+            style={{ width: 200 }}
+            placeholder="빌드 버전"
+          />
+          <Input
+            value={value?.BUILD_DT ?? ""}
+            onChange={(e: InputChangeEvent) =>
+              changeValue("BUILD_DT", e?.target?.value)
+            }
+            childRef={versionDateRef}
+            type="date"
+            style={{ width: 130 }}
+            placeholder="빌드 일시"
+          />
+        </Row>
+      )}
       <Row
         style={{
           flexDirection: "column",
@@ -233,11 +267,12 @@ export default function BoardCreate() {
           multiple
           hidden
         />
-        {!fileList?.length ? (
+        {!editFileList?.length && !fileList?.length ? (
           <FileBtn htmlFor="file" />
         ) : (
           <BackBtn style={{ margin: 0 }} onClick={fileDelete}>
-            파일삭제 (파일수 : {fileList?.length})
+            파일삭제 (파일수 :{" "}
+            {!fileList ? editFileList?.length : fileList?.length})
           </BackBtn>
         )}
       </Row>

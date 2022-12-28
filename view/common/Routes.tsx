@@ -3,7 +3,6 @@ import { Routes, Route } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { Store } from "../../functions/store";
 import Fallback from "./Fallback";
-import DevPage from "../pages/dev";
 import Container from "./Container";
 
 const Index = lazy(() => import("../pages/index"));
@@ -20,6 +19,7 @@ const Board = lazy(() => import("../pages/board"));
 const BoardDetail = lazy(() => import("../pages/boardDetail"));
 const BoardCreate = lazy(() => import("../pages/boardCreate"));
 const User = lazy(() => import("../pages/user"));
+const Dev = lazy(() => import("../pages/dev"));
 
 export default function Router() {
   const loginUser = useSelector((x: Store) => x?.master);
@@ -50,6 +50,7 @@ export default function Router() {
         <Route path="/board/add" element={isNone(<BoardCreate />)} />
         <Route path="/board/:id" element={isNone(<BoardDetail />)} />
         <Route path="/user" element={isNone(<User />)} />
+        <Route path="/dev" element={isNone(<Dev />)} />
       </Routes>
     </Suspense>
   );
