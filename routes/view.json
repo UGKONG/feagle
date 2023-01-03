@@ -1,18 +1,21 @@
-[
-  "/",
-  "/signin",
-  "/signup",
-  "/signout",
-  "/model",
-  "/shop",
-  "/shop/:id/",
-  "/device",
-  "/device/:id/",
-  "/state",
-  "/ware",
-  "/board",
-  "/board/add/",
-  "/board/:id/",
-  "/user",
-  "/dev"
-]
+{
+  "master": [
+    "/",
+    "/signin",
+    "/signup",
+    "/signout",
+    "/model",
+    "/shop",
+    "/shop/:id/",
+    "/device",
+    "/device/:id/",
+    "/state",
+    "/ware",
+    "/board",
+    "/board/add/",
+    "/board/:id/",
+    "/user",
+    "/dev"
+  ],
+  "manager": ["/"]
+}

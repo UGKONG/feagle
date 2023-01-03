@@ -58,7 +58,13 @@ app.use(bodyParser.json({ limit: "50mb" }));
 app.use(sessionConfig);
 app.use(multipartMiddleware);
 
-view.forEach((path: string) => app.use(path, express.static(basePath)));
+// View Router
+view?.master?.forEach((path: string) => {
+  app.use(path, express.static(basePath));
+});
+view?.manager?.forEach((path: string) => {
+  app.use("/manager" + path, express.static(basePath));
+});
 
 // Api Router
 app.use("/api/test", testRoute);
