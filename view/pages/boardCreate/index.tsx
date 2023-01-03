@@ -8,7 +8,6 @@ import {
   CommonCode,
   DeviceModel,
   InputChangeEvent,
-  OrNull,
   Post,
   SelectChangeEvent,
 } from "../../../types";
@@ -53,9 +52,7 @@ export default function BoardCreate() {
     dispatch({ type: "alert", payload: { type, text } });
   };
 
-  const isEdit = useMemo(() => {
-    return location?.state?.isEdit;
-  }, [location]);
+  const isEdit = useMemo(() => location?.state?.isEdit, [location]);
 
   const editFileList = useMemo(() => {
     if (!isEdit) return [];
@@ -98,29 +95,30 @@ export default function BoardCreate() {
 
     useAxios[method](url, value).then(({ data }) => {
       if (!data?.result) return useAlert("error", "저장에 실패하였습니다.");
-      fileSubmit();
+      fileSubmit(data?.current);
     });
   };
 
-  const fileSubmit = (): void => {
+  const fileSubmit = (POST_SQ: number): void => {
     let form = new FormData();
     let files = fileRef.current?.files;
-    if (!files?.length) return;
+    if (!files?.length) {
+      useAlert("success", "저장되었습니다.");
+      navigate(-1);
+      return;
+    }
 
-    let file = files[0];
-    if (!file) return;
+    form.append("fileCount", String(files?.length ?? 0));
+    for (let i = 0; i < files?.length; i++) {
+      form.append("files", files[i]);
+    }
 
-    form.append("FILE", file, file?.name ?? "");
-
-    useAxios
-      .post("/file", form, {
-        "Content-Type": "multipart/form-data",
-        onUploadProgress: ({ loaded, total }) => {
-          let percent: number = Math.round((loaded / (total ?? 0)) * 100);
-          console.log(percent + "%");
-        },
-      } as AxiosRequestConfig<FormData>)
-      .then(({ data }) => {
+    fetch("/api/file/" + POST_SQ, {
+      method: "post",
+      body: form,
+    })
+      .then((res) => res?.json())
+      .then((data) => {
         if (!data?.result) return useAlert("error", "저장에 실패하였습니다.");
         useAlert("success", "저장되었습니다.");
         navigate(-1);
@@ -144,6 +142,15 @@ export default function BoardCreate() {
     if ((TP === 4 || TP === 5) && value?.BUILD_DT?.length < 10) {
       useAlert("warning", "빌드일자를 정확히 선택해주세요.");
       return versionDateRef.current?.focus();
+    }
+
+    if (fileList) {
+      for (let i = 0; i < fileList?.length; i++) {
+        let file = fileList[i];
+        if (file.size > 524288000) {
+          return useAlert("warning", "파일 사이즈가 너무 큽니다. (500MB 이하)");
+        }
+      }
     }
 
     submit();

@@ -122,21 +122,25 @@ export const postBoard = async (req: any, res: Response) => {
     return res.send(fail(errorMessage.parameter));
   }
 
-  const { error } = await useDatabase(
+  const { error, result } = await useDatabase(
     `
     INSERT INTO tb_post (
       POST_TP, MDL_SQ, BUILD_VN, POST_TTL, 
       POST_CN, MST_SQ, BUILD_DT
     ) VALUES (
       ?, ?, ?, ?, ?, ?, ?
-    )
+    );
+
+    SET @LAST_ID = LAST_INSERT_ID();
+
+    SELECT @LAST_ID AS ID;
   `,
     [POST_TP, MDL_SQ, BUILD_VN, POST_TTL, POST_CN, MST_SQ, BUILD_DT]
   );
 
   if (error) return res.send(fail(errorMessage.db));
 
-  res.send(success());
+  res.send(success(result[2][0]?.ID));
 };
 
 // 자료, 펌웨어, 소프트웨어 수정
@@ -161,19 +165,19 @@ export const putBoard = async (req: any, res: Response) => {
     return res.send(fail(errorMessage.parameter));
   }
 
-  const { error } = await useDatabase(
+  const { error, result } = await useDatabase(
     `
     UPDATE tb_post SET
     POST_TP = ?, MDL_SQ = ?, BUILD_VN = ?, 
     POST_TTL = ?, POST_CN = ?, BUILD_DT = ?
-    WHERE POST_SQ = ?
+    WHERE POST_SQ = ?;
   `,
     [POST_TP, MDL_SQ, BUILD_VN, POST_TTL, POST_CN, BUILD_DT, POST_SQ]
   );
 
   if (error) return res.send(fail(errorMessage.db));
 
-  res.send(success());
+  res.send(success(POST_SQ));
 };
 
 // 자료, 펌웨어, 소프트웨어 삭제

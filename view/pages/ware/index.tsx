@@ -153,7 +153,7 @@ export default function Ware({ isHeader = true, currentList }: Props) {
     });
   };
 
-  useEffect(getPostList, [currentList]);
+  useEffect(getPostList, [currentList, location]);
 
   return (
     <Container isContents={currentList ? true : false} isLoading={isLoading}>

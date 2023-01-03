@@ -1,13 +1,10 @@
-const express = require("express");
-const cors = require("cors");
-const dotenv = require("dotenv");
 const bodyParser = require("body-parser");
-const session = require("express-session");
-const MySQLStore = require("express-mysql-session")(session);
-const multer = require("multer");
+const dotenv = require("dotenv");
 const multipart = require("connect-multiparty");
-const expressFileUpload = require("express-fileupload");
 
+import express from "express";
+import cors from "cors";
+import session from "express-session";
 import { programName } from "./string";
 import serverStart from "./functions/serverStart";
 import apiLogger from "./middlewares/apiLogger";
@@ -29,6 +26,7 @@ import dashboardRoute from "./routes/dashboard";
 
 // Setting
 dotenv.config();
+const MySQLStore = require("express-mysql-session")(session);
 const app = express();
 const port = process.env.SERVER_PORT || 8080;
 const basePath = __dirname + "/build";
@@ -52,15 +50,13 @@ const sessionConfig = session({
     database: process.env.DB_DATABASE,
   }),
 });
-const upload = multer({ dest: __dirname + "/upload/" });
 
 // Middleware
 app.use(cors());
-app.use(bodyParser.json({ limit: "50mb" }));
-app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 app.use(apiLogger);
+app.use(bodyParser.json({ limit: "50mb" }));
 app.use(sessionConfig);
-app.use(expressFileUpload({ createParentPath: true }));
+app.use(multipartMiddleware);
 
 view.forEach((path: string) => app.use(path, express.static(basePath)));
 

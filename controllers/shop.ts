@@ -96,6 +96,7 @@ export const getShop = async (req: Request, res: Response) => {
       SELECT DEVICE_SQ, 1 AS IS_ACTIVE
       FROM tb_alive_device
       WHERE AL_OFF IS NULL
+      GROUP BY DEVICE_SQ
     ) e ON e.DEVICE_SQ = a.DEVICE_SQ
     LEFT JOIN (
       SELECT DEVICE_SQ, COUNT(DEVICE_SQ) AS ON_COUNT

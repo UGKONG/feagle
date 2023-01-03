@@ -4,6 +4,7 @@ import styled from "styled-components";
 import { useAxios, useIsNumber } from "../../../functions/utils";
 import Container from "../../common/Container";
 import { HeaderList, Props } from "./index.type";
+import { saveAs } from "file-saver";
 
 const headerList: HeaderList = ["No", "파일 이름", "파일 유형", "파일 사이즈"];
 
@@ -11,23 +12,21 @@ export default function FileList({ currentList }: Props) {
   const dispatch = useDispatch();
 
   const useAlert = (type: "success" | "error", text: string): void => {
-    dispatch({
-      type: "alert",
-      payload: {
-        type,
-        text,
-      },
-    });
+    dispatch({ type: "alert", payload: { type, text } });
   };
 
-  const fileDownload = (FILE_SQ: number): void => {
-    if (!FILE_SQ || !useIsNumber(FILE_SQ)) return;
-    window.open("/api/file/" + FILE_SQ);
+  const fileDownload = (FILE_SQ: number, FILE_NM: string): void => {
+    if (!FILE_SQ || !useIsNumber(FILE_SQ)) {
+      return useAlert("error", "파일이 존재하지 않습니다.");
+    }
+
     useAxios.get("/file/" + FILE_SQ).then(({ data }) => {
       if (data?.result === false) {
         return useAlert("error", "파일이 존재하지 않습니다.");
       }
+
       useAlert("success", "파일을 다운받습니다.");
+      saveAs("/api/file/" + FILE_SQ, FILE_NM);
     });
   };
 
@@ -46,7 +45,9 @@ export default function FileList({ currentList }: Props) {
             {currentList?.map((item, i) => (
               <Tr
                 key={item?.FILE_SQ}
-                onClick={() => fileDownload(item?.FILE_SQ as number)}
+                onClick={() =>
+                  fileDownload(item?.FILE_SQ as number, item?.FILE_NM)
+                }
               >
                 <Td>{i + 1}</Td>
                 <Td>{item?.FILE_NM ?? "-"}</Td>

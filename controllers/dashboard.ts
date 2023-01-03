@@ -94,7 +94,8 @@ const commonSQL = `
   # 플라즈마 전류 위험 범위 조회 (MIN, MAX)
   LEFT JOIN tb_model_danger_reference j
     ON j.MDL_SQ = a.MDL_SQ
-    AND j.REF_TP = 5;
+    AND j.REF_TP = 5
+  GROUP BY a.DEVICE_SQ;
 `;
 
 // 지역 별 장비 통계
