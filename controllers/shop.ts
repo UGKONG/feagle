@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import sha256 from "sha256";
 import { fail, success, useDatabase, useIsNumber } from "../functions/utils";
 import { errorMessage } from "../string";
 import { OrNull } from "../types";
@@ -78,7 +79,7 @@ export const getShop = async (req: Request, res: Response) => {
     LIMIT 1;
 
     SELECT
-    a.DEVICE_SQ, a.MDL_SQ, b.MDL_NM, b.MDL_EN_NM, b.MDL_DESC,
+    a.DEVICE_SQ, a.MDL_SQ, b.MDL_NM, b.MDL_EN_NM, b.MDL_DESC, b.MDL_IMG_NM,
     a.SHOP_SQ, c.SHOP_NM, a.DEVICE_SN, a.DEVICE_NM, a.DEVICE_SW_VN, a.DEVICE_FW_VN,
     a.DEVICE_BUY_DT, a.DEVICE_INSTL_DT, d.UDD_VAL AS USE_TM_VAL, h.UDD_VAL AS GAS_VAL,
     IF(e.IS_ACTIVE, e.IS_ACTIVE, 0) AS IS_ACTIVE, IF(f.ON_COUNT, f.ON_COUNT, 0) AS ON_COUNT,
@@ -264,7 +265,7 @@ export const postShop = async (req: Request, res: Response) => {
       MNG_NUM,
       MNG_GD,
       MNG_ID,
-      MNG_PW,
+      sha256(MNG_PW),
     ]
   );
 

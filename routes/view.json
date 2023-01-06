@@ -17,5 +17,5 @@
     "/user",
     "/dev"
   ],
-  "manager": ["/"]
+  "manager": []
 }

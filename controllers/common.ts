@@ -46,7 +46,7 @@ export const getAuthType = async (req: Request, res: Response) => {
 
 // 세션 정보 조회
 export const getSession = async (req: any, res: Response) => {
-  res.send(req.session.user || null);
+  res.send(req.session.user || fail("세션이 만료되었습니다."));
 };
 
 // 로그아웃

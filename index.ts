@@ -58,6 +58,9 @@ app.use(bodyParser.json({ limit: "50mb" }));
 app.use(sessionConfig);
 app.use(multipartMiddleware);
 
+// Upload File Router
+app.use(express.static("upload"));
+
 // View Router
 view?.master?.forEach((path: string) => {
   app.use(path, express.static(basePath));

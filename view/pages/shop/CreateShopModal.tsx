@@ -344,7 +344,7 @@ export default function CreateShopModal({ title, getList, close }: Props) {
                     onChange={(e: InputChangeEvent) =>
                       changeDeviceValue(item?.ID, "DEVICE_SN", e?.target?.value)
                     }
-                    placeholder="시리얼 번호"
+                    placeholder="일련번호"
                   />
                   <Label htmlFor="BUY">구매일</Label>
                   <DeviceInput

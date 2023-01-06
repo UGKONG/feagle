@@ -246,6 +246,7 @@ export interface Post {
   MDL_NM?: s;
   MDL_EN_NM?: s;
   MDL_DESC?: s;
+  MDL_IMG_NM?: s;
   BUILD_VN: s;
   POST_TTL: s;
   POST_CN: s;

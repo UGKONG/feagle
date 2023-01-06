@@ -44,6 +44,7 @@
     "redux-devtools-extension": "^2.13.9",
     "request-ip": "^3.3.0",
     "scriptjs": "^2.5.9",
+    "sha256": "^0.2.0",
     "socket.io": "^4.5.3",
     "styled-components": "^5.3.6"
   },
@@ -68,6 +69,7 @@
     "@types/redux": "^3.6.0",
     "@types/request-ip": "^0.0.37",
     "@types/scriptjs": "^0.0.2",
+    "@types/sha256": "^0.2.0",
     "@types/styled-components": "^5.1.26",
     "assert": "^2.0.0",
     "babel-loader": "^8.2.5",

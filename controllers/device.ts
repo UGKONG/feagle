@@ -18,7 +18,7 @@ type DataChartData = {
 export const getDeviceList = async (req: Request, res: Response) => {
   const { error, result } = await useDatabase(`
     SELECT
-    a.DEVICE_SQ, a.MDL_SQ, b.MDL_NM, b.MDL_EN_NM, b.MDL_DESC,
+    a.DEVICE_SQ, a.MDL_SQ, b.MDL_NM, b.MDL_EN_NM, b.MDL_DESC, b.MDL_IMG_NM,
     a.SHOP_SQ, c.SHOP_NM, a.DEVICE_SN, a.DEVICE_NM, a.DEVICE_SW_VN, a.DEVICE_FW_VN,
     a.DEVICE_BUY_DT, a.DEVICE_INSTL_DT, d.UDD_VAL AS USE_TM_VAL,
     h.UDD_VAL AS GAS_VAL, IF(e.IS_ACTIVE, e.IS_ACTIVE, 0) AS IS_ACTIVE, 
@@ -75,7 +75,7 @@ export const getDeviceDetail = async (req: Request, res: Response) => {
   const { error, result } = await useDatabase(
     `
     SELECT
-    a.DEVICE_SQ, a.MDL_SQ, b.MDL_NM, b.MDL_EN_NM,
+    a.DEVICE_SQ, a.MDL_SQ, b.MDL_NM, b.MDL_EN_NM, b.MDL_IMG_NM,
     b.MDL_DESC, a.SHOP_SQ, c.SHOP_NM, c.SHOP_NUM, 
     c.SHOP_ADD, c.SHOP_ADD_DTL, a.DEVICE_SN, a.DEVICE_NM, 
     a.DEVICE_SW_VN, a.DEVICE_FW_VN, a.DEVICE_BUY_DT, 
@@ -320,32 +320,58 @@ export const deleteDevice = async (req: Request, res: Response) => {
 // 장비 사용 차트
 export const getDeviceUseChart = async (req: Request, res: Response) => {
   const DEVICE_SQ = req?.params?.DEVICE_SQ;
-  const START: string = (req?.query?.start ?? "") as string;
-  const END: string = (req?.query?.end ?? "") as string;
+  const START = req?.query?.start;
+  const END = req?.query?.end;
 
-  if (!useIsNumber(DEVICE_SQ) || START?.length < 10 || END?.length < 10) {
+  if (!useIsNumber(DEVICE_SQ)) return res.send(fail(errorMessage.parameter));
+
+  if (
+    (typeof START === "string" && START && START?.length < 10) ||
+    (typeof END === "string" && END && END?.length < 10)
+  ) {
     return res.send(fail(errorMessage.parameter));
   }
 
-  const { error, result } = await useDatabase(
-    `
-    SELECT
-    a.COMM_CODE, a.COMM_NM, IF(b.COUNT > 0, b.COUNT, 0) AS VALUE
-    FROM tb_common a
-    LEFT JOIN (
-      SELECT UD_MODE, COUNT(UD_MODE) AS COUNT
-      FROM tb_use_device
-      WHERE CONVERT(?, DATE) <= CONVERT(UD_START, DATE)
-      AND CONVERT(UD_END, DATE) <= CONVERT(?, DATE)
-      AND DEVICE_SQ = ?
-      GROUP BY UD_MODE
-    ) b ON b.UD_MODE = a.COMM_CODE 
-    WHERE a.COMM_GRP = 5
-    AND a.COMM_CODE > 0
-    ORDER BY a.COMM_CODE;
-  `,
-    [START, END, DEVICE_SQ]
-  );
+  let SQL = "";
+  let SQLParams = [];
+
+  if (!START && !END) {
+    SQL = `
+      SELECT
+      a.COMM_CODE, a.COMM_NM, IF(b.COUNT > 0, b.COUNT, 0) AS VALUE
+      FROM tb_common a
+      LEFT JOIN (
+        SELECT UD_MODE, COUNT(UD_MODE) AS COUNT
+        FROM tb_use_device
+        WHERE DEVICE_SQ = ?
+        GROUP BY UD_MODE
+      ) b ON b.UD_MODE = a.COMM_CODE 
+      WHERE a.COMM_GRP = 5
+      AND a.COMM_CODE > 0
+      ORDER BY a.COMM_CODE;
+    `;
+    SQLParams = [DEVICE_SQ];
+  } else {
+    SQL = `
+      SELECT
+      a.COMM_CODE, a.COMM_NM, IF(b.COUNT > 0, b.COUNT, 0) AS VALUE
+      FROM tb_common a
+      LEFT JOIN (
+        SELECT UD_MODE, COUNT(UD_MODE) AS COUNT
+        FROM tb_use_device
+        WHERE CONVERT(?, DATE) <= CONVERT(UD_START, DATE)
+        AND CONVERT(UD_END, DATE) <= CONVERT(?, DATE)
+        AND DEVICE_SQ = ?
+        GROUP BY UD_MODE
+      ) b ON b.UD_MODE = a.COMM_CODE 
+      WHERE a.COMM_GRP = 5
+      AND a.COMM_CODE > 0
+      ORDER BY a.COMM_CODE;
+    `;
+    SQLParams = [START as string, END as string, DEVICE_SQ];
+  }
+
+  const { error, result } = await useDatabase(SQL, SQLParams);
 
   if (error) return res.send(fail(errorMessage.db));
 
