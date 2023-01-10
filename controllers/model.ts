@@ -7,7 +7,7 @@ export const getModelList = async (req: Request, res: Response) => {
   const { error, result } = await useDatabase(
     `
     SELECT
-    MDL_SQ, MDL_NM, MDL_EN_NM, MDL_DESC, MDL_CRT_DT, MDL_IMG_NM,
+    MDL_SQ, MDL_NM, MDL_EN_NM, MDL_DESC, MDL_IMG_NM, MDL_CRT_DT
     FROM tb_device_model
     ORDER BY MDL_SQ DESC;
   `,

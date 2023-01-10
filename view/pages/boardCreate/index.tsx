@@ -18,7 +18,6 @@ import _Input from "../../common/Input";
 import _Textarea from "../../common/Textarea";
 import { useSelector } from "react-redux";
 import { Store } from "../../../functions/store";
-import { AxiosRequestConfig } from "axios";
 
 export default function BoardCreate() {
   const dispatch = useDispatch();
