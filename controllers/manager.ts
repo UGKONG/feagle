@@ -102,7 +102,7 @@ export const postLogin = async (req: any, res: Response) => {
   // 로그인 실패
   if (error || !user) req.session.user = null;
   if (error) return res.send(fail(errorMessage.db));
-  if (!user) return res.send(fail("아이디 또는 비밀번호가 일치하지 않습니다."));
+  if (!user) return res.send(fail("아이디 또는 패스워드가 일치하지 않습니다."));
 
   // 로그인 성공
   req.session.user = { ...user, ACT_TP: 3 };
@@ -168,4 +168,41 @@ export const postFindPw = async (req: Request, res: Response) => {
   if (pwUpdateError) return res.send(fail(errorMessage.db));
 
   res.send(success(tempPw ?? null));
+};
+
+// 매니저 패스워드 변경
+export const putPassword = async (req: Request, res: Response) => {
+  const MNG_SQ = req?.params?.MNG_SQ;
+  const PREV_PW = req?.query?.PREV_PW ?? req?.body?.PREV_PW;
+  const NEXT_PW = req?.query?.NEXT_PW ?? req?.body?.NEXT_PW;
+
+  if (!useIsNumber(MNG_SQ) || !PREV_PW || !NEXT_PW) {
+    return res.send(fail(errorMessage.parameter ?? "parameter error (1)"));
+  }
+
+  const { error, result } = await useDatabase(
+    `
+    SELECT COUNT(*) AS COUNT FROM tb_manager
+    WHERE MNG_SQ = ? AND MNG_PW = ?;
+  `,
+    [MNG_SQ, sha256(PREV_PW)]
+  );
+
+  if (error) return res.send(fail(errorMessage.db ?? "database error (2)"));
+
+  const count = result[0]?.COUNT ?? 0;
+  if (!count) return res.send(fail("현재 패스워드가 일치하지 않습니다."));
+
+  const { error: error1 } = await useDatabase(
+    `
+    UPDATE tb_manager SET
+    MNG_PW = ?
+    WHERE MNG_SQ = ?
+  `,
+    [sha256(NEXT_PW), MNG_SQ]
+  );
+
+  if (error1) return res.send(fail(errorMessage.db ?? "database error"));
+
+  res.send(success());
 };

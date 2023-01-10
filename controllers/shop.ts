@@ -291,7 +291,7 @@ export const postShopActivate = async (req: Request, res: Response) => {
   res.send(success(null));
 };
 
-// 피부샵 정보 수정 (미완성)
+// 피부샵 정보 수정
 export const putShop = async (req: Request, res: Response) => {
   const SHOP_SQ = req?.params?.SHOP_SQ;
   if (!useIsNumber(SHOP_SQ)) return res.send(fail(errorMessage.parameter));

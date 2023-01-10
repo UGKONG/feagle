@@ -280,10 +280,11 @@ export const postEnd = async (req: Request, res: Response) => {
 export const postUse = async (req: Request, res: Response) => {
   const DEVICE_SN = req?.query?.DEVICE_SN ?? req?.body?.DEVICE_SN;
   const UDD_TP = req?.query?.UDD_TP ?? req?.body?.UDD_TP;
-  const UDD_VAL = Number(req?.body?.UDD_VAL) ?? 0;
-  const valid = DEVICE_SN && 0 < UDD_TP && Number(UDD_TP) <= 5;
+  const UDD_VAL = Number(req?.query?.UDD_VAL ?? req?.body?.UDD_VAL ?? "0");
+  const valid = DEVICE_SN && 0 < Number(UDD_TP) && Number(UDD_TP) <= 5;
   if (!valid || isNaN(UDD_VAL)) {
-    return res.send(fail(errorMessage.parameter));
+    console.log({ UDD_VAL: req?.body?.UDD_VAL ?? "0" });
+    return res.send(fail("parameter error"));
   }
 
   const { error } = await useDatabase(
@@ -296,6 +297,6 @@ export const postUse = async (req: Request, res: Response) => {
     [UDD_TP, UDD_VAL, DEVICE_SN]
   );
 
-  if (error) return res.send(fail(errorMessage.db));
+  if (error) return res.send(fail("database error"));
   res.send(success(null));
 };

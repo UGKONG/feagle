@@ -23,7 +23,7 @@ const apiLogger = (req: Request, res: Response, next: NextFunction) => {
   const PATH = path;
   const result = `
 ▶️  ${method} ${path}
-▶️  ${JSON.stringify(parameters)}`;
+▶️  ${PARAMS}`;
   console.log(result);
 
   useDatabase(

@@ -18,11 +18,23 @@ type FileData = {
 export const getFileDownload = async (req: any, res: Response) => {
   const FILE_SQ = req?.params?.FILE_SQ;
   const user = req?.session?.user;
-  const ACT_TP = user?.ACT_TP ?? null;
-  const ACT_SQ = user?.MST_SQ ?? user?.MNG_SQ ?? user?.MEM_SQ ?? null;
-  const ACT_NM = user?.MST_NM ?? user?.MNG_NM ?? user?.MEM_NM ?? null;
+  const ACT_TP = req?.query?.TP ?? req?.body?.TP ?? user?.ACT_TP ?? null;
+  const ACT_SQ =
+    req?.query?.SQ ??
+    req?.body?.SQ ??
+    user?.MST_SQ ??
+    user?.MNG_SQ ??
+    user?.MEM_SQ ??
+    null;
+  const ACT_NM =
+    req?.query?.NM ??
+    req?.body?.NM ??
+    user?.MST_NM ??
+    user?.MNG_NM ??
+    user?.MEM_NM ??
+    null;
 
-  if (!useIsNumber(FILE_SQ) || !user) {
+  if (!useIsNumber(FILE_SQ) || !ACT_TP || !ACT_SQ || !ACT_NM) {
     return res.send(
       fail("FILE_SQ가 number 타입이 아니거나 다운받는 유저 정보가 없습니다.")
     );

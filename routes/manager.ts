@@ -7,6 +7,7 @@ import {
   postFindPw,
   postLogin,
   putManager,
+  putPassword,
 } from "../controllers/manager";
 
 const managerRouter = Router();
@@ -17,6 +18,7 @@ managerRouter
   .post("/findId", postFindId)
   .post("/findPw", postFindPw)
   .post("/login", postLogin)
+  .put("/changePw/:MNG_SQ", putPassword)
   .put("/:MNG_SQ", putManager)
   .delete("/:MNG_SQ", deleteManager);
 
